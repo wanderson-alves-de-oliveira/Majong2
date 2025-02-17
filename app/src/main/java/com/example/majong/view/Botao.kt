@@ -24,6 +24,7 @@ class Botao(val image: Bitmap, var x: Float, var y: Float, var camada:Int, val s
             2 -> Color.Blue
             else -> Color.Magenta
         }
+
         paint.color = Color.Red.toArgb()
         canvas2.drawRoundRect(0f, 0f, b.width.toFloat(), b.height.toFloat(),40f,40f, paint);
         paint.color = colorCamada.toArgb()

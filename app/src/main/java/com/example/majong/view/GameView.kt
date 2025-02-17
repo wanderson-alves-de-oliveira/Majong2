@@ -16,6 +16,7 @@ class GameView(context: Context) : SurfaceView(context), SurfaceHolder.Callback 
         holder.addCallback(this)
     }
 
+
     override fun surfaceCreated(holder: SurfaceHolder) {
         try {
             tiles = gameLoop.tiles

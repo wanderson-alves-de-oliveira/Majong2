@@ -397,6 +397,7 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                 }
             }
 
+
             disponiveis.remove(disponiveis[index])
 
             tiles.add(MahjongTile(tileImages[grau - 1], x, y, camadaP, grau)) // Criando pares

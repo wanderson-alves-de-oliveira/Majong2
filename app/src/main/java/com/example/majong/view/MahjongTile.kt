@@ -13,6 +13,7 @@ import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 
+
 class MahjongTile(var image: Bitmap, var x: Float, var y: Float, var camada:Int, var id: Int) {
     private val paint = Paint()
     private val paint2 = Paint()

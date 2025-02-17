@@ -15,4 +15,5 @@ class GameObject(var x: Float, var y: Float, var speed: Float,num:Int, bitmap: B
     fun onDraw(canvas: Canvas) {
         canvas.drawCircle(x, y, 20f, paint)
     }
+
 }
