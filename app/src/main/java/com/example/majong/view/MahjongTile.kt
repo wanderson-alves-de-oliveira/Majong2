@@ -42,7 +42,7 @@ class MahjongTile(var image: Bitmap, var x: Float, var y: Float, var camada:Int,
 //        paint.color = Color.Black.toArgb()
 
         //canvas2.drawText(id.toString(),(10).toFloat(),(b.height/1.5f).toFloat(),paint)
-
+//
         if (img != null) {
 
 
