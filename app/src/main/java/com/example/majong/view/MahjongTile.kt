@@ -24,11 +24,11 @@ class MahjongTile(var image: Bitmap, var x: Float, var y: Float, var camada:Int,
      //   canvas.drawBitmap(image, x, y, paint)
         paint.textSize = 80f
 
-        paint2.color = Color.Red.toArgb()
+        paint2.color = Color.LightGray.toArgb()
 
         paint.color = Color.Red.toArgb()
        val b: Bitmap = Bitmap.createBitmap(120,120, Bitmap.Config.ARGB_8888)
-        val img = Bitmap.createScaledBitmap(image, 120, 120, false)
+        val img = Bitmap.createScaledBitmap(image, 110, 110, false)
         val canvas2 = Canvas(b)
         //canvas2.drawRGB(250, 250, 0)
         val colorCamada = when(camada){
@@ -44,6 +44,10 @@ class MahjongTile(var image: Bitmap, var x: Float, var y: Float, var camada:Int,
 
         //canvas2.drawText(id.toString(),(10).toFloat(),(b.height/1.5f).toFloat(),paint)
 //
+
+        canvas2.drawRoundRect(0f, 0f, b.width.toFloat(), b.height.toFloat(),20f,20f, paint2);
+
+
         if (img != null) {
 
 
@@ -91,10 +95,10 @@ class MahjongTile(var image: Bitmap, var x: Float, var y: Float, var camada:Int,
 
             // Defina o raio das bordas arredondadas
             val cornerRadius = 20f
-            paint.color = Color.Red.toArgb()
+            paint.color = Color.LightGray.toArgb()
          //   canvas2.drawRoundRect(0f, 0f, b.width.toFloat(), b.height.toFloat(),40f,40f, paint);
             // Desenhe um retângulo com bordas arredondadas
-            canvas2.drawRoundRect(RectF(0f, 0f, width.toFloat(), height.toFloat()), cornerRadius, cornerRadius, paint)
+            canvas2.drawRoundRect(RectF(1f, 1f, width.toFloat(), height.toFloat()), cornerRadius, cornerRadius, paint)
         }
 
 
