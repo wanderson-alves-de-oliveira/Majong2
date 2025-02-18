@@ -19,6 +19,7 @@ class MahjongTile(var image: Bitmap, var x: Float, var yp: Float,var w:Int,var h
     private val paint2 = Paint()
     var y: Float = -100f
     var isSelected = false
+    var ty = false
 
     fun draw(canvas: Canvas) {
      //   canvas.drawBitmap(image, x, y, paint)
