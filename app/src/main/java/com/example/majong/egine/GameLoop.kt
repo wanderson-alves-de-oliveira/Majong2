@@ -17,6 +17,9 @@ import com.example.majong.R
 import com.example.majong.view.Botao
 import com.example.majong.view.GameObject
 import com.example.majong.view.MahjongTile
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlin.random.Random
 
 class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Context) : Thread() {
@@ -34,6 +37,12 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
     private val display: DisplayMetrics = context.resources.displayMetrics
     private val h = display.heightPixels
     private val w = display.widthPixels
+    private val hp = 0
+    private val wp = 0
+    var tamPadrao = 0
+    var tamNovo = 0
+    var ajustarTam = true
+
     var tileImage = BitmapFactory.decodeResource(context.resources, R.drawable.mahjongtile)
     var tileImages = mutableListOf<Bitmap>()
     val botao1 = Botao(tileImage, 100f, h * 0.75f, 0, "")
@@ -75,38 +84,50 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
 
     private fun update(deltaTime: Double) {
 
+        Thread.sleep(deltaTime.toLong() )
+
 
         while (running) {
             val canvas = surfaceHolder.lockCanvas()
+
             if (canvas != null) {
 
-                if (selectedTiles.filter { it.camada>-2 }.size < 9) {
+                if (selectedTiles.filter { it.camada > -2 }.size < 10) {
 
                     canvas.drawRGB(0, 128, 0) // Fundo verde
-                    try {
 
-                        tiles.forEach {
+                    runBlocking {
+                        launch(Dispatchers.Default) {
+                            tiles.forEach {
 
-                            if (it.camada > -1) {
-                                it.draw(canvas)
+                                val vel = (it.yp -it.y)/2
+                                if (it.y <it.yp) {
+
+                                    it.y+=if(vel>w*0.1f)vel else w*0.1f
+
+                                    if(it.y>it.yp){
+                                        it.y=it.yp
+                                    }
+
+
+                                }
+                                    it.draw(canvas)
+                               // }
+
                             }
 
+
+
+                            botao1.draw(canvas)
+                            botao2.draw(canvas)
+                            botao3.draw(canvas)
+
+
                         }
-
-                        selectedTiles.forEach { it.draw(canvas) }
-
-                        botao1.draw(canvas)
-                        botao2.draw(canvas)
-                        botao3.draw(canvas)
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-
-
-                    } catch (e: Exception) {
-                        e.printStackTrace()
                     }
 
-                    if (tiles.filter { it.camada > 0 }.isEmpty()) {
+
+                    if (tiles.filter { it.camada > 0 }.isEmpty() && selectedTiles.isEmpty()) {
 
                         popularTiles()
                     }
@@ -114,68 +135,102 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                     val novoFiltro2 = tiles.filter { it.camada == 2 }
                     val novoFiltro1 = tiles.filter { it.camada == 1 }
                     val novoFiltro0 = tiles.filter { it.camada == 0 }
-
-                    validarCamadas(novoFiltro1.toMutableList(), novoFiltro2.toMutableList(), 2)
-                    validarCamadas(novoFiltro0.toMutableList(), novoFiltro1.toMutableList(), 1)
-                    var i = 0
-                    val velocidade = w * 0.15f
-                    val velocidadey = h * 0.15f
-
-                    selectedTiles.forEach {
-                        if (it.camada > -2) {
-                            var p = (120 * i).toFloat()
-                            if (it.x > p) {
-                                it.x -= velocidade
-                                if (it.x < p) {
-                                    it.x = p
-                                }
-                            } else if (it.x < p) {
-                                it.x += velocidade
-                                if (it.x > p) {
-                                    it.x = p
-                                }
-                            }
-                            i++
+                    runBlocking {
+                        launch(Dispatchers.Default) {
 
 
-
-                        } else {
-                            var p = (120 * 8).toFloat()
-                            var py = (h * 0.9).toFloat()
-
-                            if (it.x > p) {
-                                it.x -= velocidade
-                                if (it.x < p) {
-                                    it.x = p
-                                }
-
-                            } else if (it.x < p) {
-                                it.x += velocidade
-                                if (it.x > p) {
-                                    it.x = p
-                                }
-                            }
-                            if (it.y > py) {
-                                it.y -= velocidadey
-                                if (it.y < py) {
-                                    it.y = py
-                                }
-
-                            } else if (it.y < py) {
-                                it.y += velocidadey
-                                if (it.y > py) {
-                                    it.y = py
-                                }
-                            }
-                            if (it.y == py && it.x == p) {
-                                it.camada = -1
-
-                            }
-
-
+                            validarCamadas(
+                                novoFiltro1.toMutableList(),
+                                novoFiltro2.toMutableList(),
+                                2
+                            )
+                            validarCamadas(
+                                novoFiltro0.toMutableList(),
+                                novoFiltro1.toMutableList(),
+                                1
+                            )
                         }
                     }
-                        validarSelecao(selectedTiles)
+
+                    var i = 0
+                    val velocidade = w * 0.15f
+                    val selectedTilesNovo = mutableListOf<MahjongTile>()
+                    for (item in selectedTiles) {
+
+                        selectedTilesNovo.add(item)
+
+                    }
+                    validarSelecao(selectedTilesNovo)
+                    selectedTiles.clear()
+                    selectedTiles.addAll(selectedTilesNovo)
+
+                    try {
+                        runBlocking {
+                            launch(Dispatchers.Default) {
+
+                                selectedTiles.forEach {
+                                    //  if (it.camada > -2) {
+
+                                    var p = (120 * i).toFloat()
+                                    if (it.x > p) {
+                                        it.x -= velocidade
+                                        if (it.x < p) {
+                                            it.x = p
+                                        }
+                                    } else if (it.x < p) {
+                                        it.x += velocidade
+                                        if (it.x > p) {
+                                            it.x = p
+                                        }
+                                    }
+                                    i++
+
+
+                                    // } else {
+                                    p = (120 * i).toFloat()
+                                    val py = (h * 0.9).toFloat()
+                                    val velocidadey =
+                                        if ((py - it.y )> w * 0.01f) (py - it.y) / 2 else w * 0.1f
+
+                                    if (it.x > p) {
+                                        it.x -= velocidade
+                                        if (it.x < p) {
+                                            it.x = p
+                                        }
+
+                                    } else if (it.x < p) {
+                                        it.x += velocidade
+                                        if (it.x > p) {
+                                            it.x = p
+                                        }
+                                    }
+                                    if (it.y > py) {
+                                        it.y -= velocidadey
+                                        if (it.y < py) {
+                                            it.y = py
+                                        }
+
+                                    } else if (it.y < py) {
+                                        it.y += velocidadey
+                                        if (it.y > py) {
+                                            it.y = py
+                                        }
+                                    }
+                                    if (it.y == py && it.x == p) {
+                                        it.camada = -1
+
+                                    }
+
+
+                                    // }
+
+
+                                    it.draw(canvas)
+
+                                }
+                            }
+                        }
+                    }catch (e:Exception){}
 
 
 
@@ -243,7 +298,7 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
 
     fun popularTiles() {
         val tileImage = BitmapFactory.decodeResource(context.resources, R.drawable.baleia)
-
+        ajustarTam = true
         tileImages.add(BitmapFactory.decodeResource(context.resources, R.drawable.abutre))
         tileImages.add(BitmapFactory.decodeResource(context.resources, R.drawable.baleia))
         tileImages.add(BitmapFactory.decodeResource(context.resources, R.drawable.camarao))
@@ -270,8 +325,12 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
         tileImages.add(BitmapFactory.decodeResource(context.resources, R.drawable.cobra))
         tileImages.add(BitmapFactory.decodeResource(context.resources, R.drawable.zebra))
         tileImages.add(BitmapFactory.decodeResource(context.resources, R.drawable.cavalo))
-
-       // tileImages.shuffle()
+        tamPadrao = tileImages[0].width
+        tamNovo =( (w*0.9f )/ 6).toInt()
+        val espaco = w*0.05f
+        val h = tamNovo
+        val w = tamNovo
+        // tileImages.shuffle()
         var initialize = 0
         var grau = 0
         var disponiveis: MutableList<Int> = mutableListOf()
@@ -283,7 +342,7 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
             if (i % 3 == 0) {
                 initialize = -1
                 grau++
-                if(grau>((maximo/3)/2).toInt()){
+                if (grau > ((maximo / 3) / 2).toInt()) {
                     grau = 1
                 }
             }
@@ -297,36 +356,36 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                     camadaP = 0
                     when (disponiveis[index]) {
                         in 0..5 -> {
-                            y = 120f
+                            y = tamNovo.toFloat()
                         }
 
                         in 6..11 -> {
-                            y = 120f * 2
+                            y = tamNovo.toFloat() * 2
                         }
 
                         in 12..17 -> {
-                            y = 120f * 3
+                            y = tamNovo.toFloat() * 3
                         }
 
                         in 18..23 -> {
-                            y = 120f * 4
+                            y = tamNovo.toFloat() * 4
                         }
 
                         in 24..29 -> {
-                            y = 120f * 5
+                            y = tamNovo.toFloat() * 5
                         }
 
                         in 30..35 -> {
-                            y = 120f * 6
+                            y = tamNovo.toFloat() * 6
                         }
                     }
                     when (disponiveis[index]) {
-                        in listOf(0, 6, 12, 18, 24, 30) -> x = 120f
-                        in listOf(1, 7, 13, 19, 25, 31) -> x = 120f * 2
-                        in listOf(2, 8, 14, 20, 26, 32) -> x = 120f * 3
-                        in listOf(3, 9, 15, 21, 27, 33) -> x = 120f * 4
-                        in listOf(4, 10, 16, 22, 28, 34) -> x = 120f * 5
-                        in listOf(5, 11, 17, 23, 29, 35) -> x = 120f * 6
+                        in listOf(0, 6, 12, 18, 24, 30) -> x = espaco
+                        in listOf(1, 7, 13, 19, 25, 31) -> x = espaco+tamNovo.toFloat() * 1
+                        in listOf(2, 8, 14, 20, 26, 32) -> x = espaco+tamNovo.toFloat() * 2
+                        in listOf(3, 9, 15, 21, 27, 33) -> x = espaco+tamNovo.toFloat() * 3
+                        in listOf(4, 10, 16, 22, 28, 34) -> x = espaco+tamNovo.toFloat() * 4
+                        in listOf(5, 11, 17, 23, 29, 35) -> x = espaco+tamNovo.toFloat() * 5
                     }
                 }
 
@@ -335,31 +394,38 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
 
                     when (disponiveis[index]) {
                         in 36..40 -> {
-                            y = 120f + 60
+                            y = tamNovo.toFloat() + (tamNovo.toFloat() / 2)
                         }
 
                         in 41..45 -> {
-                            y = (120f * 2) + 60
+                            y = (tamNovo.toFloat() * 2) + (tamNovo.toFloat() / 2)
                         }
 
                         in 46..50 -> {
-                            y = (120f * 3) + 60
+                            y = (tamNovo.toFloat() * 3) + (tamNovo.toFloat() / 2)
                         }
 
                         in 51..55 -> {
-                            y = (120f * 4) + 60
+                            y = (tamNovo.toFloat() * 4) + (tamNovo.toFloat() / 2)
                         }
 
                         in 56..60 -> {
-                            y = (120f * 5) + 60
+                            y = (tamNovo.toFloat() * 5) + (tamNovo.toFloat() / 2)
                         }
                     }
                     when (disponiveis[index]) {
-                        in listOf(36, 41, 46, 51, 56) -> x = 120f + 60
-                        in listOf(37, 42, 47, 52, 57) -> x = (120f * 2) + 60
-                        in listOf(38, 43, 48, 53, 58) -> x = (120f * 3) + 60
-                        in listOf(39, 44, 49, 54, 59) -> x = (120f * 4) + 60
-                        in listOf(40, 45, 50, 55, 60) -> x = (120f * 5) + 60
+                        in listOf(36, 41, 46, 51, 56) -> x = espaco+(tamNovo.toFloat() / 2)
+                        in listOf(37, 42, 47, 52, 57) -> x =
+                            espaco+ (tamNovo.toFloat() * 1) + (tamNovo.toFloat() / 2)
+
+                        in listOf(38, 43, 48, 53, 58) -> x =
+                            espaco+ (tamNovo.toFloat() * 2) + (tamNovo.toFloat() / 2)
+
+                        in listOf(39, 44, 49, 54, 59) -> x =
+                            espaco+ (tamNovo.toFloat() * 3) + (tamNovo.toFloat() / 2)
+
+                        in listOf(40, 45, 50, 55, 60) -> x =
+                            espaco+(tamNovo.toFloat() * 4) + (tamNovo.toFloat() / 2)
                     }
                 }
 
@@ -367,40 +433,40 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                     camadaP = 2
                     when (disponiveis[index]) {
                         in 61..64 -> {
-                            y = 120f + 120f
+                            y = tamNovo.toFloat() + tamNovo.toFloat()
                         }
 
                         in 65..68 -> {
-                            y = (120f * 2) + 120f
+                            y = (tamNovo.toFloat() * 2) + tamNovo.toFloat()
                         }
 
                         in 69..72 -> {
-                            y = (120f * 3) + 120f
+                            y = (tamNovo.toFloat() * 3) + tamNovo.toFloat()
                         }
 
                         in 73..76 -> {
-                            y = (120f * 4) + 120f
+                            y = (tamNovo.toFloat() * 4) + tamNovo.toFloat()
                         }
                     }
                     when (disponiveis[index]) {
-                        in listOf(61, 65, 69, 73) -> x = 120f + 120f
-                        in listOf(62, 66, 70, 74) -> x = (120f * 2) + 120f
-                        in listOf(63, 67, 71, 75) -> x = (120f * 3) + 120f
-                        in listOf(64, 68, 72, 76) -> x = (120f * 4) + 120f
+                        in listOf(61, 65, 69, 73) -> x =espaco+ tamNovo.toFloat()
+                        in listOf(62, 66, 70, 74) -> x = espaco+(tamNovo.toFloat() * 1) + tamNovo.toFloat()
+                        in listOf(63, 67, 71, 75) -> x = espaco+(tamNovo.toFloat() * 2) + tamNovo.toFloat()
+                        in listOf(64, 68, 72, 76) -> x = espaco+(tamNovo.toFloat() * 3) + tamNovo.toFloat()
                     }
                 }
 
                 else -> {
                     camadaP = 2
-                    y = (120f * 5) + 120f
-                    x = (120f * 5) + 120f
+                    y = espaco+(tamNovo.toFloat() * 4) + tamNovo.toFloat()
+                    x = espaco+(tamNovo.toFloat() * 4) + tamNovo.toFloat()
                 }
             }
 
 
             disponiveis.remove(disponiveis[index])
 
-            tiles.add(MahjongTile(tileImages[grau - 1], x, y, camadaP, grau)) // Criando pares
+            tiles.add(MahjongTile(tileImages[grau - 1], x, y, w, h, camadaP, grau)) // Criando pares
         }
 
         tiles.sortBy { it.camada }
@@ -420,15 +486,21 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                     tile.image,
                     tile.x,
                     tile.y,
+                    120,
+                    120,
                     -2,
                     tile.id
                 )
-
-                selectedTiles.add(m)
+                val selectedTilesNovo = mutableListOf<MahjongTile>()
+                selectedTilesNovo.addAll(selectedTiles)
+                selectedTilesNovo.add(m)
+                selectedTiles.clear()
+                selectedTiles.addAll(selectedTilesNovo)
 
 
                 tile.camada = -1
 
+                tile.x -=5000f
 
                 selectedTiles.sortBy { it.id }
 
@@ -464,7 +536,7 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
             tiles.forEach {
                 if (it.id == s[0].id) {
 
-                    it.camada = -1
+                    it.x = it.x + 120f
 
                 }
                 selectedTiles.removeAll(s)
@@ -484,6 +556,7 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                 tilesx[i].image,
                 tilesx[i].x,
                 tilesx[i].y,
+                wp, hp,
                 tilesx[i].camada,
                 tilesx[i].id
             )
@@ -532,7 +605,7 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
         var grau = 0
         var tem = false
         list.forEach {
-            if(!tem) {
+            if (!tem) {
                 if (it.id == grau && it.camada == -1) {
                     listr.add(it)
                     selecionados++
@@ -543,12 +616,23 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                     selecionados = 0
                     selecionados++
                 }
-                if(selecionados==3)tem = true
+                if (selecionados == 3) tem = true
             }
 
         }
         if (selecionados == 3) {
-            list.removeAll(listr)
+         //   list.removeAll(listr)
+
+            val iterator = list.iterator()
+
+            while (iterator.hasNext()) {
+                val item = iterator.next()
+                if (listr.contains(item)) {
+                    iterator.remove() // Correto!
+                }
+            }
+
+
         }
 
     }

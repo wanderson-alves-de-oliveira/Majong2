@@ -14,10 +14,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 
 
-class MahjongTile(var image: Bitmap, var x: Float, var y: Float, var camada:Int, var id: Int) {
+class MahjongTile(var image: Bitmap, var x: Float, var yp: Float,var w:Int,var h:Int, var camada:Int, var id: Int) {
     private val paint = Paint()
     private val paint2 = Paint()
-
+    var y: Float = -100f
     var isSelected = false
 
     fun draw(canvas: Canvas) {
@@ -27,8 +27,8 @@ class MahjongTile(var image: Bitmap, var x: Float, var y: Float, var camada:Int,
         paint2.color = Color.LightGray.toArgb()
 
         paint.color = Color.Red.toArgb()
-       val b: Bitmap = Bitmap.createBitmap(120,120, Bitmap.Config.ARGB_8888)
-        val img = Bitmap.createScaledBitmap(image, 110, 110, false)
+       val b: Bitmap = Bitmap.createBitmap(w,h, Bitmap.Config.ARGB_8888)
+        val img = Bitmap.createScaledBitmap(image, (w*0.9f).toInt(), (h*0.9f).toInt(), false)
         val canvas2 = Canvas(b)
         //canvas2.drawRGB(250, 250, 0)
         val colorCamada = when(camada){
@@ -100,8 +100,6 @@ class MahjongTile(var image: Bitmap, var x: Float, var y: Float, var camada:Int,
             // Desenhe um retângulo com bordas arredondadas
             canvas2.drawRoundRect(RectF(1f, 1f, width.toFloat(), height.toFloat()), cornerRadius, cornerRadius, paint)
         }
-
-
         canvas.drawBitmap(b,x,y,paint)
       //  canvas.drawBitmap(img,x,y,paint)
 
@@ -109,14 +107,14 @@ class MahjongTile(var image: Bitmap, var x: Float, var y: Float, var camada:Int,
     }
 
     fun containsTouch(touchX: Float, touchY: Float): Boolean {
-        return touchX >= x && touchX <= x + 120f && touchY >= y && touchY <= y + 120f
+        return touchX >= x && touchX <= x + w && touchY >= y && touchY <= y + h
     }
 
     fun containsCamada(touchX: Float, touchY: Float): Boolean {
-      val t1 =  touchX > x && touchX < x + 120f && touchY > y && touchY < y + 120f
-        val t2 =  touchX + 120f> x && touchX+ 120f < x + 120f && touchY > y && touchY < y + 120f
-        val t3 =  touchX > x && touchX < x + 120f && touchY + 120f> y && touchY + 120f< y + 120f
-        val t4 =  touchX + 120f> x && touchX+ 120f < x + 120f && touchY+ 120f > y && touchY + 120f< y + 120f
+      val t1 =  touchX > x && touchX < x + w && touchY > y && touchY < y + h
+        val t2 =  touchX + w> x && touchX+ w < x + w && touchY > y && touchY < y + h
+        val t3 =  touchX > x && touchX < x + w && touchY + h> y && touchY + h< y + h
+        val t4 =  touchX + w> x && touchX+ w < x + w && touchY+ h > y && touchY + h< y + h
         if(t1 || t2 || t3 || t4){
             return true
         }
