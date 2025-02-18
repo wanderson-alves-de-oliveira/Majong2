@@ -79,7 +79,6 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
 
     private fun update(deltaTime: Double) {
 
-        Thread.sleep(deltaTime.toLong())
 
 
         while (running) {
@@ -162,12 +161,15 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                     }
 
 
-                    try {
+
 
                         runBlocking {
                             launch(Dispatchers.Default) {
                                 var i = 0
                                 val velocidade = w * 0.15f
+
+                                try {
+
                                 selectedTiles.forEach {
                                     //  if (it.camada > -2) {
 
@@ -265,13 +267,17 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                                     it.draw(canvas)
 
                                 }
+
+                                ////////////////
+                                } catch (e: Exception) {
+                                }
+
+
                             }
                         }
 
                         eliminarSelecao()
 
-                    } catch (e: Exception) {
-                    }
                     if (tiles.filter { it.camada > 0 }.isEmpty() && selectedTiles.isEmpty()) {
 
                         popularTiles()
