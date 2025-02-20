@@ -22,7 +22,7 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
 
     private var lastTime = System.nanoTime()
     private val targetFps = 60
-    private var timet = 9
+    private var timet = 5
     private val optimalTime = 1_000_000_000 / targetFps
     private var touchX: Float = 0f
     private var touchY: Float = 0f
@@ -37,12 +37,14 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
     var tamPadrao = 0
     var tamNovo = 0
     var ajustarY = true
-
+    val divisor = 3
     var tileImage = BitmapFactory.decodeResource(context.resources, R.drawable.mahjongtile)
     var tileImages = mutableListOf<Bitmap>()
     val botao1 = Botao(tileImage, 100f, h * 0.75f, 0, "")
     val botao2 = Botao(tileImage, 220f, h * 0.75f, 1, "")
     val botao3 = Botao(tileImage, 340f, h * 0.75f, 2, "")
+    val IA_LIMIT = 50
+    var timeValidarIA = IA_LIMIT
 
     fun startLoop() {
         running = true
@@ -80,85 +82,84 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
     private fun update(deltaTime: Double) {
 
 
-
         while (running) {
             val canvas = surfaceHolder.lockCanvas()
+            validarSelecao(selectedTiles)
 
             if (canvas != null) {
+                try {
+                    if (selectedTiles.filter { it.camada > -2 }.size < 8) {
 
-                if (selectedTiles.filter { it.camada > -2 }.size < 10) {
+                        if (!ajustarY && timeValidarIA == IA_LIMIT) {
+                            iaJogando()
 
-                    canvas.drawRGB(0, 128, 0) // Fundo verde
+                        }
+                        if (!ajustarY) {
+                            timeValidarIA--
+                            if (timeValidarIA < 0) {
+                                timeValidarIA = IA_LIMIT
+                            }
+                        }
+                        canvas.drawRGB(0, 128, 0) // Fundo verde
 
-                    runBlocking {
-                        launch(Dispatchers.Default) {
-                            tiles.forEach {
+                        runBlocking {
+                            launch(Dispatchers.Default) {
+                                tiles.forEach {
 
-                                if (ajustarY) {
-                                    val vel = (it.yp - it.y) / 2
-                                    if (it.y < it.yp) {
+                                    if (ajustarY) {
+                                        val vel = (it.yp - it.y) / divisor
+                                        if (it.y < it.yp) {
 
-                                        it.y += if (vel > w * 0.1f) vel else w * 0.1f
+                                            it.y += if (vel > w * 0.1f) vel else w * 0.1f
 
-                                        if (it.y > it.yp) {
-                                            it.y = it.yp
-                                            it.ty = true
+                                            if (it.y > it.yp) {
+                                                it.y = it.yp
+                                                it.ty = true
+                                            }
+
+
                                         }
-
-
                                     }
+
+                                    it.draw(canvas)
+                                    // }
+
                                 }
 
-                                it.draw(canvas)
-                                // }
+                                if (tiles.filter { it.ty == false }.isEmpty()) {
+                                    ajustarY = false
+
+                                }
 
                             }
+                        }
 
-                            if(tiles.filter { it.ty==false }.isEmpty()){
-                                ajustarY = false
+                        botao1.draw(canvas)
+                        botao2.draw(canvas)
+                        botao3.draw(canvas)
 
+
+                        val novoFiltro2 = tiles.filter { it.camada == 2 }
+                        val novoFiltro1 = tiles.filter { it.camada == 1 }
+                        val novoFiltro0 = tiles.filter { it.camada == 0 }
+                        runBlocking {
+                            launch(Dispatchers.Default) {
+
+
+                                validarCamadas(
+                                    novoFiltro1.toMutableList(),
+                                    novoFiltro2.toMutableList(),
+                                    2
+                                )
+                                validarCamadas(
+                                    novoFiltro0.toMutableList(),
+                                    novoFiltro1.toMutableList(),
+                                    1
+                                )
                             }
 
-                        }
-                    }
-
-                    botao1.draw(canvas)
-                    botao2.draw(canvas)
-                    botao3.draw(canvas)
-
-
-                    val novoFiltro2 = tiles.filter { it.camada == 2 }
-                    val novoFiltro1 = tiles.filter { it.camada == 1 }
-                    val novoFiltro0 = tiles.filter { it.camada == 0 }
-                    runBlocking {
-                        launch(Dispatchers.Default) {
-
-
-                            validarCamadas(
-                                novoFiltro1.toMutableList(),
-                                novoFiltro2.toMutableList(),
-                                2
-                            )
-                            validarCamadas(
-                                novoFiltro0.toMutableList(),
-                                novoFiltro1.toMutableList(),
-                                1
-                            )
-                        }
-
-
-
-
-                        val selectedTilesNovo = mutableListOf<MahjongTile>()
-                        for (item in selectedTiles) {
-
-                            selectedTilesNovo.add(item)
 
                         }
-                        validarSelecao(selectedTilesNovo)
-                        selectedTiles.clear()
-                        selectedTiles.addAll(selectedTilesNovo)
-                    }
 
 
 
@@ -170,105 +171,126 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
 
                                 try {
 
-                                selectedTiles.forEach {
-                                    //  if (it.camada > -2) {
+                                    selectedTiles.forEach {
+                                        //  if (it.camada > -2) {
 
 
-                                    if (it.camada > -3) {
-                                        var p = (120 * i).toFloat()
-                                        if (it.x > p) {
-                                            it.x -= velocidade
-                                            if (it.x < p) {
-                                                it.x = p
-                                            }
-                                        } else if (it.x < p) {
-                                            it.x += velocidade
+                                        if (it.camada > -3) {
+                                            var p = ((w * 0.9 / 7) * i).toFloat()
                                             if (it.x > p) {
-                                                it.x = p
+                                                it.x -= velocidade
+                                                if (it.x < p) {
+                                                    it.x = p
+                                                }
+                                            } else if (it.x < p) {
+                                                it.x += velocidade
+                                                if (it.x > p) {
+                                                    it.x = p
+                                                }
                                             }
-                                        }
-                                        i++
+                                            i++
 
 
-                                        // } else {
-                                        p = (120 * i).toFloat()
-                                        val py = (h * 0.9).toFloat()
-                                        val mediay = (py - it.y) / 2
-                                        val velocidadey =
-                                            if ((mediay) > w * 0.01f) mediay else w * 0.1f
+                                            // } else {
+                                            p = ((w * 0.9 / 8) * i).toFloat()
+                                            val py = (h * 0.8).toFloat()
+                                            val mediay = (py - it.y) / divisor
+                                            val velocidadey =
+                                                if ((mediay) > w * 0.01f) mediay else w * 0.1f
 
-                                        if (it.x > p) {
-                                            it.x -= velocidade
-                                            if (it.x < p) {
-                                                it.x = p
-                                            }
-
-                                        } else if (it.x < p) {
-                                            it.x += velocidade
                                             if (it.x > p) {
-                                                it.x = p
-                                            }
-                                        }
-                                        if (it.y > py) {
-                                            it.y -= velocidadey
-                                            if (it.y < py) {
-                                                it.y = py
-                                            }
+                                                it.x -= velocidade
+                                                if (it.x < p) {
+                                                    it.x = p
+                                                }
 
-                                        } else if (it.y < py) {
-                                            it.y += velocidadey
+                                            } else if (it.x < p) {
+                                                it.x += velocidade
+                                                if (it.x > p) {
+                                                    it.x = p
+                                                }
+                                            }
                                             if (it.y > py) {
-                                                it.y = py
+                                                it.y -= velocidadey
+                                                if (it.y < py) {
+                                                    it.y = py
+                                                }
+
+                                            } else if (it.y < py) {
+                                                it.y += velocidadey
+                                                if (it.y > py) {
+                                                    it.y = py
+                                                }
                                             }
-                                        }
-                                        if (it.y == py && it.x == p) {
-                                            it.camada = -1
+                                            if (it.y == py && it.x == p) {
+                                                it.camada = -1
 
-                                        }
-                                    } else {
-                                        val py = (h * 0.6).toFloat()
-                                        val mediay = (it.y - py) / 2
-                                        val velocidadey =
-                                            if ((mediay) > w * 0.01f) mediay else w * 0.1f
-
-
-                                        if (it.y > h * 0.0) {
-                                            it.y -= velocidadey
-
-                                        }
-
-                                        val px = (w * 0.5).toFloat()
-                                        val nivelado =
-                                            if (px - it.x > 0) px - it.x else (px - it.x) * -1
-                                        val velocidadee =
-                                            if ((nivelado / 2) > w * 0.01f) (nivelado) / 2 else w * 0.1f
-                                        if (it.x < w / 2) {
-
-                                            it.x += velocidadee
-                                            if (it.x > w / 2) {
-                                                it.x = (w / 2).toFloat()
-                                                it.camada = -4
                                             }
-                                        } else if (it.x > w / 2) {
+                                        } else {
+                                            val py = (h * 0.6).toFloat()
+                                            val mediay = (it.y - py) / divisor
+                                            val velocidadey =
+                                                if ((mediay) > w * 0.01f) mediay else w * 0.1f
 
-                                            it.x -= velocidadee
-                                            if (it.x < w / 2) {
-                                                it.x = (w / 2).toFloat()
-                                                it.camada = -4
+
+
+                                            if (it.camada == -4) {
+                                                val mediax =
+                                                    if ((100 + it.x) / divisor > w * 0.1f) (100 + it.x) / 2 else w * 0.1f
+                                                it.w -= 40
+                                                it.h -= 40
+                                                it.x -= mediax
+                                                if (it.x < -100) {
+                                                    it.camada = -5
+                                                }
                                             }
+
+                                            if (it.camada > -4) {
+                                                if (it.y > py + (h * 0.1)) {
+                                                    it.w += 30
+                                                    it.h += 30
+                                                }
+
+                                                if (it.y > h * 0.0) {
+                                                    it.y -= velocidadey
+
+                                                }
+
+                                                val px = (w * 0.5).toFloat()
+                                                val nivelado =
+                                                    if (px - it.x > 0) px - it.x else (px - it.x) * -1
+                                                val velocidadee =
+                                                    if ((nivelado / divisor) > w * 0.01f) (nivelado) / divisor else w * 0.1f
+
+
+                                                if (it.x < w / 2) {
+
+                                                    it.x += velocidadee
+                                                    if (it.x > w / 2) {
+                                                        it.x = (w / 2).toFloat()
+                                                        it.camada = -4
+                                                    }
+                                                } else if (it.x > w / 2) {
+
+                                                    it.x -= velocidadee
+                                                    if (it.x < w / 2) {
+                                                        it.x = (w / 2).toFloat()
+                                                        it.camada = -4
+                                                    }
+                                                }
+                                            }
+
+
                                         }
 
+                                        // }
+
+
+                                        it.draw(canvas)
 
                                     }
 
-                                    // }
-
-
-                                    it.draw(canvas)
-
-                                }
-
-                                ////////////////
+                                    ////////////////
                                 } catch (e: Exception) {
                                 }
 
@@ -278,43 +300,49 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
 
                         eliminarSelecao()
 
-                    if (tiles.filter { it.camada > 0 }.isEmpty() && selectedTiles.isEmpty()) {
 
-                        popularTiles()
+
+                        if (tiles.filter { it.camada > 0 }.isEmpty() && selectedTiles.isEmpty()) {
+
+                            popularTiles()
+                        }
+
+                    } else {
+                        validarSelecao(selectedTiles)
+                        if (selectedTiles.filter { it.camada > -2 }.size >= 8) {
+                            val paint = Paint()
+                            paint.textSize = 150f
+                            canvas.drawRGB(244, 128, 0) // Fundo verde
+                            paint.color = Color.Red.toArgb()
+
+                            canvas.drawText("GAME OUVER", 100f, (h * 0.5).toFloat(), paint)
+                            canvas.drawText(
+                                timet.toString(),
+                                (w * 0.5).toFloat(),
+                                (h * 0.7).toFloat(),
+                                paint
+                            )
+                            timet--
+                            Thread.sleep(700)
+                            if (timet == 0) {
+                                selectedTiles.clear()
+                                tiles.clear()
+                                popularTiles()
+                                timet = 5
+
+                            }
+                        }
                     }
+                    surfaceHolder.unlockCanvasAndPost(canvas)
 
-                } else {
-                    val paint = Paint()
-                    paint.textSize = 150f
-                    canvas.drawRGB(244, 128, 0) // Fundo verde
-                    paint.color = Color.Red.toArgb()
 
-                    canvas.drawText("GAME OUVER", 100f, (h * 0.5).toFloat(), paint)
-                    canvas.drawText(
-                        timet.toString(),
-                        (w * 0.5).toFloat(),
-                        (h * 0.7).toFloat(),
-                        paint
-                    )
-                    timet--
-                    Thread.sleep(700)
-                    if (timet == 0) {
-                        selectedTiles.clear()
-                        tiles.clear()
-                        popularTiles()
-                        timet = 9
-
-                    }
-
+                } catch (ew: Exception) {
+                    ew.stackTrace
                 }
-                surfaceHolder.unlockCanvasAndPost(canvas)
-
-
             }
 
 
         }
-
 
     }
 
@@ -325,7 +353,7 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
             listr.add(it)
 
         }
-        val listr2 = listr.filter { it.camada == -4 }
+        val listr2 = listr.filter { it.camada == -5 }
         listr.removeAll(listr2)
         selectedTiles.clear()
         selectedTiles.addAll(listr)
@@ -544,56 +572,63 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
     }
 
     fun onTouchEvent(event: MotionEvent) {
-        if (event.action == MotionEvent.ACTION_DOWN) {
-            tiles.find {
-                it.containsTouch(
-                    event.x,
-                    event.y
-                ) && it.camada == 2 && selectedTiles.filter { it.camada > -3 }.size < 10
-            }?.let { tile ->
+        try {
 
-                val m: MahjongTile = MahjongTile(
-                    tile.image,
-                    tile.x,
-                    tile.y,
-                    120,
-                    120,
-                    -2,
-                    tile.id
-                )
-                val selectedTilesNovo = mutableListOf<MahjongTile>()
-                selectedTilesNovo.addAll(selectedTiles)
-                selectedTilesNovo.add(m)
-                selectedTiles.clear()
-                selectedTiles.addAll(selectedTilesNovo)
 
-                tile.camada = -1
+            if (event.action == MotionEvent.ACTION_DOWN) {
+                tiles.find {
+                    it.containsTouch(
+                        event.x,
+                        event.y
+                    ) && it.camada == 2 && selectedTiles.filter { it.camada > -3 }.size < 8
+                }?.let { tile ->
 
-                tile.x -= 5000f
+                    val m: MahjongTile = MahjongTile(
+                        tile.image,
+                        tile.x,
+                        tile.y,
+                        120,
+                        120,
+                        -2,
+                        tile.id
+                    )
+                    val selectedTilesNovo = mutableListOf<MahjongTile>()
+                    selectedTilesNovo.addAll(selectedTiles)
+                    selectedTilesNovo.add(m)
+                    selectedTiles.clear()
+                    selectedTiles.addAll(selectedTilesNovo)
 
-                selectedTiles.sortBy { it.id }
+                    tile.camada = -1
+
+                    tile.x -= 5000f
+
+                    selectedTiles.sortBy { it.id }
+
+                }
+                if (botao1.containsTouch(
+                        event.x,
+                        event.y
+                    )
+                ) {
+
+                } else if (botao2.containsTouch(
+                        event.x,
+                        event.y
+                    )
+                ) {
+                    limparSelecionados()
+                } else if (botao3.containsTouch(
+                        event.x,
+                        event.y
+                    )
+                ) {
+                    embaralha()
+                }
 
             }
-            if (botao1.containsTouch(
-                    event.x,
-                    event.y
-                )
-            ) {
 
-            } else if (botao2.containsTouch(
-                    event.x,
-                    event.y
-                )
-            ) {
-                limparSelecionados()
-            } else if (botao3.containsTouch(
-                    event.x,
-                    event.y
-                )
-            ) {
-                embaralha()
-            }
-
+        } catch (e: Exception) {
+            e.stackTrace
         }
     }
 
@@ -690,20 +725,195 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
 
         }
         if (selecionados == 3) {
-            //   list.removeAll(listr)
 
-//            val iterator = list.iterator()
-//
-//            while (iterator.hasNext()) {
-//                val item = iterator.next()
-//                if (listr.contains(item)) {
-//                    iterator.remove() // Correto!
-//                }
-//            }
             listr.forEach { it.camada = -3 }
 
         }
 
+    }
+
+    fun iaJogando() {
+        val camada2 = tiles.filter { it.camada == 2 }.toMutableList()
+        val tem3 = validarSelecaoIA(camada2, 3, 0)
+        var tem2 = false
+        var tem1 = false
+
+        if (!tem3) {
+            if (selectedTiles.isEmpty()) {
+                tem2 = validarSelecaoIA(camada2, 2, 0)
+            }
+            if (!tem2 && selectedTiles.isNotEmpty()) {
+                tem1 = validarSelecaoIA(selectedTiles, 2, 1)
+                if(!tem1){
+                    validarSelecaoIA(camada2, 1, 2)
+                }
+            }
+
+        }
+
+    }
+
+    fun validarSelecaoIA(list: MutableList<MahjongTile>, min: Int, modo: Int): Boolean {
+        val listr: MutableList<MahjongTile> = mutableListOf()
+        val listr2: MutableList<MahjongTile> = mutableListOf()
+        var listr3: MutableList<MahjongTile> = mutableListOf()
+
+        if (modo == 0 || modo == 2) {
+            list.forEach { it0 ->
+                var listrd = list.filter { it.id == it0.id }.toMutableList()
+                if (listrd.size >= min) {
+                    listr.add(it0)
+                }
+            }
+            listr.sortBy { it.id }
+            if (listr.size > 7 - selectedTiles.size && min < 3) {
+                val possou = listr.size - (7 - selectedTiles.size )
+
+                for (j in 0..possou) {
+                    if(listr.size<=7 - selectedTiles.size || listr.size<3){
+                        break
+                    }
+                    listr.removeAt(0)
+                    listr.removeAt(0)
+
+
+                }
+
+            }
+            if (listr.size >= min && modo==0) {
+                var i = 0
+                if (i < 8 - selectedTiles.size) {
+                    listr.forEach {
+                        achou(it)
+                        i++
+                    }
+                }
+
+                    return true
+
+            }
+        } else if(modo==1){
+
+            list.forEach { it0 ->
+                var listrd = list.filter { it.id == it0.id }.toMutableList()
+                if (listrd.size >= min) {
+                    listr.add(it0)
+                }
+            }
+
+            var i = 0
+
+            for (j in 0..listr.size - 1) {
+                if (j % 2 == 0) {
+                    listr2.add(listr[j])
+
+                }
+            }
+            listr2.forEach {o->
+                listr3.addAll(tiles.filter {
+                    it.id== o.id && it.camada == 2 }.toMutableList())
+            }
+
+
+
+            if (i < 8 - selectedTiles.size && listr3.isNotEmpty()) {
+                listr3.forEach {
+                    achou(it)
+                    i++
+                }
+                return true
+            }else{
+                val listrt: MutableList<MahjongTile> = mutableListOf()
+                val listrv: MutableList<MahjongTile> = mutableListOf()
+
+                val listrr = tiles.filter { it.camada==2 }.toMutableList()
+                listrr.forEach { it0 ->
+                    var listrd = listrr.filter { it.id == it0.id }.toMutableList()
+                    if (listrd.size == 2) {
+                        listrt.add(it0)
+                    }
+                }
+
+               listrt.forEach {  list.forEach { o->
+
+                   if(o.id==it.id){
+                       listrv.add(it)
+                   }
+
+               }}
+                var ii = 0
+                if (ii < 8 - selectedTiles.size && listrv.isNotEmpty()) {
+                    listrv.forEach {
+                        achou(it)
+                        ii++
+                    }
+                    return true
+                }
+
+
+            }
+
+
+        }
+
+        if(modo==2){
+
+            var listrx: MutableList<MahjongTile> = mutableListOf()
+
+            listr.forEach {
+                selectedTiles.forEach { o->
+                    if(o.id==it.id){
+                        listrx.add(it)
+
+                    }
+
+                }
+            }
+            if(listrx.isNotEmpty()) {
+                achou(listrx[0])
+            }else{
+                achou(listr[0])
+
+            }
+
+
+                return true
+
+        }
+
+        return false
+    }
+
+    fun achou(tile: MahjongTile) {
+        val m: MahjongTile = MahjongTile(
+            tile.image,
+            tile.x,
+            tile.y,
+            120,
+            120,
+            -2,
+            tile.id
+        )
+
+
+        val total = selectedTiles.filter { it.id==tile.id && it.camada > -3}.size + 1
+
+        if(total>3){
+            return
+        }
+
+        val selectedTilesNovo = mutableListOf<MahjongTile>()
+        selectedTilesNovo.addAll(selectedTiles)
+        selectedTilesNovo.add(m)
+        selectedTiles.clear()
+        selectedTiles.addAll(selectedTilesNovo)
+
+
+        tile.camada = -1
+
+        tile.x -= 5000f
+
+        selectedTiles.sortBy { it.id }
     }
 
 }
