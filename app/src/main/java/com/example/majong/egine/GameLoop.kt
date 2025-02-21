@@ -337,8 +337,7 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
 
 
                             }
-                        }
-                        runBlocking {
+
                             launch(Dispatchers.Default) {
                                 var i = 0
                                 val velocidade = w * 0.15f
