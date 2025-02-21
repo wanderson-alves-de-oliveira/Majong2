@@ -14,13 +14,23 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 
 
-class MahjongTile(var image: Bitmap, var x: Float, var yp: Float,var w:Int,var h:Int, var camada:Int, var id: Int) {
+class MahjongTile(var image: Bitmap, var x: Float, var yp: Float,var w:Int,var h:Int, var camada:Int, var id: Int,girando:Boolean=false) {
     private val paint = Paint()
     private val paint2 = Paint()
-    var y: Float = -100f
+    var y: Float = if(id>=1000)yp else-100f
     var isSelected = false
-    var ty = false
+    var intro = true
 
+    var ty = false
+    var espaco  = 0f
+    var girando = girando
+    var giroc= 0f
+    private val imutw = w
+    private val imuth = h
+    private val VAL_LIMITG = 25
+    private val VAL_LIMITG_INTRO = 3
+
+    var timeG = if(intro) VAL_LIMITG_INTRO else VAL_LIMITG
     fun draw(canvas: Canvas) {
      //   canvas.drawBitmap(image, x, y, paint)
         paint.textSize = 80f
@@ -29,7 +39,14 @@ class MahjongTile(var image: Bitmap, var x: Float, var yp: Float,var w:Int,var h
 
         paint.color = Color.Red.toArgb()
        val b: Bitmap = Bitmap.createBitmap(w,h, Bitmap.Config.ARGB_8888)
-        val img = Bitmap.createScaledBitmap(image, (w*0.9f).toInt(), (h*0.9f).toInt(), false)
+        if (!isSelected) {
+            espaco = 0f
+        } else {
+            espaco = w*0.06f
+
+        }
+
+        val img = Bitmap.createScaledBitmap(image, ((w*0.9f)-espaco).toInt(), ((h*0.9f)-espaco).toInt(), false)
         val canvas2 = Canvas(b)
         //canvas2.drawRGB(250, 250, 0)
         val colorCamada = when(camada){
@@ -45,8 +62,10 @@ class MahjongTile(var image: Bitmap, var x: Float, var yp: Float,var w:Int,var h
 
         //canvas2.drawText(id.toString(),(10).toFloat(),(b.height/1.5f).toFloat(),paint)
 //
-
-        canvas2.drawRoundRect(0f, 0f, b.width.toFloat(), b.height.toFloat(),20f,20f, paint2);
+        if (isSelected) {
+            paint2.color = Color.Gray.toArgb()
+        }
+        canvas2.drawRoundRect(0f, 0f, b.width.toFloat()-espaco, b.height.toFloat()-espaco,20f,20f, paint2);
 
 
         if (img != null) {
@@ -87,8 +106,8 @@ class MahjongTile(var image: Bitmap, var x: Float, var yp: Float,var w:Int,var h
                 paint.colorFilter = ColorMatrixColorFilter(matrix)
 
             // Obtenha as dimensões da View
-            val width =img.width
-            val height = img.height
+            var width =img.width
+            var height = img.height
 
             // Crie um BitmapShader com a imagem
             val shader = BitmapShader(img!!, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
@@ -99,10 +118,52 @@ class MahjongTile(var image: Bitmap, var x: Float, var yp: Float,var w:Int,var h
             paint.color = Color.LightGray.toArgb()
          //   canvas2.drawRoundRect(0f, 0f, b.width.toFloat(), b.height.toFloat(),40f,40f, paint);
             // Desenhe um retângulo com bordas arredondadas
-            canvas2.drawRoundRect(RectF(1f, 1f, width.toFloat(), height.toFloat()), cornerRadius, cornerRadius, paint)
+
+
+
+            canvas2.drawRoundRect(RectF(1f, 1f, (width).toFloat(), (height).toFloat()), cornerRadius, cornerRadius, paint)
+
+
+
         }
-        canvas.drawBitmap(b,x,y,paint)
-      //  canvas.drawBitmap(img,x,y,paint)
+if(intro) {
+    if (girando) {
+        giroc -= 5f
+        timeG--
+        if (timeG <= 0 && giroc <= 0) {
+            girando = false
+            giroc = 0f
+            timeG = VAL_LIMITG
+            intro = false
+        }
+        canvas.save()
+        canvas.translate((x - (w*0.5f)), (y + espaco) - giroc)
+        //  canvas.rotate(giroc,centerX,centerY)
+        canvas.drawBitmap(b, x + espaco, y + espaco, paint)
+        canvas.restore()
+    } else {
+        canvas.drawBitmap(b, x + espaco, y + espaco, paint)
+    }
+}else{
+    if(girando){
+        giroc-=200f
+        timeG--
+        if(timeG<=0 && giroc<=0){
+            girando = false
+            giroc=0f
+            timeG =VAL_LIMITG
+        }
+        canvas.save()
+        canvas.translate((x- (w*0.5f)),(y+espaco)+giroc)
+        //  canvas.rotate(giroc,centerX,centerY)
+        canvas.drawBitmap(b,x+espaco,y+espaco,paint)
+        canvas.restore()
+    }else{
+        canvas.drawBitmap(b,x+espaco,y+espaco,paint)
+    }
+}
+
+
 
 
     }
