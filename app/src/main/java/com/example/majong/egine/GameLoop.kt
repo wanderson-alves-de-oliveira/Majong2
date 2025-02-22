@@ -28,6 +28,8 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
     private var lastTime = System.nanoTime()
     private val targetFps = 60
     private var timet = 5
+    private var toque = 0
+
     private val optimalTime = 1_000_000_000 / targetFps
     private var touchX: Float = 0f
     private var touchY: Float = 0f
@@ -117,7 +119,7 @@ try {
     update(deltaTime)
 
 }catch (e:Exception){
-    Thread.sleep(100)
+
 }
 
 
@@ -218,48 +220,7 @@ try {
                                             e.stackTrace
                                         }
 
-                                    runBlocking {
-                                        launch(Dispatchers.Default) {
 
-                                            tiles.filter { it.camada>=0 }.forEach {
-
-                                                if (ajustarY) {
-                                                    val vel = (it.yp - it.y) / divisor
-                                                    if (it.y < it.yp) {
-
-                                                        it.y += if (vel > w * 0.1f) vel else w * 0.1f
-
-                                                        if (it.y > it.yp) {
-                                                            it.y = it.yp
-                                                            it.ty = true
-                                                        }
-
-
-                                                    }
-                                                }
-                                                if(!(it.w<=0 || it.h<=0) ) {
-                                                    it.draw(canvas)
-                                                }
-                                                // }
-
-                                            }
-
-                                            if (tiles.filter { !selectedTiles.filter { it.camada !=-5}.contains(it) }
-                                                    .filter { it.ty == false }.isEmpty()) {
-                                                ajustarY = false
-
-                                            }
-
-                                        }
-
-//////////////////////////////////////////////////////////////
-
-
-
-                                ///////////////////
-
-
-                                    }
 //                            runBlocking {
 //                                launch(Dispatchers.Default) {
                                     paint.color = Color.LightGray.toArgb()
@@ -290,7 +251,54 @@ try {
 //////////////////////////////////////////////
 
                                     runBlocking {
+
+
+
+
+//////////////////////////////////////////////////////////////
+
+
+
+                                            ///////////////////
+
+
+
+
+
+
                                         launch(Dispatchers.Default) {
+
+
+                                            tiles.forEach {
+
+                                                if (ajustarY) {
+                                                    val vel = (it.yp - it.y) / divisor
+                                                    if (it.y < it.yp) {
+
+                                                        it.y += if (vel > w * 0.1f) vel else w * 0.1f
+
+                                                        if (it.y > it.yp) {
+                                                            it.y = it.yp
+                                                            it.ty = true
+                                                        }
+
+
+                                                    }
+                                                }
+                                                if(!(it.w<=0 || it.h<=0) ) {
+                                                    it.draw(canvas)
+                                                }
+                                                // }
+
+                                            }
+
+                                            if (tiles.filter { !selectedTiles.filter { it.camada !=-5}.contains(it) }
+                                                    .filter { it.ty == false }.isEmpty()) {
+                                                ajustarY = false
+
+                                            }
+
+
                                             val novoFiltro2 =
                                                 tiles.filter { !selectedTiles.filter { it.camada !=-5}.contains(it) }
                                                     .filter { it.camada == 2 }
@@ -311,16 +319,16 @@ try {
                                                 novoFiltro1.toMutableList(),
                                                 1
                                             )
-                                        }
 
 
 
-                                        launch(Dispatchers.Default) {
-                                            var i = 0
-                                            val velocidade = w * 0.15f
+
 
                                             try {
 
+
+                                                var i = 0
+                                                val velocidade = w * 0.15f
 
                                                 selectedTiles.filter { it.camada > -3 }.forEach {
                                                     var p = ((w * 0.9 / 7) * i).toFloat()
@@ -377,12 +385,10 @@ try {
 
                                                 }
                                             } catch (e: Exception) {
+                                                e.stackTrace
                                             }
 
 
-                                        }
-
-                                        launch(Dispatchers.Default) {
                                             var i = 0
                                             val velocidade = w * 0.15f
                                             try {
@@ -459,6 +465,7 @@ try {
 
                                                 ////////////////
                                             } catch (e: Exception) {
+                                                e.stackTrace
                                             }
                                         }
 
@@ -525,6 +532,11 @@ try {
                     }
 
 //kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk
+
+            if(toque>0){
+                toque--
+            }
+
         }
 
     }
@@ -536,10 +548,15 @@ try {
             listr.add(it)
 
         }
+
         val listr2 = listr.filter { it.camada == -5 }
-        listr.removeAll(listr2)
-        selectedTiles.clear()
-        selectedTiles.addAll(listr)
+
+        for (item in selectedTiles.toList()) { // Criando uma cópia para evitar a modificação direta
+            if (listr2.contains(item)) {
+                selectedTiles.remove(item) // Adiciona sem erro
+            }
+        }
+
 
         dica = false
     }
@@ -946,6 +963,7 @@ try {
                     try {
                         achou(tilesx3[i])
                     } catch (e: Exception) {
+                        e.stackTrace
                     }
 
                 }
@@ -1230,9 +1248,10 @@ try {
         if (total > 3) {
             return
         }
-        tile.camada = -2
+        tile.camada = -1
         tile.w = (this.w * 0.9 / 8).toInt()
         tile.h = (this.w * 0.9 / 8).toInt()
+        tile.x -= 5000f
 
 
         val novosItens = mutableListOf<MahjongTile>()
@@ -1241,14 +1260,13 @@ try {
             novosItens.add(item)
 
         }
-        novosItens.add(tile)
+        novosItens.add(m)
         selectedTiles.clear()
         selectedTiles.addAll(novosItens)
 
 
 
 
-        //  tile.camada = tile.x -= 5000f
 
         selectedTiles.sortBy { it.id }
 
@@ -1291,6 +1309,13 @@ try {
     fun onTouchEvent(event: MotionEvent) {
         try {
 
+            if(toque>3){
+                return
+            }
+
+            toque++
+            eliminarSelecao()
+
             if (event.action == MotionEvent.ACTION_DOWN) {
                 tiles.filter { !selectedTiles.contains(it) }.find {
                     it.containsTouch(
@@ -1322,7 +1347,7 @@ try {
                             novosItens.add(item)
 
                     }
-                    novosItens.add(tile)
+                    novosItens.add(m)
                     selectedTiles.clear()
                     selectedTiles.addAll(novosItens)
 
@@ -1331,8 +1356,8 @@ try {
 //                    selectedTiles.clear()
 //                    selectedTiles.addAll(selectedTilesNovo)
 
-                    // tile.camada = -1
-                    // tile.x -= 5000f
+                     tile.camada = -1
+                     tile.x -= 5000f
                     onTocarEfeito(0)
                     selectedTiles.sortBy { it.id }
 
