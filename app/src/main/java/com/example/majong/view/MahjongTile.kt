@@ -15,11 +15,17 @@ import androidx.compose.ui.graphics.toArgb
 
 
 class MahjongTile(var image: Bitmap, var x: Float, var yp: Float,var w:Int,var h:Int, var camada:Int, var id: Int,girando:Boolean=false) {
+
+
+
     private val paint = Paint()
     private val paint2 = Paint()
     var y: Float = if(id>=1000)yp else-100f
     var isSelected = false
     var intro = true
+    var bloqueado = false
+    var ref  = -1
+
 
     var ty = false
     var espaco  = 0f
@@ -38,6 +44,11 @@ class MahjongTile(var image: Bitmap, var x: Float, var yp: Float,var w:Int,var h
         paint2.color = Color.LightGray.toArgb()
 
         paint.color = Color.Red.toArgb()
+
+        if(w<=0 || h <=0){
+            w=100
+            h=100
+        }
        val b: Bitmap = Bitmap.createBitmap(w,h, Bitmap.Config.ARGB_8888)
         if (!isSelected) {
             espaco = 0f
@@ -137,7 +148,7 @@ if(intro) {
             intro = false
         }
         canvas.save()
-        canvas.translate((x - (w*0.5f)), (y + espaco) - giroc)
+        canvas.translate(x - espaco, (y + espaco) - giroc)
         //  canvas.rotate(giroc,centerX,centerY)
         canvas.drawBitmap(b, x + espaco, y + espaco, paint)
         canvas.restore()
