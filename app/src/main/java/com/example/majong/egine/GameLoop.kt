@@ -51,6 +51,8 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
     var tamNovo = 0
     var ajustarY = true
     var bloquerBT = false
+    var bloquerBT2 = false
+
     var time1 = 0
     var time2 = 0
     var time3 = 0
@@ -71,7 +73,7 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
         ((w * 0.8f) / 6).toInt(),
         ((w * 0.9f) / 6).toInt(),
         2,
-        1000
+        5000
     )
     val botao2 = MahjongTile(
         ima,
@@ -146,17 +148,14 @@ try {
                         if (canvas != null) {
                             try {
 
-                                    validarSelecao(selectedTiles)
+                                    validarSelecao(selectedTiles.filter { it.camada !=-5}.toMutableList())
 
                                 bloquerBT =
                                     selectedTiles.filter { it.camada < -2 && it.camada >= -4 }
                                         .isEmpty()
-                                if (selectedTiles.filter { it.camada > -2 }.size < 8 || selectedTiles.filter { it.camada > -2 }.size >= 8 && dica) {
+                                if (selectedTiles.filter { it.camada > -2 }.size < 7 || selectedTiles.filter { it.camada > -2 }.size >7 && dica) {
 
-//                        if (!ajustarY && timeValidarIA == IA_LIMIT) {
-//                            iaJogando()
 //
-//                        }
                                     if (!ajustarY) {
                                         timeValidarIA--
                                         if (timeValidarIA < 0) {
@@ -166,46 +165,7 @@ try {
                                     // canvas.drawRGB(0, 128, 0) // Fundo verde
                                     canvas.drawBitmap(walld[0], 0f, 0f, paint)
 
-                                    runBlocking {
-                                        launch(Dispatchers.Default) {
-
-                                            tiles.forEach {
-
-                                                if (ajustarY) {
-                                                    val vel = (it.yp - it.y) / divisor
-                                                    if (it.y < it.yp) {
-
-                                                        it.y += if (vel > w * 0.1f) vel else w * 0.1f
-
-                                                        if (it.y > it.yp) {
-                                                            it.y = it.yp
-                                                            it.ty = true
-                                                        }
-
-
-                                                    }
-                                                }
-                                                if(!(it.w<=0 || it.h<=0)) {
-                                                    it.draw(canvas)
-                                                }
-                                                // }
-
-                                            }
-
-                                            if (tiles.filter { !selectedTiles.contains(it) }
-                                                    .filter { it.ty == false }.isEmpty()) {
-                                                ajustarY = false
-
-                                            }
-
-                                        }
-
-//////////////////////////////////////////////////////////////
-
-
-                                        launch(Dispatchers.Default) {
-
-                                            try {
+                                        try {
 
 
                                             if (!bloquerBT) {
@@ -228,27 +188,74 @@ try {
                                                 botao1.camada = 1
                                                 botao1.isSelected = true
                                                 time1--
+                                            }else{
+                                                bloquerBT2 = true
+
                                             }
                                             if (time2 > 0 ) {
                                                 botao2.camada = 1
                                                 botao2.isSelected = true
 
                                                 time2--
+                                            }else{
+                                                bloquerBT2 = true
+
                                             }
                                             if (time3 > 0) {
                                                 botao3.camada = 1
                                                 botao3.isSelected = true
 
                                                 time3--
+                                            }else{
+                                                bloquerBT2 = true
+
                                             }
                                             botao1.draw(canvas)
                                             botao2.draw(canvas)
                                             botao3.draw(canvas)
 
-                                            }catch (e:Exception){
-                                                e.stackTrace
-                                            }
+                                        }catch (e:Exception){
+                                            e.stackTrace
                                         }
+
+                                    runBlocking {
+                                        launch(Dispatchers.Default) {
+
+                                            tiles.filter { it.camada>=0 }.forEach {
+
+                                                if (ajustarY) {
+                                                    val vel = (it.yp - it.y) / divisor
+                                                    if (it.y < it.yp) {
+
+                                                        it.y += if (vel > w * 0.1f) vel else w * 0.1f
+
+                                                        if (it.y > it.yp) {
+                                                            it.y = it.yp
+                                                            it.ty = true
+                                                        }
+
+
+                                                    }
+                                                }
+                                                if(!(it.w<=0 || it.h<=0) ) {
+                                                    it.draw(canvas)
+                                                }
+                                                // }
+
+                                            }
+
+                                            if (tiles.filter { !selectedTiles.filter { it.camada !=-5}.contains(it) }
+                                                    .filter { it.ty == false }.isEmpty()) {
+                                                ajustarY = false
+
+                                            }
+
+                                        }
+
+//////////////////////////////////////////////////////////////
+
+
+
                                 ///////////////////
 
 
@@ -285,13 +292,13 @@ try {
                                     runBlocking {
                                         launch(Dispatchers.Default) {
                                             val novoFiltro2 =
-                                                tiles.filter { !selectedTiles.contains(it) }
+                                                tiles.filter { !selectedTiles.filter { it.camada !=-5}.contains(it) }
                                                     .filter { it.camada == 2 }
                                             val novoFiltro1 =
-                                                tiles.filter { !selectedTiles.contains(it) }
+                                                tiles.filter { !selectedTiles.filter { it.camada !=-5}.contains(it) }
                                                     .filter { it.camada == 1 }
                                             val novoFiltro0 =
-                                                tiles.filter { !selectedTiles.contains(it) }
+                                                tiles.filter { !selectedTiles.filter { it.camada !=-5}.contains(it) }
                                                     .filter { it.camada == 0 }
 
                                             validarCamadas(
@@ -476,8 +483,8 @@ try {
                                     }
 
                                 } else {
-                                    validarSelecao(selectedTiles)
-                                    if (selectedTiles.filter { it.camada > -2 }.size >= 8) {
+                                   // validarSelecao(selectedTiles.filter { it.camada !=-5}.toMutableList())
+                                    if (selectedTiles.filter { it.camada > -2 }.size >= 7) {
                                         val paint = Paint()
                                         paint.textSize = 150f
                                         canvas.drawRGB(244, 128, 0) // Fundo verde
@@ -557,7 +564,7 @@ try {
     init {
         val medida = this.h * 1.2f
 
-        if (tiles.filter { !selectedTiles.contains(it) }.isEmpty()) {
+        if (tiles.filter { !selectedTiles.filter { it.camada !=-5}.contains(it) }.isEmpty()) {
             popularTiles()
             walld.add(
                 Bitmap.createScaledBitmap(
@@ -602,6 +609,7 @@ try {
         val tileImage =
             BitmapFactory.decodeResource(context.resources, R.drawable.baleia)
         ajustarY = true
+        selectedTiles.clear()
         tileImages.clear()
         tileImages.add(
             BitmapFactory.decodeResource(
@@ -914,17 +922,16 @@ try {
     private fun limparSelecionados() {
         if (selectedTiles.filter { it.camada != -5 }.isNotEmpty()) {
             var s: MutableList<MahjongTile> =
-                selectedTiles.filter { it.camada != -5 }
-                    .filter { it.id == selectedTiles.filter { it.camada != -5 }[0].id }
+                selectedTiles.filter { it.id == selectedTiles.filter { it.camada != -5 }[0].id }
                     .toMutableList()
             var tilesx: MutableList<MahjongTile> =
-                tiles.filter { !selectedTiles.contains(it) }
+                tiles.filter { !selectedTiles.filter { it.camada !=-5}.contains(it) }
                     .filter { it.camada == 0 && it.id == s[0].id }.toMutableList()
             var tilesx1: MutableList<MahjongTile> =
-                tiles.filter { !selectedTiles.contains(it) }
+                tiles.filter { !selectedTiles.filter { it.camada !=-5}.contains(it) }
                     .filter { it.camada == 1 && it.id == s[0].id }.toMutableList()
             var tilesx2: MutableList<MahjongTile> =
-                tiles.filter { !selectedTiles.contains(it) }
+                tiles.filter { !selectedTiles.filter { it.camada !=-5}.contains(it) }
                     .filter { it.camada == 2 && it.id == s[0].id }.toMutableList()
             var tilesx3: MutableList<MahjongTile> = mutableListOf()
             tilesx3.addAll(tilesx2)
@@ -1056,10 +1063,10 @@ try {
         var tem1 = false
 
         if (!tem3) {
-            if (selectedTiles.isEmpty()) {
+            if (selectedTiles.filter { it.camada !=-5}.isEmpty()) {
                 tem2 = validarSelecaoIA(camada2, 2, 0)
             }
-            if (!tem2 && selectedTiles.isNotEmpty()) {
+            if (!tem2 && selectedTiles.filter { it.camada !=-5}.isNotEmpty()) {
                 tem1 = validarSelecaoIA(selectedTiles, 2, 1)
                 if (!tem1) {
                     //   validarSelecaoIA(camada2, 1, 2)
@@ -1137,7 +1144,7 @@ try {
 
 
 
-            if (i < 8 - selectedTiles.size && listr3.isNotEmpty()) {
+            if (i < 8 - selectedTiles.filter { it.camada !=-5}.size && listr3.isNotEmpty()) {
                 listr3.forEach {
                     achou(it)
                     i++
@@ -1218,7 +1225,7 @@ try {
             tile.id
         )
         m.y = tile.y
-        val total = selectedTiles.filter { it.id == tile.id && it.camada > -3 }.size + 1
+        val total = selectedTiles.filter { it.camada !=-5}.filter { it.id == tile.id && it.camada > -3 }.size + 1
 
         if (total > 3) {
             return
@@ -1332,7 +1339,7 @@ try {
 
                 }
 
-                if (bloquerBT) {
+                if (bloquerBT && bloquerBT2) {
                     if (botao1.containsTouch(
                             event.x,
                             event.y
@@ -1363,6 +1370,10 @@ try {
 
                         embaralha()
                     }
+
+                    bloquerBT2 = false
+
+
                 }
 
             }
