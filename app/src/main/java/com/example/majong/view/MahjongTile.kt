@@ -139,7 +139,7 @@ class MahjongTile(var image: Bitmap, var x: Float, var yp: Float,var w:Int,var h
         }
 if(intro) {
     if (girando) {
-        giroc -= 5f
+        giroc -= 50f
         timeG--
         if (timeG <= 0 && giroc <= 0) {
             girando = false
