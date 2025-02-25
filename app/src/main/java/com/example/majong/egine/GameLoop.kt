@@ -55,6 +55,7 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
     var ajustarY = true
     var bloquerBT = false
     var bloquerBT2 = false
+    var embaralhando = false
 
     var time1 = 0
     var time2 = 0
@@ -242,7 +243,7 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                                     launch(Dispatchers.Default) {
 
 
-                                        if (isTouched || ajustarY) {
+                                        if (isTouched || ajustarY || embaralhando) {
                                         val canvas2 = Canvas(b)
 
                                         canvas2.drawColor(
@@ -250,7 +251,7 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                                             PorterDuff.Mode.CLEAR
                                         )
 
-
+                                      var countEmbaralhar = 0
                                         tiles.forEach {
 
                                             if (ajustarY) {
@@ -267,13 +268,23 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
 
                                                 }
                                             }
+                                            if(embaralhando){
+                                                if(it.girando){
+                                                    countEmbaralhar++
+                                                }
+                                            }
+
                                             if (!(it.w <= 0 || it.h <= 0) && it.camada >= 0) {
                                                 it.draw(canvas2)
                                             }
                                             // }
 
                                         }
-
+                                            if(embaralhando){
+                                                if(countEmbaralhar<=0){
+                                                    embaralhando = false
+                                                }
+                                            }
                                         if (tiles
                                                 .filter { it.ty == false }.isEmpty()
                                         ) {
@@ -320,7 +331,12 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                                         }
                                         launch(Dispatchers.Default) {
 
+                                            val canvas3 = Canvas(b2)
 
+                                            canvas3.drawColor(
+                                                Color.Transparent.toArgb(),
+                                                PorterDuff.Mode.CLEAR
+                                            )
 
 
                                     try {
@@ -328,12 +344,7 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
 
                                         var i = 0
                                         val velocidade = w * 0.15f
-                                        val canvas3 = Canvas(b2)
 
-                                        canvas3.drawColor(
-                                            Color.Transparent.toArgb(),
-                                            PorterDuff.Mode.CLEAR
-                                        )
                                         selectedTiles.filter { it.camada > -3 }.forEach {
                                             var p = ((w * 0.9 / 7) * i).toFloat()
                                             if (it.x > p) {
@@ -462,7 +473,7 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                                                     }
                                                 }
 
-                                                it.draw(canvas)
+                                                it.draw(canvas3)
 
                                             }
 
@@ -633,8 +644,7 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
     }
 
     fun popularTiles() {
-        val tileImage =
-            BitmapFactory.decodeResource(context.resources, R.drawable.baleia)
+
         ajustarY = true
         selectedTiles.clear()
         tileImages.clear()
@@ -1444,7 +1454,7 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                     ) {
                         time3 = 10
                         botao3.isSelected = true
-
+                        embaralhando=true
                         embaralha()
                     }
 

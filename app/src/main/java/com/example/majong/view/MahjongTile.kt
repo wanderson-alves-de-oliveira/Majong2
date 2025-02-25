@@ -33,7 +33,7 @@ class MahjongTile(var image: Bitmap, var x: Float, var yp: Float,var w:Int,var h
     var giroc= 0f
     private val imutw = w
     private val imuth = h
-    private val VAL_LIMITG = 25
+    private val VAL_LIMITG = 3
     private val VAL_LIMITG_INTRO = 3
 
     var timeG = if(intro) VAL_LIMITG_INTRO else VAL_LIMITG
@@ -139,7 +139,7 @@ class MahjongTile(var image: Bitmap, var x: Float, var yp: Float,var w:Int,var h
         }
 if(intro) {
     if (girando) {
-        giroc -= 50f
+        giroc --;
         timeG--
         if (timeG <= 0 && giroc <= 0) {
             girando = false
@@ -157,7 +157,7 @@ if(intro) {
     }
 }else{
     if(girando){
-        giroc-=200f
+        giroc-=2f
         timeG--
         if(timeG<=0 && giroc<=0){
             girando = false
