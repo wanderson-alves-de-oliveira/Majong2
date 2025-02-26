@@ -39,11 +39,11 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
     private var songs: Int = 0
     private var efeitoSonoro: MediaPlayer = MediaPlayer.create(this.context, R.raw.dim)
     private var efeitoSonoro2: MediaPlayer = MediaPlayer.create(this.context, R.raw.finalyy)
-
     var tiles = mutableListOf<MahjongTile>()
     var selectedTiles = mutableListOf<MahjongTile>()
     var selectedTilesBase = mutableListOf<Botao>()
     private val paint = Paint()
+    private var itenImpossivel = false
 
     private val display: DisplayMetrics = context.resources.displayMetrics
     private val h = display.heightPixels
@@ -66,12 +66,11 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
     var lampada = BitmapFactory.decodeResource(context.resources, R.drawable.lampada)
     var ima = BitmapFactory.decodeResource(context.resources, R.drawable.ima)
     var giro = BitmapFactory.decodeResource(context.resources, R.drawable.giro)
-    val b: Bitmap = Bitmap.createBitmap(w,h, Bitmap.Config.ARGB_8888)
-    val b2: Bitmap = Bitmap.createBitmap(w,h, Bitmap.Config.ARGB_8888)
-    val b3: Bitmap = Bitmap.createBitmap(w,h, Bitmap.Config.ARGB_8888)
+    val b: Bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+    var b2: Bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+    val b3: Bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
 
 
-    // var  walld = Bitmap.createScaledBitmap(wall, (w).toInt(), (h).toInt(), false)
     var walld: MutableList<Bitmap> = mutableListOf()
     var tileImages = mutableListOf<Bitmap>()
     val botao1 = MahjongTile(
@@ -91,6 +90,7 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
         ((w * 0.9f) / 6).toInt(),
         2,
         2000
+
     )
     val botao3 = MahjongTile(
         giro,
@@ -100,6 +100,7 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
         ((w * 0.9f) / 6).toInt(),
         2,
         3000
+
     )
     val IA_LIMIT = 50
     var timeValidarIA = IA_LIMIT
@@ -239,11 +240,10 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                             runBlocking {
 
 
+                                launch(Dispatchers.Default) {
 
-                                    launch(Dispatchers.Default) {
 
-
-                                        if (isTouched || ajustarY || embaralhando) {
+                                    if (isTouched || ajustarY || embaralhando) {
                                         val canvas2 = Canvas(b)
 
                                         canvas2.drawColor(
@@ -251,25 +251,25 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                                             PorterDuff.Mode.CLEAR
                                         )
 
-                                      var countEmbaralhar = 0
+                                        var countEmbaralhar = 0
                                         tiles.forEach {
 
-                                            if (ajustarY) {
-                                                val vel = (it.yp - it.y) / divisor
-                                                if (it.y < it.yp) {
-
-                                                    it.y += if (vel > w * 0.1f) vel else w * 0.1f
-
-                                                    if (it.y > it.yp) {
-                                                        it.y = it.yp
-                                                        it.ty = true
-                                                    }
-
-
-                                                }
-                                            }
-                                            if(embaralhando){
-                                                if(it.girando){
+//                                            if (ajustarY) {
+//                                                val vel = (it.yp - it.y) / divisor
+//                                                if (it.y < it.yp) {
+//
+//                                                    it.y += if (vel > w * 0.1f) vel else w * 0.1f
+//
+//                                                    if (it.y > it.yp) {
+//                                                        it.y = it.yp
+//                                                        it.ty = true
+//                                                    }
+//
+//
+//                                                }
+//                                            }
+                                            if (embaralhando) {
+                                                if (it.girando) {
                                                     countEmbaralhar++
                                                 }
                                             }
@@ -280,11 +280,11 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                                             // }
 
                                         }
-                                            if(embaralhando){
-                                                if(countEmbaralhar<=0){
-                                                    embaralhando = false
-                                                }
+                                        if (embaralhando) {
+                                            if (countEmbaralhar <= 0) {
+                                                embaralhando = false
                                             }
+                                        }
                                         if (tiles
                                                 .filter { it.ty == false }.isEmpty()
                                         ) {
@@ -292,51 +292,34 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
 
                                         }
 
-                                            isTouched = false
-                                            launch(Dispatchers.Default) {
-                                                canvas.drawBitmap(b, 0f, 0f, paint)
-                                                canvas.drawBitmap(b2, 0f, 0f, paint)
-                                            }
-
-                                        }else{
+                                        isTouched = false
+                                        launch(Dispatchers.Default) {
                                             canvas.drawBitmap(b, 0f, 0f, paint)
                                             canvas.drawBitmap(b2, 0f, 0f, paint)
-
                                         }
 
+                                    } else {
+                                        canvas.drawBitmap(b, 0f, 0f, paint)
+                                        canvas.drawBitmap(b2, 0f, 0f, paint)
+
+                                    }
 
 
-                                        val novoFiltro2 =
-                                            tiles
-                                                .filter { it.camada == 2 }
-                                        val novoFiltro1 =
-                                            tiles
-                                                .filter { it.camada == 1 }
-                                        val novoFiltro0 =
-                                            tiles
-                                                .filter { it.camada == 0 }
-
-                                        validarCamadas(
-                                            novoFiltro1.toMutableList(),
-                                            novoFiltro2.toMutableList(),
-                                            2
-                                        )
-                                        validarCamadas(
-                                            novoFiltro0.toMutableList(),
-                                            novoFiltro1.toMutableList(),
-                                            1
-                                        )
+                                }
 
 
-                                        }
-                                        launch(Dispatchers.Default) {
 
-                                            val canvas3 = Canvas(b2)
 
-                                            canvas3.drawColor(
-                                                Color.Transparent.toArgb(),
-                                                PorterDuff.Mode.CLEAR
-                                            )
+
+                                launch(Dispatchers.Default) {
+
+                                    val canvas3 = Canvas(b2)
+                                    val bk: Bitmap = b2
+
+                                    canvas3.drawColor(
+                                        Color.Transparent.toArgb(),
+                                        PorterDuff.Mode.CLEAR
+                                    )
 
 
                                     try {
@@ -401,6 +384,7 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                                         }
                                     } catch (e: Exception) {
                                         e.stackTrace
+                                        b2 = bk
                                     }
 
 
@@ -486,10 +470,19 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                                     }
                                 }
 
-//                            launch(Dispatchers.Default) {
-//                                eliminarSelecao()
-//
-//                            }
+                            launch(Dispatchers.Default) {
+                              if(itenImpossivel){
+                                  paint.textSize = 150f
+                                  paint.color = Color.Red.toArgb()
+                                  canvas.drawText(
+                                      "itenImpossivel",
+                                      100f,
+                                      (h * 0.5).toFloat(),
+                                      paint
+                                  )
+                              }
+
+                            }
 
                             }
 
@@ -790,11 +783,14 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
 
 
             val canvasB = Canvas(b3)
-
             canvasB.drawColor(
                 Color.Transparent.toArgb(),
                 PorterDuff.Mode.CLEAR
             )
+            paint.color = Color.Black.toArgb()
+            paint.alpha = 150
+
+
             canvasB.drawRoundRect(
                 RectF(
                     (this.w * 0.08).toFloat(),
@@ -804,6 +800,7 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                 ), 30f, 30f, paint
             )
             paint.color = Color(0xFF2F4F4F).toArgb()
+            paint.alpha = 150
 
             canvasB.drawRoundRect(
                 RectF(
@@ -813,13 +810,13 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                     (selectedTilesBase[0].y).toFloat() + (selectedTilesBase[0].h * 1.15f).toFloat()
                 ), 30f, 30f, paint
             )
-
+            paint.color = Color.Black.toArgb()
+            paint.alpha = 255
             selectedTilesBase.forEach { it.draw(canvasB) }
-        }catch (ett:Exception){
+
+        } catch (ett: Exception) {
             ett.stackTrace
         }
-
-
 
 
         // tileImages.shuffle()
@@ -1091,7 +1088,7 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
         }
         if (avaliar) {
             isTouched = true
-         }
+        }
 
     }
 
@@ -1140,12 +1137,15 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
         val tem3 = validarSelecaoIA(camada2, 3, 0)
         var tem2 = false
         var tem1 = false
+        itenImpossivel = false
 
         if (!tem3) {
             if (selectedTiles.filter { it.camada != -5 }.isEmpty()) {
                 tem2 = validarSelecaoIA(camada2, 2, 0)
             }
             if (!tem2 && selectedTiles.filter { it.camada != -5 }.isNotEmpty()) {
+                itenImpossivel = false
+
                 tem1 = validarSelecaoIA(selectedTiles, 2, 1)
                 if (!tem1) {
                     //   validarSelecaoIA(camada2, 1, 2)
@@ -1188,6 +1188,13 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
             if (listr.size >= min && modo == 0) {
                 var i = 0
 
+                val temEspaco = 7 - selectedTiles.filter { it.camada != -5 }.size
+
+                if (temEspaco < listr.size) {
+                    itenImpossivel = true
+                    return false
+                }
+
                 if (i < min) {
                     listr.filter { it.id == listr[0].id }.forEach {
                         achou(it)
@@ -1222,8 +1229,13 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
             }
 
 
+            if (listr3.size>1) {
+             val m = listr3[0]
+                listr3.clear()
+                listr3.add(m)
+            }
 
-            if (i < 8 - selectedTiles.filter { it.camada != -5 }.size && listr3.isNotEmpty()) {
+            if (i < 7 - selectedTiles.filter { it.camada != -5 }.size && listr3.isNotEmpty()) {
                 listr3.forEach {
                     achou(it)
                     i++
@@ -1241,7 +1253,13 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                         listrt.add(it0)
                     }
                 }
+                val temEspaco = 7 - selectedTiles.filter { it.camada != -5 }.size
 
+                if (temEspaco < listrv.size) {
+                    itenImpossivel = true
+
+                    return false
+                }
                 listrt.forEach {
                     list.forEach { o ->
 
@@ -1252,7 +1270,13 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                     }
                 }
                 var ii = 0
-                if (ii < 8 - selectedTiles.size && listrv.isNotEmpty()) {
+
+                if (temEspaco < listrv.size) {
+                    itenImpossivel = true
+                    return false
+                }
+
+                if (ii < 7 - selectedTiles.size && listrv.isNotEmpty()) {
                     listrv.forEach {
                         achou(it)
                         ii++
@@ -1302,6 +1326,7 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
             120,
             -2,
             tile.id
+
         )
         m.y = tile.y
         val total = selectedTiles.filter { it.camada != -5 }
@@ -1394,6 +1419,7 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                         (this.w * 0.9 / 8).toInt(),
                         -2,
                         tile.id
+
                     )
                     m.y = tile.y
                     tile.camada = -2
@@ -1402,7 +1428,7 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
 //                    val selectedTilesNovo = mutableListOf<MahjongTile>()
 //                    selectedTilesNovo.addAll(selectedTiles)
                     tile.ref = tiles.indexOf(tile)
-
+                    carregarCamadas()
                     val novosItens = mutableListOf<MahjongTile>()
 
                     for (item in selectedTiles) {
@@ -1454,7 +1480,7 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                     ) {
                         time3 = 10
                         botao3.isSelected = true
-                        embaralhando=true
+                        embaralhando = true
                         embaralha()
                     }
 
@@ -1468,6 +1494,33 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
         } catch (e: Exception) {
             e.stackTrace
         }
+    }
+
+
+    fun carregarCamadas() {
+        val novoFiltro2 =
+            tiles
+                .filter { it.camada == 2 }
+        val novoFiltro1 =
+            tiles
+                .filter { it.camada == 1 }
+        val novoFiltro0 =
+            tiles
+                .filter { it.camada == 0 }
+
+
+        validarCamadas(
+            novoFiltro1.toMutableList(),
+            novoFiltro2.toMutableList(),
+            2
+        )
+        validarCamadas(
+            novoFiltro0.toMutableList(),
+            novoFiltro1.toMutableList(),
+            1
+        )
+
+
     }
 
 }
