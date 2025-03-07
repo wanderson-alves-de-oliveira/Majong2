@@ -36,7 +36,7 @@ class MahjongTile(
     var ref = -1
 
 
-    var ty = false
+    var ty = true
     var espaco = 0f
     var girando = girando
     var giroc = 0f
@@ -171,13 +171,24 @@ class MahjongTile(
                     timeG = VAL_LIMITG
                     intro = false
                     y=yp
+                    ty=false
+
                 }
                 if(y<yp){
-                    val vel = (yp-y)/2
+                   val vel = h*(timeG/8)
                     y+=vel
 
                     if(y>yp){
                         y=yp
+                        girando = false
+                        giroc = 0f
+                        timeG = VAL_LIMITG
+                        intro = false
+                        y=yp
+                        ty=false
+
+
+
                     }
                 }
 
