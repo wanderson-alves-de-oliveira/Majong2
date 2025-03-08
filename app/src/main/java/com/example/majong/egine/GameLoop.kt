@@ -710,6 +710,7 @@ if(listr2.size==3) {
                 R.drawable.cavalo
             )
         )
+
         tileImages.shuffle()
         tamPadrao = tileImages[0].width
         tiles.clear()
@@ -771,7 +772,7 @@ if(listr2.size==3) {
 
 
         var disponiveis: MutableList<Int> = mutableListOf()
-
+       // fase=3
         when (fase) {
             0 -> {
 
@@ -783,35 +784,71 @@ if(listr2.size==3) {
                 tiles =   QuadradoB().quadradoB(w,disponiveis, tileImages)
 
             }
-            2 -> {
+            2-> {
+
+                tiles =   QuadradoC().quadradoC(w,disponiveis, tileImages)
+
+            }
+            3-> {
                 tiles =   Plus().plus(w,disponiveis, tileImages)
 
 
             }
-            3 -> {
+            4-> {
 
-                tiles =   Cabeca().cabeca(w,disponiveis, tileImages)
+                tiles =   QuadradoI().quadradoI(w,disponiveis, tileImages)
 
             }
-            4 -> {
+            5-> {
+
+                tiles =   QuadradoT().quadradoT(w,disponiveis, tileImages)
+
+            }
+
+            6-> {
+
+                tiles =   QuadradoF().quadrado(w,disponiveis, tileImages)
+
+            }
+            7-> {
+
+                tiles =   QuadradoO().quadrado(w,disponiveis, tileImages)
+
+            }
+           8-> {
 
                 tiles =   Arvore().arvore(w,disponiveis, tileImages)
 
             }
-            10 -> {
+            9 -> {
+
+                tiles =   Cabeca().cabeca(w,disponiveis, tileImages)
+
+            }
+           10 -> {
 
                 tiles =   Coracao().coracao(w,disponiveis, tileImages)
 
             }
-            5 -> {
+            11-> {
+
+                tiles =   Peixe().quadrado(w,disponiveis, tileImages)
+
+            }
+            12-> {
+
+                tiles =   SquareA().quadrado(w,disponiveis, tileImages)
+
+            }
+            13 -> {
 
                 tiles =   Square().quadrado(w,disponiveis, tileImages)
 
             }
 
         }
-        fase ++
-        if (fase > 5) {
+       fase ++
+        if (fase > 13) {
             fase = 0
         }
 
@@ -1280,6 +1317,7 @@ if(listr2.size==3) {
                     selectedTiles.clear()
                     selectedTiles.addAll(novosItens)
 
+                   // carregarCamadas()
 
 //
 //                    selectedTiles.clear()

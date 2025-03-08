@@ -15,12 +15,12 @@ class Coracao {
         val espaco = w * 0.05f
         val h = tamNovo
         val w = tamNovo
-        for (i in 0 until 79) {
+        for (i in 0 until 49) {
             disponiveis.add(i)
         }
         var maximo = disponiveis.size
 
-        for (i in 0 until 78) {
+        for (i in 0 until 48) {
             if (i % 3 == 0) {
                 initialize = -1
                 grau++
@@ -144,28 +144,39 @@ class Coracao {
                     }
                 }
 
-                in 36..76 -> {
+                in 36..47 -> {
                     camadaP = 2
                     when (disponiveis[index]) {
                         in 36..39 -> {
                             y = (tamNovo.toFloat() * 2) + tamNovo.toFloat()
                         }
-                        in 36..39 -> {
-                            y = (tamNovo.toFloat() * 2) + tamNovo.toFloat()
+                        in 40..41 -> {
+                            y = (tamNovo.toFloat() * 3) + tamNovo.toFloat()
                         }
-
+                        in 42..45 -> {
+                            y = (tamNovo.toFloat() * 6) + tamNovo.toFloat()
+                        }
+                        in 46..46 -> {
+                            y = (tamNovo.toFloat() * 4) + tamNovo.toFloat()
+                        }
+                        in 47..47 -> {
+                            y = (tamNovo.toFloat() * 1) + tamNovo.toFloat()
+                        }
                     }
                     when (disponiveis[index]) {
-                        in listOf(36, 65, 69, 73) -> x =
+                        in listOf(36, 42) -> x =
                             espaco + tamNovo.toFloat()
-                        in listOf(37, 66, 70, 74) -> x =
+                        in listOf(37, 40, 43) -> x =
                             espaco + (tamNovo.toFloat() * 1) + tamNovo.toFloat()
 
-                        in listOf(38, 67, 71, 75) -> x =
+                        in listOf(38, 41, 44) -> x =
                             espaco + (tamNovo.toFloat() * 2) + tamNovo.toFloat()
 
-                        in listOf(39, 68, 72, 76) -> x =
+                        in listOf(39, 45) -> x =
                             espaco + (tamNovo.toFloat() * 3) + tamNovo.toFloat()
+
+                        in listOf(46,47) -> x =
+                            espaco + (tamNovo.toFloat() * 1.6f) + tamNovo.toFloat()
                     }
                 }
 //
