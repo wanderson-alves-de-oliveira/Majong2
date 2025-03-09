@@ -59,7 +59,7 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
     var bloquerBT2 = false
     var embaralhando = false
 
-    var fase = 0
+    var fase = -8
 
     var time1 = 0
     var time2 = 0
@@ -293,7 +293,10 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                                     } else {
                                         canvas.drawBitmap(b, 0f, 0f, paint)
                                         //  canvas.drawBitmap(b2, 0f, 0f, paint)
+                                        launch(Dispatchers.Default) {
 
+                                            carregarCamadas()
+                                        }
                                     }
 
 
@@ -431,7 +434,13 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                                         e.stackTrace
                                         //  b2 = bk
                                     }
+
                                     eliminarSelecao()
+
+
+                                }
+                                launch(Dispatchers.Default) {
+                                    Thread.sleep(30)
 
 
                                 }
@@ -516,7 +525,6 @@ if(listr2.size==3) {
         }
 
     }
-    carregarCamadas()
     avaliar3 = false
 }
 
@@ -774,6 +782,46 @@ if(listr2.size==3) {
         var disponiveis: MutableList<Int> = mutableListOf()
        // fase=3
         when (fase) {
+            -8 -> {
+
+                tiles =   Quadrado0A().quadradoA(w,disponiveis, tileImages)
+
+            }
+            -7 -> {
+
+                tiles =   Quadrado0B().quadradoB(w,disponiveis, tileImages)
+
+            }
+            -6-> {
+
+                tiles =   Quadrado0C().quadradoC(w,disponiveis, tileImages)
+
+            }
+            -5-> {
+                tiles =   Plus0A().plus(w,disponiveis, tileImages)
+
+
+            }
+            -4-> {
+
+                tiles =   Quadrado0I().quadradoI(w,disponiveis, tileImages)
+
+            }
+            -3-> {
+
+                tiles =   Cabeca0A().cabeca(w,disponiveis, tileImages)
+
+            }
+            -2 -> {
+
+                tiles =   Coracao0A().coracao(w,disponiveis, tileImages)
+
+            }
+            -1-> {
+
+                tiles =   Square0A().quadrado(w,disponiveis, tileImages)
+
+            }
             0 -> {
 
                 tiles =   QuadradoA().quadradoA(w,disponiveis, tileImages)
@@ -845,10 +893,15 @@ if(listr2.size==3) {
                 tiles =   Square().quadrado(w,disponiveis, tileImages)
 
             }
+            14 -> {
+
+                tiles =   QuadradoCC().quadradoC(w,disponiveis, tileImages)
+
+            }
 
         }
        fase ++
-        if (fase > 13) {
+        if (fase > 14) {
             fase = 0
         }
 
@@ -1272,11 +1325,7 @@ if(listr2.size==3) {
 
             if (event.action == MotionEvent.ACTION_DOWN) {
 
-                runBlocking {
-                    launch(Dispatchers.Default) {
-                        carregarCamadas()
-                    }
-                }
+
 
 
                 tiles.filter { !selectedTiles.contains(it) }.find {
@@ -1285,6 +1334,8 @@ if(listr2.size==3) {
                         event.y
                     ) && it.camada == 2 && selectedTiles.filter { it.camada > -3 }.size < 80
                 }?.let { tile ->
+
+                            carregarCamadas()
 
                     val m: MahjongTile = MahjongTile(
                         tile.image,
@@ -1317,7 +1368,7 @@ if(listr2.size==3) {
                     selectedTiles.clear()
                     selectedTiles.addAll(novosItens)
 
-                   // carregarCamadas()
+
 
 //
 //                    selectedTiles.clear()

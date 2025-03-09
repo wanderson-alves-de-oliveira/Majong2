@@ -4,7 +4,7 @@ import android.graphics.Bitmap
 import com.example.majong.view.MahjongTile
 import kotlin.random.Random
 
-class QuadradoB {
+class Quadrado0B {
 
 
 
@@ -17,12 +17,12 @@ class QuadradoB {
         val espaco = (((w * 0.9f) / 6)).toInt()
         val h = tamNovo
         val w = tamNovo
-        for (i in 0 until 28) {
+        for (i in 0 until 25) {
             disponiveis.add(i)
         }
         var maximo = disponiveis.size
 
-        for (i in 0 until 27) {
+        for (i in 0 until 24) {
             if (i % 3 == 0) {
                 initialize = -1
                 grau++
@@ -37,7 +37,7 @@ class QuadradoB {
             var y = 0f
             when (disponiveis[index]) {
                 in 0..15 -> {
-                    camadaP = 0
+                    camadaP = 1
                     when (disponiveis[index]) {
                         in 0..3 -> {
                             y = tamNovo.toFloat()*0.6f
@@ -74,8 +74,8 @@ class QuadradoB {
                     }
                 }
 
-                in 16..21 -> {
-                    camadaP = 1
+                in 16..23 -> {
+                    camadaP = 2
 
                     when (disponiveis[index]) {
                         in 16..18 -> {
@@ -86,7 +86,9 @@ class QuadradoB {
                             y = (tamNovo.toFloat() * 3) + (tamNovo.toFloat() / 2)
                         }
 
-
+                        in 22..23 -> {
+                            y = (tamNovo.toFloat() * 2) + (tamNovo.toFloat() / 2)
+                        }
 
 
                     }
@@ -100,35 +102,14 @@ class QuadradoB {
                         in listOf(18, 21) -> x =
                             espaco + (tamNovo.toFloat() * 2) + (tamNovo.toFloat() / 2)
 
-
+                        in listOf(22) -> x =
+                            espaco + (tamNovo.toFloat() * 0.5f) + (tamNovo.toFloat() / 2)
+                        in listOf( 23) -> x =
+                            espaco + (tamNovo.toFloat() * 1.5f) + (tamNovo.toFloat() / 2)
 
                     }
                 }
 
-                in 22..26-> {
-                    camadaP = 2
-                    when (disponiveis[index]) {
-                        in 22..23 -> {
-                            y = (tamNovo.toFloat() + tamNovo.toFloat())*0.5f
-                        }
-
-                        in 24..25 -> {
-                            y = (tamNovo.toFloat() * 2) + tamNovo.toFloat()
-                        }
-                        in 26..26 -> {
-                            y = (tamNovo.toFloat() * 1) + tamNovo.toFloat()
-                        }
-
-                    }
-                    when (disponiveis[index]) {
-                        in listOf(22, 24) -> x =
-                            espaco + (tamNovo.toFloat() * 0) + tamNovo.toFloat()
-                        in listOf(23, 25) -> x =
-                            espaco + (tamNovo.toFloat() * 1) + tamNovo.toFloat()
-                        in listOf(26) -> x =
-                            espaco + (tamNovo.toFloat() * 0.5f) + tamNovo.toFloat()
-                    }
-                }
 
 //                else -> {
 //                    camadaP = 2
