@@ -21,6 +21,8 @@ class GameView(context: Context) : SurfaceView(context), SurfaceHolder.Callback 
         try {
             tiles = gameLoop.tiles
             selectedTiles = gameLoop.selectedTiles
+            selectedTiles.removeAll(gameLoop.removerDaLista)
+            gameLoop.removerDaLista.clear()
         }catch (_:Exception){}
 
         gameLoop = GameLoop(holder, context)

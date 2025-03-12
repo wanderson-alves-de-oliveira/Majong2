@@ -49,7 +49,7 @@ class MahjongTile(
     fun draw(canvas: Canvas) {
         paint.textSize = 80f
 
-        paint2.color = Color.LightGray.toArgb()
+        paint2.color = Color.Black.toArgb()
 
         paint.color = Color.Red.toArgb()
 
@@ -89,10 +89,11 @@ class MahjongTile(
         if (isSelected) {
             paint2.color = Color.Gray.toArgb()
         }
+        paint2.alpha = 180
         canvas2.drawRoundRect(
             0f,
             0f,
-            b.width.toFloat() - espaco,
+            img.width.toFloat(),
             b.height.toFloat() - espaco,
             20f,
             20f,

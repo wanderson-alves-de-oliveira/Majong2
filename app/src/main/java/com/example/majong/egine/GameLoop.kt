@@ -43,6 +43,8 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
     var tiles = mutableListOf<MahjongTile>()
     var selectedTiles = mutableListOf<MahjongTile>()
     var selectedTilesBase = mutableListOf<Botao>()
+    var removerDaLista = mutableListOf<MahjongTile>()
+
     private val paint = Paint()
     private var itenImpossivel = false
     private val coroutine: CoroutineScope = CoroutineScope(Dispatchers.Default)
@@ -59,7 +61,7 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
     var bloquerBT2 = false
     var embaralhando = false
 
-    var fase = -8
+    var fase = -9
 
     var time1 = 0
     var time2 = 0
@@ -167,7 +169,7 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                         bloquerBT =
                             selectedTiles.filter { it.camada < -2 && it.camada >= -4 }
                                 .isEmpty()
-                        if (selectedTiles.filter { it.camada > -2 }.size < 70 || selectedTiles.filter { it.camada > -2 }.size > 70 && dica) {
+                        if (selectedTiles.filter { it.camada > -2 }.size < 7 || selectedTiles.filter { it.camada > -2 }.size > 7 && dica) {
 
 //
                             if (!ajustarY) {
@@ -439,11 +441,11 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
 
 
                                 }
-                                launch(Dispatchers.Default) {
-                                    Thread.sleep(30)
-
-
-                                }
+//                                launch(Dispatchers.Default) {
+//                                    Thread.sleep(30)
+//
+//
+//                                }
                             }
 
 
@@ -782,14 +784,21 @@ if(listr2.size==3) {
         var disponiveis: MutableList<Int> = mutableListOf()
        // fase=3
         when (fase) {
+
+            -9-> {
+
+                tiles =   Quadrado0B().quadradoB(w,disponiveis, tileImages)
+
+            }
             -8 -> {
 
                 tiles =   Quadrado0A().quadradoA(w,disponiveis, tileImages)
 
             }
+
             -7 -> {
 
-                tiles =   Quadrado0B().quadradoB(w,disponiveis, tileImages)
+                tiles =   Quadrado01().quadrado(w,disponiveis, tileImages)
 
             }
             -6-> {
@@ -898,7 +907,11 @@ if(listr2.size==3) {
                 tiles =   QuadradoCC().quadradoC(w,disponiveis, tileImages)
 
             }
+            else -> {
 
+                tiles =   QuadradoAleatorio().quadrado(w,disponiveis, tileImages)
+
+            }
         }
        fase ++
         if (fase > 14) {
@@ -1044,7 +1057,8 @@ if(listr2.size==3) {
                     tiles[it.ref].bloqueado = true
                 }
             }
-
+            removerDaLista.clear()
+            removerDaLista.addAll(listr)
 
         }
 
@@ -1332,10 +1346,10 @@ if(listr2.size==3) {
                     it.containsTouch(
                         event.x,
                         event.y
-                    ) && it.camada == 2 && selectedTiles.filter { it.camada > -3 }.size < 80
+                    ) && it.camada == 2 && selectedTiles.filter { it.camada > -3 }.size < 8
                 }?.let { tile ->
 
-                            carregarCamadas()
+                           // carregarCamadas()
 
                     val m: MahjongTile = MahjongTile(
                         tile.image,
