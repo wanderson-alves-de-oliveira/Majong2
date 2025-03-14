@@ -1,5 +1,6 @@
 package com.example.majong.egine
 
+import android.content.Context
 import android.graphics.Bitmap
 import com.example.majong.view.MahjongTile
 import kotlin.random.Random
@@ -8,7 +9,7 @@ class Plus {
 
 
 
-    fun plus(w:Int, disponiveis: MutableList<Int>, tileImages: MutableList<Bitmap>) :MutableList<MahjongTile>{
+    fun plus(context: Context, w:Int, disponiveis: MutableList<Int>, tileImages: MutableList<Bitmap>) :MutableList<MahjongTile>{
         var initialize = 0
         var grau = 0
         var tiles = mutableListOf<MahjongTile>()
@@ -174,6 +175,7 @@ class Plus {
             tiles.add(
                 MahjongTile(
                     tileImages[grau - 1],
+                    context,
                     x,
                     y,
                     w,
