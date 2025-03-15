@@ -104,9 +104,9 @@ class Quadrado0B {
                             espaco + (tamNovo.toFloat() * 2) + (tamNovo.toFloat() / 2)
 
                         in listOf(22) -> x =
-                            espaco + (tamNovo.toFloat() * 0.5f) + (tamNovo.toFloat() / 2)
+                            espaco + (tamNovo.toFloat() * 0.6f) + (tamNovo.toFloat() / 2)
                         in listOf( 23) -> x =
-                            espaco + (tamNovo.toFloat() * 1.5f) + (tamNovo.toFloat() / 2)
+                            espaco + (tamNovo.toFloat() * 1.6f) + (tamNovo.toFloat() / 2)
 
                     }
                 }

@@ -96,8 +96,10 @@ class QuadradoAleatorio {
                     y = pXY0.get(camada0).y
 
                     x = pXY0.get(camada0).x
+                    if (camada0 < pXY0.size-1) {
 
-                    camada0++
+                        camada0++
+                    }
                 }
 
                 in index0+1..index1 -> {
@@ -106,8 +108,10 @@ class QuadradoAleatorio {
 
                     x = pXY1.get(camada1).x
 
+                    if (camada1 < pXY1.size-1) {
+                        camada1++
+                    }
 
-                    camada1++
                 }
 
                 in index1+1..ran[0] -> {
@@ -116,8 +120,10 @@ class QuadradoAleatorio {
 
                     x = pXY2.get(camada2).x
 
+                    if (camada2 < pXY2.size-1) {
 
-                    camada2++
+                        camada2++
+                    }
                 }
 //
 //                else -> {

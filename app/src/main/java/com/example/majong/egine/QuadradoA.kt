@@ -129,7 +129,7 @@ class QuadradoA {
                         in listOf(26, 28) -> x =
                             espaco + (tamNovo.toFloat() * 1) + tamNovo.toFloat()
                         in listOf(29) -> x =
-                            espaco + (tamNovo.toFloat() * 0.5f) + tamNovo.toFloat()
+                            espaco + (tamNovo.toFloat() * 0.6f) + tamNovo.toFloat()
                     }
                 }
 

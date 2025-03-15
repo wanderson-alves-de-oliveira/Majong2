@@ -114,7 +114,7 @@ class Quadrado01 {
 
 
                         in listOf(34,37) -> x =
-                            espaco + (tamNovo.toFloat() * 2f) + (tamNovo.toFloat() / 2)
+                            espaco + (tamNovo.toFloat() * 2.1f) + (tamNovo.toFloat() / 2)
 
                         in listOf(35,38) -> x =
                             espaco + (tamNovo.toFloat() * 3.5f) + (tamNovo.toFloat() / 2)

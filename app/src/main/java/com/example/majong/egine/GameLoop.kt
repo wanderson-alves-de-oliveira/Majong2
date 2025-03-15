@@ -1,6 +1,7 @@
 package com.example.majong.egine
 
 import android.content.Context
+import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
@@ -9,6 +10,7 @@ import android.graphics.PorterDuff
 import android.graphics.RectF
 import android.media.MediaPlayer
 import android.util.DisplayMetrics
+import android.util.TypedValue
 import android.view.MotionEvent
 import android.view.SurfaceHolder
 import androidx.compose.ui.graphics.Color
@@ -44,8 +46,8 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
     private var efeitoSonoro2: MediaPlayer = MediaPlayer.create(this.context, R.raw.finalyy)
     var tiles = mutableListOf<MahjongTile>()
     var selectedTiles = mutableListOf<MahjongTile>()
-    var selectedTilesBase = mutableListOf<Botao>()
-    var removerDaLista = mutableListOf<MahjongTile>()
+     var removerDaLista = mutableListOf<MahjongTile>()
+    var fps = 1L
 
     private val paint = Paint()
     private var itenImpossivel = false
@@ -63,7 +65,7 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
     var bloquerBT2 = false
     var embaralhando = false
 
-    var fase = -9
+    var fase = 15
 
     var time1 = 0
     var time2 = 0
@@ -77,13 +79,14 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
     var ima = BitmapFactory.decodeResource(context.resources, R.drawable.ima)
     var giro = BitmapFactory.decodeResource(context.resources, R.drawable.giro)
     val b: Bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
-    var main = MainView(this.context,  (w*1.1f).toInt(), (h*1.1f).toInt())
+    var main = MainView(this.context, (w * 1.1f).toInt(), (h * 1.1f).toInt())
 
     //var b2: Bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
     val b3: Bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
 
 
-    var btm = BotaoM(this.context,
+    var btm = BotaoM(
+        this.context,
         tileImage,
         ((this.w * 0.9 / 4) * (1)).toFloat(),
         (this.h * 0.6).toFloat(),
@@ -145,13 +148,15 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
 
         while (running) {
             val now = System.nanoTime()
-            val deltaTime = (now - lastTime) / 1_000_000_000.0 // Convertendo para segundos
+            var deltaTime = (now - lastTime) / 1_000_000_000.0
+            if (deltaTime < 0) deltaTime = 0.1
+            // Convertendo para segundos
             lastTime = now
             try {
                 update(deltaTime)
 
             } catch (e: Exception) {
-
+                e.stackTrace
             }
 
 
@@ -172,9 +177,8 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
 
         while (running) {
 
-
             var canvas: Canvas? = null
-            if (!cLocked ){
+            if (!cLocked) {
                 canvas = this.surfaceHolder.lockCanvas();
                 cLocked = true;
             }
@@ -188,8 +192,8 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                             main.draw(canvas)
                             btm.draw(canvas)
 
-                            if(btm.liberar>3){
-                                index=1
+                            if (btm.liberar > 3) {
+                                index = 1
                                 btm.liberar = 0
 
                             }
@@ -199,24 +203,35 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                         }
                     }
 
-                    if (cLocked ) {
+                    if (cLocked) {
                         surfaceHolder.unlockCanvasAndPost(canvas);
                         cLocked = false;
                     }
 
 
                 } else {
+
+                    Thread.sleep(fps)
+
+
+
                     if (canvas != null) {
-                        try {
+                        //     try {
 
-                            validarSelecao(selectedTiles.filter { it.camada != -5 }.toMutableList())
 
-                            bloquerBT =
-                                selectedTiles.filter { it.camada < -2 && it.camada >= -4 }
-                                    .isEmpty()
-                            if (selectedTiles.filter { it.camada > -2 }.size < 7 || selectedTiles.filter { it.camada > -2 }.size > 7 && dica) {
+                        validarSelecao(selectedTiles.filter { it.camada != -5 }
+                            .toMutableList())
+
+
+                        bloquerBT =
+                            selectedTiles.filter { it.camada < -2 && it.camada >= -4 }
+                                .isEmpty()
+                        if (selectedTiles.filter { it.camada > -2 }.size < 7 || selectedTiles.filter { it.camada > -2 }.size > 7 && dica) {
 
 //
+                            try {
+
+
                                 if (!ajustarY) {
                                     timeValidarIA--
                                     if (timeValidarIA < 0) {
@@ -328,6 +343,7 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                                                     .filter { it.ty == true }.isEmpty()
                                             ) {
                                                 ajustarY = false
+                                                fps = 10
 
                                             }
 
@@ -342,7 +358,14 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                                             //  canvas.drawBitmap(b2, 0f, 0f, paint)
                                             launch(Dispatchers.Default) {
 
-                                                carregarCamadas()
+                                                try {
+                                                    carregarCamadas()
+
+                                                } catch (eeee: Exception) {
+                                                    eeee.stackTrace
+                                                    //  b2 = bk
+                                                }
+
                                             }
                                         }
 
@@ -387,9 +410,18 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
 
 
                                                     val py = (h * 0.75).toFloat()
-                                                    val mediay = (h) * 0.05
-                                                    val velocidadey = it.h
+                                                    //val mediay = (h) * 0.05
 
+                                                  //  val tempoQueda = calculoVelocidade(it,py)// Tempo em segundos
+                                                    val resources = context.resources
+                                                    val velocidadey = (it.h/2).toFloat().toDp(resources)
+                                                    // var velocidadey = calculoVelocidade(it,py)
+
+
+//
+//                                                    if (velocidadey.toFloat() < it.h) {
+//                                                        velocidadey = it.h
+//                                                    }
 
 
                                                     if (it.x > p) {
@@ -405,13 +437,13 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                                                         }
                                                     }
                                                     if (it.y > py) {
-                                                        it.y -= velocidadey
+                                                        it.y -= velocidadey.toFloat()
                                                         if (it.y < py) {
                                                             it.y = py
                                                         }
 
                                                     } else if (it.y < py) {
-                                                        it.y += velocidadey
+                                                        it.y += velocidadey.toFloat()
                                                         if (it.y > py) {
                                                             it.y = py
                                                         }
@@ -481,9 +513,13 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                                             e.stackTrace
                                             //  b2 = bk
                                         }
+                                        try {
 
-                                        eliminarSelecao()
-
+                                            eliminarSelecao()
+                                        } catch (eeee: Exception) {
+                                            eeee.stackTrace
+                                            //  b2 = bk
+                                        }
 
                                     }
 //                                launch(Dispatchers.Default) {
@@ -503,9 +539,18 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                                     fase++
                                     popularTiles()
                                 }
+                            } catch (exx: Exception) {
+                                exx.stackTrace
+                            }
 
-                            } else {
-                                // validarSelecao(selectedTiles.filter { it.camada !=-5}.toMutableList())
+
+/////////////////////////////////////////////////////////////////////////////
+                        } else {
+                            // validarSelecao(selectedTiles.filter { it.camada !=-5}.toMutableList())
+
+                            try {
+
+
                                 if (selectedTiles.filter { it.camada > -2 }.size >= 7) {
                                     val paint = Paint()
                                     paint.textSize = 150f
@@ -534,21 +579,38 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
 
                                     }
                                 }
+
+                            } catch (exx: Exception) {
+                                exx.stackTrace
                             }
-                            if (cLocked ) {
+                        }
+
+                        try {
+
+
+                            if (cLocked) {
                                 surfaceHolder.unlockCanvasAndPost(canvas);
                                 cLocked = false;
                             }
+                        } catch (exxg: Exception) {
+                            exxg.stackTrace
 
-                        } catch (ew: Exception) {
-                            ew.stackTrace
                         }
+//                        } catch (ew: Exception) {
+//                            ew.stackTrace
+//                        }
                     }
                 }
 
 
             } catch (e: Exception) {
                 e.printStackTrace()
+
+                time3 = 10
+                botao3.isSelected = true
+                embaralhando = true
+                embaralha()
+
             }
 
 //kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk
@@ -569,14 +631,44 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
 
         }
 
-        val listr2 = listr.filter { it.camada == -5 }
+        var listr2 = listr.filter { it.camada == -5 }.toMutableList()
+
+        if (listr2.size > 3) {
+            var listrddd: MutableList<MahjongTile> = mutableListOf()
+            var o = 0
+            for (item in listr2.toList()) { // Criando uma cópia para evitar a modificação direta
+                if (o < 3) {
+                    listrddd.add(item)
+                    o++
+                } else {
+                    break
+                }
+            }
+            listr2.clear()
+        }
         if (listr2.size == 3) {
             for (item in selectedTiles.toList()) { // Criando uma cópia para evitar a modificação direta
                 if (listr2.contains(item)) {
-                    selectedTiles.remove(item) // Adiciona sem erro
+                    selectedTiles.remove(item)
+                    // Adiciona sem erro
                 }
 
             }
+
+
+//            var i = 0
+//            while (i < selectedTiles.size) {
+//                val lValue: MahjongTile = selectedTiles[i]
+//                if (listr2.contains(lValue)) {
+//                   // selectedTiles.remove(lValue)
+//                    selectedTiles[i].camada=-6
+//                    i--
+//                    // Adiciona sem erro
+//                }
+//                i++
+//            }
+
+
             avaliar3 = false
         }
 
@@ -650,8 +742,10 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
     }
 
     fun popularTiles() {
-
+        avaliar3 = false
         ajustarY = true
+        fps = 1
+
         selectedTiles.clear()
         tileImages.clear()
         tileImages.add(
@@ -776,19 +870,7 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
         tiles.clear()
 
 
-        for (i in 0 until 7) {
-            selectedTilesBase.add(
-                Botao(
-                    tileImages[0],
-                    ((this.w * 0.9 / 8) * (i + 1)).toFloat(),
-                    (this.h * 0.75).toFloat(),
-                    (this.w * 0.9 / 8).toInt(),
-                    (this.w * 0.9 / 8).toInt(),
-                    0,
-                    "4000"
-                )
-            )
-        }
+
 
         try {
 
@@ -805,9 +887,9 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
             canvasB.drawRoundRect(
                 RectF(
                     (this.w * 0.08).toFloat(),
-                    (selectedTilesBase[0].y - (this.w * 0.03).toFloat()).toFloat(),
+                    ((this.h * 0.75).toFloat() - (this.w * 0.03).toFloat()).toFloat(),
                     (this.w * 0.93).toFloat(),
-                    (selectedTilesBase[0].y).toFloat() + (selectedTilesBase[0].h * 1.22f).toFloat()
+                    ((this.h * 0.75)).toFloat() + (((this.w * 0.9 / 8).toInt())* 1.22f).toFloat()
                 ), 30f, 30f, paint
             )
             paint.color = Color(0xFF2F4F4F).toArgb()
@@ -816,14 +898,24 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
             canvasB.drawRoundRect(
                 RectF(
                     (this.w * 0.09).toFloat(),
-                    (selectedTilesBase[0].y - (this.w * 0.02).toFloat()).toFloat(),
+                    ((this.h * 0.75).toFloat() - (this.w * 0.02).toFloat()).toFloat(),
                     (this.w * 0.92).toFloat(),
-                    (selectedTilesBase[0].y).toFloat() + (selectedTilesBase[0].h * 1.15f).toFloat()
+                    ( (this.h * 0.75).toFloat()).toFloat() + (((this.w * 0.9 / 8).toInt())* 1.15f).toFloat()
+                ), 30f, 30f, paint
+            )
+            paint.color =  Color(0xFFE6E6FA).toArgb()
+            paint.alpha = 150
+
+            canvasB.drawRoundRect(
+                RectF(
+                    (this.w * 0.09).toFloat(),
+                    ((this.h * 0.755).toFloat() - (this.w * 0.02).toFloat()).toFloat(),
+                    (this.w * 0.92).toFloat(),
+                    ( (this.h * 0.755).toFloat()).toFloat() + (((this.w * 0.9 / 8).toInt())* 1.0f).toFloat()
                 ), 30f, 30f, paint
             )
             paint.color = Color.Black.toArgb()
             paint.alpha = 255
-            selectedTilesBase.forEach { it.draw(canvasB) }
 
         } catch (ett: Exception) {
             ett.stackTrace
@@ -831,155 +923,154 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
 
 
         var disponiveis: MutableList<Int> = mutableListOf()
-        // fase=3
         when (fase) {
 
             -9 -> {
 
-                tiles = Quadrado0B().quadradoB(this.context,w, disponiveis, tileImages)
+                tiles = Quadrado0B().quadradoB(this.context, w, disponiveis, tileImages)
 
             }
 
             -8 -> {
 
-                tiles = Quadrado0A().quadradoA(this.context,w, disponiveis, tileImages)
+                tiles = Quadrado0A().quadradoA(this.context, w, disponiveis, tileImages)
 
             }
 
             -7 -> {
 
-                tiles = Quadrado01().quadrado(this.context,w, disponiveis, tileImages)
+                tiles = Quadrado01().quadrado(this.context, w, disponiveis, tileImages)
 
             }
 
             -6 -> {
 
-                tiles = Quadrado0C().quadradoC(this.context,w, disponiveis, tileImages)
+                tiles = Quadrado0C().quadradoC(this.context, w, disponiveis, tileImages)
 
             }
 
             -5 -> {
-                tiles = Plus0A().plus(this.context,w, disponiveis, tileImages)
+                tiles = Plus0A().plus(this.context, w, disponiveis, tileImages)
 
 
             }
 
             -4 -> {
 
-                tiles = Quadrado0I().quadradoI(this.context,w, disponiveis, tileImages)
+                tiles = Quadrado0I().quadradoI(this.context, w, disponiveis, tileImages)
 
             }
 
             -3 -> {
 
-                tiles = Cabeca0A().cabeca(this.context,w, disponiveis, tileImages)
+                tiles = Cabeca0A().cabeca(this.context, w, disponiveis, tileImages)
 
             }
 
             -2 -> {
 
-                tiles = Coracao0A().coracao(this.context,w, disponiveis, tileImages)
+                tiles = Coracao0A().coracao(this.context, w, disponiveis, tileImages)
 
             }
 
             -1 -> {
 
-                tiles = Square0A().quadrado(this.context,w, disponiveis, tileImages)
+                tiles = Square0A().quadrado(this.context, w, disponiveis, tileImages)
 
             }
 
             0 -> {
 
-                tiles = QuadradoA().quadradoA(this.context,w, disponiveis, tileImages)
+                tiles = QuadradoA().quadradoA(this.context, w, disponiveis, tileImages)
 
             }
 
             1 -> {
-                tiles = QuadradoB().quadradoB(this.context,w, disponiveis, tileImages)
+                tiles = QuadradoB().quadradoB(this.context, w, disponiveis, tileImages)
 
             }
 
             2 -> {
 
-                tiles = QuadradoC().quadradoC(this.context,w, disponiveis, tileImages)
+                tiles = QuadradoC().quadradoC(this.context, w, disponiveis, tileImages)
 
             }
 
             3 -> {
-                tiles = Plus().plus(this.context,w, disponiveis, tileImages)
+                tiles = Plus().plus(this.context, w, disponiveis, tileImages)
 
 
             }
 
             4 -> {
 
-                tiles = QuadradoI().quadradoI(this.context,w, disponiveis, tileImages)
+                tiles = QuadradoI().quadradoI(this.context, w, disponiveis, tileImages)
 
             }
 
             5 -> {
 
-                tiles = QuadradoT().quadradoT(this.context,w, disponiveis, tileImages)
+                tiles = QuadradoT().quadradoT(this.context, w, disponiveis, tileImages)
 
             }
 
             6 -> {
 
-                tiles = QuadradoF().quadrado(this.context,w, disponiveis, tileImages)
+                tiles = QuadradoF().quadrado(this.context, w, disponiveis, tileImages)
 
             }
 
             7 -> {
 
-                tiles = QuadradoO().quadrado(this.context,w, disponiveis, tileImages)
+                tiles = QuadradoO().quadrado(this.context, w, disponiveis, tileImages)
 
             }
 
             8 -> {
 
-                tiles = Arvore().arvore(this.context,w, disponiveis, tileImages)
+                tiles = Arvore().arvore(this.context, w, disponiveis, tileImages)
 
             }
 
             9 -> {
 
-                tiles = Cabeca().cabeca(this.context,w, disponiveis, tileImages)
+                tiles = Cabeca().cabeca(this.context, w, disponiveis, tileImages)
 
             }
 
             10 -> {
 
-                tiles = Coracao().coracao(this.context,w, disponiveis, tileImages)
+                tiles = Coracao().coracao(this.context, w, disponiveis, tileImages)
 
             }
 
             11 -> {
 
-                tiles = Peixe().quadrado(this.context,w, disponiveis, tileImages)
+                tiles = Peixe().quadrado(this.context, w, disponiveis, tileImages)
 
             }
 
             12 -> {
 
-                tiles = SquareA().quadrado(this.context,w, disponiveis, tileImages)
+                tiles = SquareA().quadrado(this.context, w, disponiveis, tileImages)
 
             }
 
             13 -> {
 
-                tiles = Square().quadrado(this.context,w, disponiveis, tileImages)
+                tiles = Square().quadrado(this.context, w, disponiveis, tileImages)
 
             }
 
             14 -> {
 
-                tiles = QuadradoCC().quadradoC(this.context,w, disponiveis, tileImages)
+                tiles = QuadradoCC().quadradoC(this.context, w, disponiveis, tileImages)
 
             }
 
             else -> {
 
-                tiles = QuadradoAleatorio().quadrado(this.context,w, disponiveis, tileImages)
+                tiles = QuadradoAleatorio().quadrado(this.context, w, disponiveis, tileImages)
 
             }
         }
@@ -1432,7 +1523,7 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                     m.y = tile.y
                     m.ty = false
                     m.naLista = true
-                     tile.ty = false
+                    tile.ty = false
                     tile.camada = -2
                     tile.w = (this.w * 0.9 / 8).toInt()
                     tile.h = (this.w * 0.9 / 8).toInt()
@@ -1506,12 +1597,11 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                         event.x,
                         event.y
                     )
-                ){
+                ) {
 
-                    btm.animar=true
+                    btm.animar = true
 
                 }
-
 
 
             }
@@ -1520,6 +1610,34 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
             e.stackTrace
         }
     }
+fun calculoVelocidade(it : MahjongTile,py:Float):Double{
+  var vel =
+    if (it.y > py) {
+        (it.y - py)
+    } else if (it.y < py) {
+        (py - it.y)
+    } else {
+        it.h
+    }
+var tempo =  (vel.toDouble()/it.h).toDouble()
+
+    if(tempo<1)tempo = 1.0
+
+    return tempo
+}
+
+
+    fun calcularVelocidadeQuedaLivre(
+        tempo: Float,
+        gravidade: Float = 9.8f // Aceleração da gravidade padrão (m/s²)
+    ): Float {
+        require(tempo >= 0) { "O tempo deve ser um valor não negativo." }
+        return (gravidade * tempo)
+
+    }
+
+
+
 
 
     fun carregarCamadas() {
@@ -1548,5 +1666,11 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
 
 
     }
-
+    fun Float.toDp(resources: Resources): Float {
+        return TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP,
+            this,
+            resources.displayMetrics
+        )
+    }
 }
