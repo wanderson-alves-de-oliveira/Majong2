@@ -46,7 +46,7 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
     private var efeitoSonoro2: MediaPlayer = MediaPlayer.create(this.context, R.raw.finalyy)
     var tiles = mutableListOf<MahjongTile>()
     var selectedTiles = mutableListOf<MahjongTile>()
-     var removerDaLista = mutableListOf<MahjongTile>()
+    var removerDaLista = mutableListOf<MahjongTile>()
     var fps = 1L
 
     private val paint = Paint()
@@ -64,8 +64,9 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
     var bloquerBT = false
     var bloquerBT2 = false
     var embaralhando = false
+    var pontos = 0
 
-    var fase = 15
+    var fase = -9
 
     var time1 = 0
     var time2 = 0
@@ -75,6 +76,15 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
 
     val divisor = 3
     var tileImage = BitmapFactory.decodeResource(context.resources, R.drawable.mahjongtile)
+    var coin = BitmapFactory.decodeResource(context.resources, R.drawable.moeda)
+    val coinP = Bitmap.createScaledBitmap(
+        coin,
+        ((w * 0.1f)).toInt(),
+        ((w * 0.1f)).toInt(),
+        false
+    )
+
+
     var lampada = BitmapFactory.decodeResource(context.resources, R.drawable.lampada)
     var ima = BitmapFactory.decodeResource(context.resources, R.drawable.ima)
     var giro = BitmapFactory.decodeResource(context.resources, R.drawable.giro)
@@ -412,9 +422,10 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                                                     val py = (h * 0.75).toFloat()
                                                     //val mediay = (h) * 0.05
 
-                                                  //  val tempoQueda = calculoVelocidade(it,py)// Tempo em segundos
+                                                    //  val tempoQueda = calculoVelocidade(it,py)// Tempo em segundos
                                                     val resources = context.resources
-                                                    val velocidadey = (it.h/2).toFloat().toDp(resources)
+                                                    val velocidadey =
+                                                        (it.h / 2).toFloat().toDp(resources)
                                                     // var velocidadey = calculoVelocidade(it,py)
 
 
@@ -461,13 +472,18 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
 
 
                                                     if (it.camada == -4) {
-                                                        val mediax =
-                                                            if ((100 + it.x) / divisor > w * 0.1f) (100 + it.x) / 2 else w * 0.1f
-//
-                                                        it.x -= mediax
-                                                        if (it.x < (it.w * 2) * -1) {
-                                                            it.camada = -5
+                                                        val mediax = it.h
+                                                        if (it.x < (w * 0.70f)) {
+                                                            it.x += mediax
 
+                                                        }
+                                                        if (it.y > (h * 0f)) {
+                                                            it.y -= mediax
+
+                                                        }
+                                                        if (it.x >= (w * 0.7f) && it.y <= 20f) {
+                                                            it.camada = -5
+                                                            pontos++
 
                                                         }
                                                     }
@@ -504,8 +520,9 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                                                     }
 
                                                 }
-
-                                                it.draw(canvas)
+                                                if (it.y > h * 0.05f) {
+                                                    it.draw(canvas)
+                                                }
 
 
                                             }
@@ -520,6 +537,42 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                                             eeee.stackTrace
                                             //  b2 = bk
                                         }
+
+                                        paint.color = Color.Black.toArgb()
+                                        paint.alpha = 150
+
+
+                                        canvas.drawRoundRect(
+                                            RectF(
+                                                (w * 0.72).toFloat(),
+                                                ((h * 0.02).toFloat() - (w * 0.025).toFloat()).toFloat(),
+                                                (w * 0.955).toFloat(),
+                                                ((h * 0.02)).toFloat() + ((((w * 0.05)).toInt()) * 1.22f).toFloat()
+                                            ), 40f, 40f, paint
+                                        )
+                                        paint.color = Color.LightGray.toArgb()
+                                        paint.alpha = 150
+
+                                        canvas.drawRoundRect(
+                                            RectF(
+                                                (w * 0.72).toFloat(),
+                                                ((h * 0.02).toFloat() - (w * 0.02).toFloat()).toFloat(),
+                                                (w * 0.95).toFloat(),
+                                                ((h * 0.02).toFloat()).toFloat() + ((((w * 0.05)).toInt()) * 1.15f).toFloat()
+                                            ), 40f, 40f, paint
+                                        )
+
+                                        paint.textSize = 50f
+                                        paint.color = Color.White.toArgb()
+                                        canvas.drawText(
+                                            pontos.toString(),
+                                            w * 0.81f,
+                                            h * 0.04f,
+                                            paint
+                                        )
+                                        paint.alpha = 255
+                                        canvas.drawBitmap(coinP, w * 0.7f, 0f, paint)
+
 
                                     }
 //                                launch(Dispatchers.Default) {
@@ -600,6 +653,8 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
 //                            ew.stackTrace
 //                        }
                     }
+
+
                 }
 
 
@@ -889,7 +944,7 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                     (this.w * 0.08).toFloat(),
                     ((this.h * 0.75).toFloat() - (this.w * 0.03).toFloat()).toFloat(),
                     (this.w * 0.93).toFloat(),
-                    ((this.h * 0.75)).toFloat() + (((this.w * 0.9 / 8).toInt())* 1.22f).toFloat()
+                    ((this.h * 0.75)).toFloat() + (((this.w * 0.9 / 8).toInt()) * 1.22f).toFloat()
                 ), 30f, 30f, paint
             )
             paint.color = Color(0xFF2F4F4F).toArgb()
@@ -900,10 +955,10 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                     (this.w * 0.09).toFloat(),
                     ((this.h * 0.75).toFloat() - (this.w * 0.02).toFloat()).toFloat(),
                     (this.w * 0.92).toFloat(),
-                    ( (this.h * 0.75).toFloat()).toFloat() + (((this.w * 0.9 / 8).toInt())* 1.15f).toFloat()
+                    ((this.h * 0.75).toFloat()).toFloat() + (((this.w * 0.9 / 8).toInt()) * 1.15f).toFloat()
                 ), 30f, 30f, paint
             )
-            paint.color =  Color(0xFFE6E6FA).toArgb()
+            paint.color = Color(0xFFE6E6FA).toArgb()
             paint.alpha = 150
 
             canvasB.drawRoundRect(
@@ -911,7 +966,7 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                     (this.w * 0.09).toFloat(),
                     ((this.h * 0.755).toFloat() - (this.w * 0.02).toFloat()).toFloat(),
                     (this.w * 0.92).toFloat(),
-                    ( (this.h * 0.755).toFloat()).toFloat() + (((this.w * 0.9 / 8).toInt())* 1.0f).toFloat()
+                    ((this.h * 0.755).toFloat()).toFloat() + (((this.w * 0.9 / 8).toInt()) * 1.0f).toFloat()
                 ), 30f, 30f, paint
             )
             paint.color = Color.Black.toArgb()
@@ -1423,6 +1478,8 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
         )
         m.y = tile.y
         m.ty = false
+        m.naLista = true
+
         tile.ty = false
         val total = selectedTiles.filter { it.camada != -5 }
             .filter { it.id == tile.id && it.camada > -3 }.size + 1
@@ -1610,21 +1667,22 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
             e.stackTrace
         }
     }
-fun calculoVelocidade(it : MahjongTile,py:Float):Double{
-  var vel =
-    if (it.y > py) {
-        (it.y - py)
-    } else if (it.y < py) {
-        (py - it.y)
-    } else {
-        it.h
+
+    fun calculoVelocidade(it: MahjongTile, py: Float): Double {
+        var vel =
+            if (it.y > py) {
+                (it.y - py)
+            } else if (it.y < py) {
+                (py - it.y)
+            } else {
+                it.h
+            }
+        var tempo = (vel.toDouble() / it.h).toDouble()
+
+        if (tempo < 1) tempo = 1.0
+
+        return tempo
     }
-var tempo =  (vel.toDouble()/it.h).toDouble()
-
-    if(tempo<1)tempo = 1.0
-
-    return tempo
-}
 
 
     fun calcularVelocidadeQuedaLivre(
@@ -1635,9 +1693,6 @@ var tempo =  (vel.toDouble()/it.h).toDouble()
         return (gravidade * tempo)
 
     }
-
-
-
 
 
     fun carregarCamadas() {
@@ -1666,6 +1721,7 @@ var tempo =  (vel.toDouble()/it.h).toDouble()
 
 
     }
+
     fun Float.toDp(resources: Resources): Float {
         return TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP,
