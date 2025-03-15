@@ -399,11 +399,11 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                                 }
 
 
-
-                                runBlocking {
-
-
-                                    launch(Dispatchers.Default) {
+//
+//                                runBlocking {
+//
+//
+//                                    launch(Dispatchers.Default) {
 
 
                                         try {
@@ -574,13 +574,13 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                                         canvas.drawBitmap(coinP, w * 0.7f, 0f, paint)
 
 
-                                    }
+                                  //  }
 //                                launch(Dispatchers.Default) {
 //                                    Thread.sleep(30)
 //
 //
 //                                }
-                                }
+                               // }
 
 
 
