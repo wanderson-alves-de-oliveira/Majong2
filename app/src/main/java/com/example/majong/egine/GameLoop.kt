@@ -47,7 +47,6 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
     var tiles = mutableListOf<MahjongTile>()
     var selectedTiles = mutableListOf<MahjongTile>()
     var removerDaLista = mutableListOf<MahjongTile>()
-    var fps = 1L
 
     private val paint = Paint()
     private var itenImpossivel = false
@@ -221,7 +220,6 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
 
                 } else {
 
-                    Thread.sleep(fps)
 
 
 
@@ -353,7 +351,6 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                                                     .filter { it.ty == true }.isEmpty()
                                             ) {
                                                 ajustarY = false
-                                                fps = 10
 
                                             }
 
@@ -799,7 +796,6 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
     fun popularTiles() {
         avaliar3 = false
         ajustarY = true
-        fps = 1
 
         selectedTiles.clear()
         tileImages.clear()

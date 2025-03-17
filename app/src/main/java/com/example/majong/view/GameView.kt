@@ -11,6 +11,7 @@ class GameView(context: Context) : SurfaceView(context), SurfaceHolder.Callback 
     lateinit var gameLoop: GameLoop
     private var tiles = mutableListOf<MahjongTile>()
     private var selectedTiles = mutableListOf<MahjongTile>()
+    private var pontos = 0
 
     init {
         holder.addCallback(this)
@@ -20,15 +21,18 @@ class GameView(context: Context) : SurfaceView(context), SurfaceHolder.Callback 
     override fun surfaceCreated(holder: SurfaceHolder) {
         try {
             tiles = gameLoop.tiles
+            pontos = gameLoop.pontos
             selectedTiles = gameLoop.selectedTiles
             selectedTiles.removeAll(gameLoop.removerDaLista)
             gameLoop.removerDaLista.clear()
+
         }catch (_:Exception){}
 
         gameLoop = GameLoop(holder, context)
         if (this.tiles.isNotEmpty()) {
             gameLoop.tiles = this.tiles
             gameLoop.selectedTiles = this.selectedTiles
+            gameLoop.pontos = this.pontos
         }
         gameLoop.startLoop()
     }
