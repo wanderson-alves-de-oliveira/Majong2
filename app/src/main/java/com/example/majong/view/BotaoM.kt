@@ -15,7 +15,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.sp
 import com.example.majong.R
 
-class BotaoM(val contexte: Context,val image: Bitmap, var x: Float, var y: Float, var w:Int, var h:Int, var camada:Int, val stt:String) {
+class BotaoM(val contexte: Context,val image: Bitmap, var x: Float, var y: Float, var w:Int, var h:Int, var camada:Int, var stt:String) {
     private val paint = Paint()
 
 var animar = false

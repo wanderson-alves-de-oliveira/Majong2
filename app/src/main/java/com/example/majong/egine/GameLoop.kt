@@ -16,6 +16,8 @@ import android.view.SurfaceHolder
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import com.example.majong.R
+import com.example.majong.db.BDTile
+import com.example.majong.db.Base
 import com.example.majong.view.Botao
 import com.example.majong.view.BotaoM
 import com.example.majong.view.MahjongTile
@@ -38,6 +40,7 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
     private var touchY: Float = 0f
     private var isTouched = false
     private var dica = false
+
 
     private var avaliar3 = false
 
@@ -65,7 +68,7 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
     var embaralhando = false
     var pontos = 0
 
-    var fase = -9
+    var fase = 0
 
     var time1 = 0
     var time2 = 0
@@ -94,6 +97,8 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
     val b3: Bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
 
 
+    var ultimaFase = 0
+
     var btm = BotaoM(
         this.context,
         tileImage,
@@ -102,7 +107,7 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
         (this.w * 0.6).toInt(),
         (this.h * 0.1).toInt(),
         0,
-        "4000"
+        ultimaFase.toString()
     )
 
     var walld: MutableList<Bitmap> = mutableListOf()
@@ -195,6 +200,14 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
             try {
 
                 if (index == 0) {
+
+                    if (ultimaFase == 0) {
+                        val bd = BDTile(context)
+                        ultimaFase = bd.buscar().nivel
+                        fase = ultimaFase
+                    }
+                   btm.stt=ultimaFase.toString()
+
                     if (canvas != null) {
                         try {
 
@@ -586,8 +599,12 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                                         .isEmpty() && selectedTiles.filter { it.camada != -5 }
                                         .isEmpty()
                                 ) {
-                                    fase++
-                                    popularTiles()
+
+                                    finalizarFase()
+
+
+
+
                                 }
                             } catch (exx: Exception) {
                                 exx.stackTrace
@@ -672,6 +689,23 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
             }
 
         }
+
+    }
+
+    private fun finalizarFase() {
+
+
+
+        fase++
+
+            val bd = BDTile(context)
+            var pontuacaoNova = bd.buscar().pontos+pontos
+            bd.atualizar(Base(fase.toInt() , pontuacaoNova))
+
+        ultimaFase = fase
+
+        popularTiles()
+
 
     }
 
@@ -974,146 +1008,156 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
 
 
         var disponiveis: MutableList<Int> = mutableListOf()
+
+
+        if (fase == 0) {
+            val bd = BDTile(context)
+            ultimaFase = bd.buscar().nivel
+            fase = ultimaFase
+        }
+
+
+
         when (fase) {
 
-            -9 -> {
+            1 -> {
 
                 tiles = Quadrado0B().quadradoB(this.context, w, disponiveis, tileImages)
 
             }
 
-            -8 -> {
+            2 -> {
 
                 tiles = Quadrado0A().quadradoA(this.context, w, disponiveis, tileImages)
 
             }
 
-            -7 -> {
+            3-> {
 
                 tiles = Quadrado01().quadrado(this.context, w, disponiveis, tileImages)
 
             }
 
-            -6 -> {
+            4-> {
 
                 tiles = Quadrado0C().quadradoC(this.context, w, disponiveis, tileImages)
 
             }
 
-            -5 -> {
+            5 -> {
                 tiles = Plus0A().plus(this.context, w, disponiveis, tileImages)
 
 
             }
 
-            -4 -> {
+            6 -> {
 
                 tiles = Quadrado0I().quadradoI(this.context, w, disponiveis, tileImages)
 
             }
 
-            -3 -> {
+           7 -> {
 
                 tiles = Cabeca0A().cabeca(this.context, w, disponiveis, tileImages)
 
             }
 
-            -2 -> {
+            8 -> {
 
                 tiles = Coracao0A().coracao(this.context, w, disponiveis, tileImages)
 
             }
 
-            -1 -> {
+            9 -> {
 
                 tiles = Square0A().quadrado(this.context, w, disponiveis, tileImages)
 
             }
 
-            0 -> {
+            10 -> {
 
                 tiles = QuadradoA().quadradoA(this.context, w, disponiveis, tileImages)
 
             }
 
-            1 -> {
-                tiles = QuadradoB().quadradoB(this.context, w, disponiveis, tileImages)
-
-            }
-
-            2 -> {
-
-                tiles = QuadradoC().quadradoC(this.context, w, disponiveis, tileImages)
-
-            }
-
-            3 -> {
-                tiles = Plus().plus(this.context, w, disponiveis, tileImages)
-
-
-            }
-
-            4 -> {
-
-                tiles = QuadradoI().quadradoI(this.context, w, disponiveis, tileImages)
-
-            }
-
-            5 -> {
-
-                tiles = QuadradoT().quadradoT(this.context, w, disponiveis, tileImages)
-
-            }
-
-            6 -> {
-
-                tiles = QuadradoF().quadrado(this.context, w, disponiveis, tileImages)
-
-            }
-
-            7 -> {
-
-                tiles = QuadradoO().quadrado(this.context, w, disponiveis, tileImages)
-
-            }
-
-            8 -> {
-
-                tiles = Arvore().arvore(this.context, w, disponiveis, tileImages)
-
-            }
-
-            9 -> {
-
-                tiles = Cabeca().cabeca(this.context, w, disponiveis, tileImages)
-
-            }
-
-            10 -> {
-
-                tiles = Coracao().coracao(this.context, w, disponiveis, tileImages)
-
-            }
-
             11 -> {
-
-                tiles = Peixe().quadrado(this.context, w, disponiveis, tileImages)
+                tiles = QuadradoB().quadradoB(this.context, w, disponiveis, tileImages)
 
             }
 
             12 -> {
 
-                tiles = SquareA().quadrado(this.context, w, disponiveis, tileImages)
+                tiles = QuadradoC().quadradoC(this.context, w, disponiveis, tileImages)
 
             }
 
             13 -> {
+                tiles = Plus().plus(this.context, w, disponiveis, tileImages)
+
+
+            }
+
+            14 -> {
+
+                tiles = QuadradoI().quadradoI(this.context, w, disponiveis, tileImages)
+
+            }
+
+            15 -> {
+
+                tiles = QuadradoT().quadradoT(this.context, w, disponiveis, tileImages)
+
+            }
+
+            16 -> {
+
+                tiles = QuadradoF().quadrado(this.context, w, disponiveis, tileImages)
+
+            }
+
+            17 -> {
+
+                tiles = QuadradoO().quadrado(this.context, w, disponiveis, tileImages)
+
+            }
+
+            18 -> {
+
+                tiles = Arvore().arvore(this.context, w, disponiveis, tileImages)
+
+            }
+
+            19 -> {
+
+                tiles = Cabeca().cabeca(this.context, w, disponiveis, tileImages)
+
+            }
+
+            20 -> {
+
+                tiles = Coracao().coracao(this.context, w, disponiveis, tileImages)
+
+            }
+
+            21 -> {
+
+                tiles = Peixe().quadrado(this.context, w, disponiveis, tileImages)
+
+            }
+
+           22 -> {
+
+                tiles = SquareA().quadrado(this.context, w, disponiveis, tileImages)
+
+            }
+
+            23 -> {
 
                 tiles = Square().quadrado(this.context, w, disponiveis, tileImages)
 
             }
 
-            14 -> {
+            24 -> {
 
                 tiles = QuadradoCC().quadradoC(this.context, w, disponiveis, tileImages)
 

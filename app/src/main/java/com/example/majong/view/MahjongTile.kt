@@ -47,7 +47,7 @@ class MahjongTile(
     var giroc = 0f
     private val imutw = w
     private val imuth = h
-    private val VAL_LIMITG = 3
+    private val VAL_LIMITG = 10
     private val VAL_LIMITG_INTRO = 20
     private var coinp: Bitmap? = null
 
@@ -241,18 +241,29 @@ class MahjongTile(
 
         } else {
             if (girando) {
-                giroc -= 2f
+                giroc -= 20f
                 timeG--
                 if (timeG <= 0 && giroc <= 0) {
                     girando = false
                     giroc = 0f
                     timeG = VAL_LIMITG
                 }
+//                canvas.save()
+//                canvas.translate((x - (w * 0.5f)), (y + espaco) + giroc)
+//                //  canvas.rotate(giroc,centerX,centerY)
+//                canvas.drawBitmap(b, x + espaco, y + espaco, paint)
+//                canvas.restore()
+
                 canvas.save()
+                val centroX = x + b.width / 2f
+                val centroY = y + b.height / 2f
+
+                // Rotaciona o canvas em torno do centro da imagem
+                canvas.rotate(giroc, centroX, centroY)
                 canvas.translate((x - (w * 0.5f)), (y + espaco) + giroc)
-                //  canvas.rotate(giroc,centerX,centerY)
-                canvas.drawBitmap(b, x + espaco, y + espaco, paint)
+                 canvas.drawBitmap(b, x + espaco, y + espaco, paint)
                 canvas.restore()
+
             } else {
 
                 canvas.drawBitmap(b, x + espaco, y + espaco, paint)
