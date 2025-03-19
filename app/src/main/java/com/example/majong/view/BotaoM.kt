@@ -2,6 +2,7 @@ package com.example.majong.view
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.BitmapShader
 import android.graphics.Canvas
 import android.graphics.ColorMatrix
@@ -23,10 +24,26 @@ var animar = false
     var t = 0f
     var inicio = true
     var yp = h*11f
-val xFix = x
+var xFix = x
     fun draw(canvas: Canvas ) {
-         paint.textSize = 80f
+         paint.textSize = spToPx(w*0.04f)
        val b: Bitmap = Bitmap.createBitmap(w,h, Bitmap.Config.ARGB_8888)
+        var coin = BitmapFactory.decodeResource(contexte.resources, R.drawable.moeda)
+        val coinP = Bitmap.createScaledBitmap(
+            coin,
+            ((w * 0.1f)).toInt(),
+            ((w * 0.1f)).toInt(),
+            false
+        )
+
+        var vid = BitmapFactory.decodeResource(contexte.resources, R.drawable.ad)
+        val videP = Bitmap.createScaledBitmap(
+            vid,
+            ((w * 0.25f)).toInt(),
+            ((w * 0.2f)).toInt(),
+            false
+        )
+
 
         val canvas2 = Canvas(b)
 
@@ -77,25 +94,63 @@ val xFix = x
         }
 
         paint.alpha = 200
+        if(camada==0) {
+            paint.color = Color(0xFF4169E1).toArgb()
+        }else  if(camada==1) {
+            paint.color = Color(0xFF8BC34A).toArgb()
 
-        paint.color = Color(0xFF4169E1).toArgb()
+        }else  if(camada==2) {
+            paint.color = Color(0xFFF44336).toArgb()
 
+        }
          canvas2.drawRoundRect(RectF(b.width.toFloat()*0.05f, b.height.toFloat()*0.05f, b.width.toFloat()*0.95f, b.height.toFloat()*0.95f), 70f, 70f, paint)
 
-        paint.color = Color(0xFF836FFF).toArgb()
+        if(camada==0) {
+            paint.color = Color(0xFF836FFF).toArgb()
+        }else  if(camada==1) {
+            paint.color = Color(0xFF4CAF50).toArgb()
 
+        }else  if(camada==2) {
+            paint.color = Color(0xFFE91E63).toArgb()
+
+        }
         canvas2.drawRoundRect(RectF(b.width.toFloat()*0.05f, b.height.toFloat()*0.1f, b.width.toFloat()*0.95f, b.height.toFloat()*0.95f), 70f, 70f, paint)
 
-        paint.textSize =  spToPx(30f)
+        paint.textSize =  spToPx(w*0.04f)
 
          paint.color = Color(0xFFffffff).toArgb()
+        if(camada==0) {
+            canvas2.drawText(
+                stt,
+                (w * 0.1).toFloat(),
+                (h * 0.6).toFloat(),
+                paint
+            )
+        }else   if(camada==1) {
+            canvas2.drawText(
+                stt,
+                (w * 0.25).toFloat(),
+                (h * 0.4).toFloat(),
+                paint
+            )
+            canvas2.drawBitmap(coinP, (w * 0.35).toFloat(),  (h * 0.55).toFloat(), paint)
 
-        canvas2.drawText(
-            "Nível $stt",
-            100f,
-            (h * 0.6).toFloat(),
-            paint
-        )
+            canvas2.drawText(
+                "100",
+                (w * 0.45).toFloat(),
+                (h * 0.65).toFloat(),
+                paint
+            )
+        }else   if(camada==2) {
+            canvas2.drawText(
+                stt,
+                (w * 0.25).toFloat(),
+                (h * 0.4).toFloat(),
+                paint
+            )
+            canvas2.drawBitmap(videP, (w * 0.35).toFloat(),  (h * 0.55).toFloat(), paint)
+
+        }
 
 
 

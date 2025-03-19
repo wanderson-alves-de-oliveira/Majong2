@@ -150,6 +150,54 @@ class QuadradoAleatorio {
                 )
             ) // Criando pares
 
+            var t0 =tiles.filter { it.camada==0 }
+
+            var t01 =tiles.filter { it.camada==0 }
+
+            for (i in 0 until t0.size-1){
+
+
+                for (j in 1 until t01.size){
+                    if(t0[i].x==t01[j].x && t0[i].y==t01[j].y){
+                        tiles.get(tiles.indexOf(t0[i])).x = tiles.get(tiles.indexOf(t0[i])).x-(tamNovo.toFloat() * (0.8f))
+                        tiles.get(tiles.indexOf(t0[i])).y = tiles.get(tiles.indexOf(t0[i])).y+(tamNovo.toFloat() * (0.8f))
+                    }
+                }
+            }
+
+
+            var t1 =tiles.filter { it.camada==1 }
+
+            var t11 =tiles.filter { it.camada==1 }
+
+            for (i in 0 until t1.size-1){
+
+
+                for (j in 1 until t11.size){
+                    if(t1[i].x==t11[j].x && t1[i].y==t11[j].y){
+                        tiles.get(tiles.indexOf(t1[i])).x = tiles.get(tiles.indexOf(t1[i])).x-(tamNovo.toFloat() * (0.8f))
+                        tiles.get(tiles.indexOf(t1[i])).y = tiles.get(tiles.indexOf(t1[i])).y+(tamNovo.toFloat() * (0.8f))
+                    }
+                }
+            }
+
+
+            var t2 =tiles.filter { it.camada==2 }
+
+            var t21 =tiles.filter { it.camada==2 }
+
+            for (i in 0 until t2.size-1){
+
+
+                for (j in 1 until t21.size){
+                    if(t2[i].x==t21[j].x && t2[i].y==t21[j].y){
+                        tiles.get(tiles.indexOf(t2[i])).x = tiles.get(tiles.indexOf(t2[i])).x-(tamNovo.toFloat() * (0.8f))
+                        tiles.get(tiles.indexOf(t2[i])).y = tiles.get(tiles.indexOf(t2[i])).y+(tamNovo.toFloat() * (0.8f))
+                    }
+                }
+            }
+
+
         }
 
         return tiles
