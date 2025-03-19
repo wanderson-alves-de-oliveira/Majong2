@@ -30,16 +30,17 @@ class QuadradoAleatorio {
             }
         }
         ran.shuffle()
-        val tamNovo = ((w * 0.9f) / 7).toInt()
-        val espaco = w * 0.05f
+       // ran[0] = 108
+        val tamNovo = ((w * 0.9f) / 6.5f).toInt()
+        val espaco = w * 0.03f
         val h = tamNovo
         val w = tamNovo
 
-        for (i in 0 until 7) {
+        for (i in 0 until 6) {
             pY.add(tamNovo.toFloat() * (i + 1))
             if (i < 6) {
 
-                pX.add(espaco + tamNovo.toFloat() * i)
+                pX.add(espaco + (tamNovo.toFloat() * i))
             }
         }
 
@@ -51,8 +52,8 @@ class QuadradoAleatorio {
                     pY[i] + (tamNovo.toFloat() * (0.5f))
                 )
                 var o2 = Offset(
-                    pX[j] + (tamNovo.toFloat() * (0.7f)),
-                    pY[i] + (tamNovo.toFloat() * (0.7f))
+                    pX[j] + (tamNovo.toFloat() * (0.75f)),
+                    pY[i] + (tamNovo.toFloat() * (0.75f))
                 )
 
                 pXY0.add(o)
@@ -67,7 +68,7 @@ class QuadradoAleatorio {
         var camada0 = 0
         var camada1 = 0
         var camada2 = 0
-        var index0 = (0..ran[0]/2).random()
+        var index0 = (0..(ran[0]/2)-1).random()
         var index1 = (ran[0]/2..ran[0]).random()
 
         for (i in 0 until ran[0]+1) {
@@ -150,52 +151,58 @@ class QuadradoAleatorio {
                 )
             ) // Criando pares
 
-            var t0 =tiles.filter { it.camada==0 }
+ //           var t0 =tiles.filter { it.camada==0 }
 
-            var t01 =tiles.filter { it.camada==0 }
-
-            for (i in 0 until t0.size-1){
-
-
-                for (j in 1 until t01.size){
-                    if(t0[i].x==t01[j].x && t0[i].y==t01[j].y){
-                        tiles.get(tiles.indexOf(t0[i])).x = tiles.get(tiles.indexOf(t0[i])).x-(tamNovo.toFloat() * (0.8f))
-                        tiles.get(tiles.indexOf(t0[i])).y = tiles.get(tiles.indexOf(t0[i])).y+(tamNovo.toFloat() * (0.8f))
-                    }
-                }
-            }
-
-
-            var t1 =tiles.filter { it.camada==1 }
-
-            var t11 =tiles.filter { it.camada==1 }
-
-            for (i in 0 until t1.size-1){
-
-
-                for (j in 1 until t11.size){
-                    if(t1[i].x==t11[j].x && t1[i].y==t11[j].y){
-                        tiles.get(tiles.indexOf(t1[i])).x = tiles.get(tiles.indexOf(t1[i])).x-(tamNovo.toFloat() * (0.8f))
-                        tiles.get(tiles.indexOf(t1[i])).y = tiles.get(tiles.indexOf(t1[i])).y+(tamNovo.toFloat() * (0.8f))
-                    }
-                }
-            }
-
-
-            var t2 =tiles.filter { it.camada==2 }
-
-            var t21 =tiles.filter { it.camada==2 }
-
-            for (i in 0 until t2.size-1){
+//            var t01 =tiles.filter { it.camada==0 }
+//
+//            for (i in 0 until t0.size-1){
+//
+//
+//                for (j in 1 until t01.size){
+//                    if(t0[i].x==t01[j].x && t0[i].y==t01[j].y){
+//                        tiles.get(tiles.indexOf(t0[i])).x = tiles.get(tiles.indexOf(t0[i])).x-(tamNovo.toFloat() * (0.8f))
+//                        tiles.get(tiles.indexOf(t0[i])).y = tiles.get(tiles.indexOf(t0[i])).y+(tamNovo.toFloat() * (0.8f))
+//                    }
+//                }
+//            }
+//
+//
+//            var t1 =tiles.filter { it.camada==1 }
+//
+//            var t11 =tiles.filter { it.camada==1 }
+//
+//            for (i in 0 until t1.size-1){
+//
+//
+//                for (j in 1 until t11.size){
+//                    if(t1[i].x==t11[j].x && t1[i].y==t11[j].y){
+//                        tiles.get(tiles.indexOf(t1[i])).x =
+//                        if(tiles.get(tiles.indexOf(t1[i])).x-(tamNovo.toFloat() * (0.8f)) >=espaco)
+//                            tiles.get(tiles.indexOf(t1[i])).x-(tamNovo.toFloat() * (0.8f))
+//                        else espaco+ (tamNovo.toFloat() * (0.4f).toFloat())
+//                        tiles.get(tiles.indexOf(t1[i])).y = tiles.get(tiles.indexOf(t1[i])).y+(tamNovo.toFloat() * (0.8f))
+//                    }
+//                }
+//            }
 
 
-                for (j in 1 until t21.size){
-                    if(t2[i].x==t21[j].x && t2[i].y==t21[j].y){
-                        tiles.get(tiles.indexOf(t2[i])).x = tiles.get(tiles.indexOf(t2[i])).x-(tamNovo.toFloat() * (0.8f))
-                        tiles.get(tiles.indexOf(t2[i])).y = tiles.get(tiles.indexOf(t2[i])).y+(tamNovo.toFloat() * (0.8f))
-                    }
-                }
-            }
+//            var t2 =tiles.filter { it.camada==2 }
+//
+//            var t21 =tiles.filter { it.camada==2 }
+//
+//            for (i in 0 until t2.size-1){
+//
+//
+//                for (j in 1 until t21.size){
+//                    if(t2[i].x==t21[j].x && t2[i].y==t21[j].y){
+//                        tiles.get(tiles.indexOf(t2[i])).x =
+//                            if(tiles.get(tiles.indexOf(t2[i])).x-(tamNovo.toFloat() * (0.8f)) >=espaco)
+//                                tiles.get(tiles.indexOf(t2[i])).x-(tamNovo.toFloat() * (0.8f))
+//                        else espaco+ (tamNovo.toFloat() * (0.5f).toFloat())
+//                        tiles.get(tiles.indexOf(t2[i])).y = tiles.get(tiles.indexOf(t2[i])).y+(tamNovo.toFloat() * (0.8f))
+//                    }
+//                }
+//            }
 
 
         }
