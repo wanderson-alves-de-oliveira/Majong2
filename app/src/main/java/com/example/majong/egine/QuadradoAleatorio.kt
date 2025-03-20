@@ -207,7 +207,13 @@ class QuadradoAleatorio {
 
         }
 
-        return tiles
+        var tiles2 = tiles.filter { it.camada==2 }
+
+        tiles2.reversed()
+        tiles.removeAll(tiles2)
+        tiles.addAll(tiles2)
+
+        return tiles.reversed().toMutableList()
 
     }
 
