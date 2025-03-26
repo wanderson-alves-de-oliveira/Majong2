@@ -14,6 +14,9 @@ class QuadradoAleatorio {
                  disponiveis: MutableList<Int>,
                  tileImages: MutableList<Bitmap>
     ): MutableList<MahjongTile> {
+
+
+
         var initialize = 0
         var grau = 0
         var tiles = mutableListOf<MahjongTile>()
@@ -30,7 +33,7 @@ class QuadradoAleatorio {
             }
         }
         ran.shuffle()
-       // ran[0] = 108
+      //  ran[0] = 78
         val tamNovo = ((w * 0.9f) / 6.5f).toInt()
         val espaco = w * 0.03f
         val h = tamNovo
@@ -68,8 +71,10 @@ class QuadradoAleatorio {
         var camada0 = 0
         var camada1 = 0
         var camada2 = 0
-        var index0 = (0..(ran[0]/2)-1).random()
-        var index1 = (ran[0]/2..ran[0]).random()
+        val resultado =   gerarValoresAleatorios(ran[0])
+
+        var index0 = resultado.first
+        var index1 = resultado.first+resultado.second
 
         for (i in 0 until ran[0]+1) {
             disponiveis.add(i)
@@ -207,15 +212,28 @@ class QuadradoAleatorio {
 
         }
 
-        var tiles2 = tiles.filter { it.camada==2 }
 
-        tiles2.reversed()
-        tiles.removeAll(tiles2)
-        tiles.addAll(tiles2)
 
-        return tiles.reversed().toMutableList()
+        return tiles
 
     }
 
+    fun gerarValoresAleatorios(valor: Int): Triple<Int, Int, Int>{
+
+
+        val random = Random.Default
+        var valor1: Int
+        var valor2: Int
+        var valor3: Int
+
+        do {
+            valor1 = random.nextInt(1, 36) // Gera um valor aleatório entre 1 e 35
+            valor2 = random.nextInt(1, 36) // Gera outro valor aleatório entre 1 e 35
+            valor3 = valor - valor1 - valor2 // Calcula o terceiro valor
+
+        } while (valor3 <= 0 || valor3 >= 36) // Garante que o terceiro valor esteja dentro do intervalo
+
+        return Triple(valor1, valor2, valor3)
+    }
 
 }

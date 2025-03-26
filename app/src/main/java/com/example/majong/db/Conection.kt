@@ -26,7 +26,7 @@ class Conection(context: Context?) :
 
 
         val valores = ContentValues()
-        valores.put("nivel", 1)
+        valores.put("nivel", 0)
         valores.put("pontos", 0)
         db.insert("tile", null, valores)
 

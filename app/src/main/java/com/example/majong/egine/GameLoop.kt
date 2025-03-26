@@ -75,6 +75,7 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
     var corrigirfalha = false
 
     var limparComCredito = false
+    var tutor = false
 
 
     var fase = 0
@@ -100,6 +101,8 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
     var ima = BitmapFactory.decodeResource(context.resources, R.drawable.ima)
     var giro = BitmapFactory.decodeResource(context.resources, R.drawable.giro)
     val b: Bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+   // val binit: Bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+
     var main = MainView(this.context, (w * 1.1f).toInt(), (h * 1.1f).toInt())
     var venceuP = Venceu(this.context, (w).toInt(), (h).toInt(), 0)
     var perdeuL = Venceu(this.context, (w).toInt(), (h).toInt(), 1)
@@ -109,6 +112,7 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
 
     var pontuacaoNova = 0
     var score = 0
+    var limitar = 7
 
 
     var ultimaFase = 0
@@ -262,13 +266,13 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                         if (!corrigirfalha || limparComCredito) {
 
 
-                            if (!limparComCredito && !(selectedTiles.filter { it.camada > -2 }.size < 7 ||
-                                        selectedTiles.filter { it.camada > -2 }.size > 7 && dica)
+                            if ( !limparComCredito && !(selectedTiles.filter { it.camada > -2 }.size < limitar ||
+                                        selectedTiles.filter { it.camada > -2 }.size > limitar && dica )
                             ) {
                                 corrigirfalha = true
                             } else {
                                 corrigirfalha = false
-                                if ((selectedTiles.filter { it.camada > -2 }.size < 6)){
+                                if ((selectedTiles.filter { it.camada > -2 }.size < 6)) {
                                     limparComCredito = false
                                 }
                             }
@@ -280,6 +284,7 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
 
                                 if (limparComCredito) {
                                     dica = true
+                                    limitar = 20
                                     if (selectedTilesRes.isEmpty()) {
                                         selectedTilesRes =
                                             selectedTiles.filter { it.id == selectedTiles[0].id }
@@ -353,6 +358,13 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                                     } else {
                                         bloquerBT2 = true
 
+                                        if(selectedTiles.isEmpty()){
+                                            botao2.camada = 1
+                                            botao2.isSelected = true
+                                        }
+
+
+
                                     }
                                     if (time3 > 0) {
                                         botao3.camada = 1
@@ -398,8 +410,10 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                                             )
 
                                             var countEmbaralhar = 0
-                                            tiles.forEach {
+                                          //  tiles.forEach {
+                                                for (itty in 0 until tiles.size) {
 
+                                                    val it = tiles[itty]
                                                 if (embaralhando) {
                                                     if (it.girando) {
                                                         countEmbaralhar++
@@ -450,19 +464,7 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
 
                                     }
 
-                                    launch(Dispatchers.Default) {
-                                        if (itenImpossivel) {
-                                            paint.textSize = 150f
-                                            paint.color = Color.Red.toArgb()
-                                            canvas.drawText(
-                                                "itenImpossivel",
-                                                100f,
-                                                (h * 0.5).toFloat(),
-                                                paint
-                                            )
-                                        }
 
-                                    }
 
                                 }
 
@@ -479,7 +481,72 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
 
                                     var i = 0
 
-                                    selectedTiles.forEach {
+                                    if(tutor) {
+
+
+
+
+                                        paint.color = Color.Black.toArgb()
+                                        paint.alpha = 230
+                                      //  val canvasG = Canvas(binit)
+                                        canvas.drawRoundRect(
+                                            RectF(
+                                                0f,
+                                                0f,
+                                                w.toFloat(),
+                                               h*1.3f
+                                            ), 0f, 0f, paint
+                                        )
+                                     //   canvas.drawBitmap(binit, 0f, 0f, paint)
+
+                                        paint.color = Color.Blue.toArgb()
+                                        paint.alpha = 255
+                                        canvas.drawRoundRect(
+                                            RectF(
+                                                (w * 0.1).toFloat(),
+                                                (h * 0.1).toFloat() ,
+                                                (w * 0.9 ).toFloat(),
+                                                ((h * 0.3)).toFloat()
+                                            ), 60f, 60f, paint
+                                        )
+
+                                        paint.textSize = spToPx((this.w * 0.017f))
+                                        paint.color = Color.White.toArgb()
+                                        canvas.drawText(
+                                            "Selecione três peças iguais ",
+                                            w * 0.15f,
+                                            h * 0.15f,
+                                            paint
+                                        )
+
+
+                                        canvas.drawText(
+                                            "para limpar",
+                                            w * 0.2f,
+                                            h * 0.2f,
+                                            paint
+                                        )
+
+
+
+                                        for (i in tiles.size - 3 until tiles.size) {
+                                            tiles[i].draw(canvas)
+                                        }
+
+
+
+
+
+                                        paint.alpha = 255
+                                    }
+
+
+
+                                   // selectedTiles.forEach {
+
+                                        for (itt in 0 until selectedTiles.size) {
+
+                                            val it = selectedTiles[itt]
                                         if (it.camada > -3) {
                                             i++
                                             val velocidade = w * 0.15f
@@ -551,8 +618,8 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                                                 }
                                                 if (it.x >= (w * 0.7f) && it.y <= 20f) {
                                                     it.camada = -5
-
-
+                                                   limitar = 7
+                                                    tutor = false
                                                     pontos++
 
                                                 }
@@ -730,47 +797,47 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                             try {
 
 
-                                    val paint = Paint()
-                                    paint.textSize = 150f
-                                    canvas.drawBitmap(walld[0], 0f, 0f, paint)
-                                    falhou = true
+                                val paint = Paint()
+                                paint.textSize = 150f
+                                canvas.drawBitmap(walld[0], 0f, 0f, paint)
+                                falhou = true
 
-                                    if (true) {
+                                if (true) {
 
-                                        perdeuL.pontos = score
-                                        perdeuL.fase = ultimaFase + 1
-                                        perdeuL.pontos = score.toInt()
+                                    perdeuL.pontos = score
+                                    perdeuL.fase = ultimaFase + 1
+                                    perdeuL.pontos = score.toInt()
 
-                                        perdeuL.draw(canvas)
-
-
-                                        if (perdeuL.btm.liberar > 3) {
-                                            //    finalizarFase()
-
-                                            perdeuL =
-                                                Venceu(this.context, (w).toInt(), (h).toInt(), 1)
-                                            limparComCredito = true
-                                            perdeuL.btm.liberar = 0
+                                    perdeuL.draw(canvas)
 
 
-                                        } else if (perdeuL.btmCoin.liberar > 3 && score >= 100) {
-                                            //    finalizarFase()
-                                            val bd = BDTile(context)
-                                            score = score - 100
-                                            bd.atualizar(Base(fase.toInt(), score.toLong()))
+                                    if (perdeuL.btm.liberar > 3) {
+                                        //    finalizarFase()
 
-                                            perdeuL =
-                                                Venceu(this.context, (w).toInt(), (h).toInt(), 1)
-                                            limparComCredito = true
-                                            perdeuL.btmCoin.liberar = 0
+                                        perdeuL =
+                                            Venceu(this.context, (w).toInt(), (h).toInt(), 1)
+                                        limparComCredito = true
+                                        perdeuL.btm.liberar = 0
 
-                                        }
+
+                                    } else if (perdeuL.btmCoin.liberar > 3 && score >= 100) {
+                                        //    finalizarFase()
+                                        val bd = BDTile(context)
+                                        score = score - 100
+                                        bd.atualizar(Base(fase.toInt(), score.toLong()))
+
+                                        perdeuL =
+                                            Venceu(this.context, (w).toInt(), (h).toInt(), 1)
+                                        limparComCredito = true
+                                        perdeuL.btmCoin.liberar = 0
 
                                     }
 
+                                }
 
 
-                                    paint.color = Color.Red.toArgb()
+
+                                paint.color = Color.Red.toArgb()
 
 //                                    canvas.drawText(
 //                                        "GAME OUVER",
@@ -822,7 +889,6 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
 
             } catch (e: Exception) {
                 e.printStackTrace()
-
 
 
             }
@@ -1154,12 +1220,19 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
 
         val bd = BDTile(context)
         ultimaFase = bd.buscar().nivel
+
         fase = ultimaFase
 
         score = bd.buscar().pontos.toInt()
 
 
         when (fase) {
+            0 -> {
+
+                tiles = Quadrado000().quadrado(this.context, w, disponiveis, tileImages)
+                tutor = true
+
+            }
 
             1 -> {
 
@@ -1334,7 +1407,7 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
             tilesx3.addAll(tilesx2)
             tilesx3.addAll(tilesx1)
             tilesx3.addAll(tilesx)
-
+limitar =20
             if (s.size > 1) {
                 achou(tilesx3[0])
 
@@ -1466,6 +1539,7 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
         var tem2 = false
         var tem1 = false
         itenImpossivel = false
+        limitar = 20
 
         if (!tem3) {
             if (selectedTiles.filter { it.camada != -5 }.isEmpty()) {
@@ -1474,13 +1548,10 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
             if (!tem2 && selectedTiles.filter { it.camada != -5 }.isNotEmpty()) {
                 itenImpossivel = false
 
-                tem1 = validarSelecaoIA(selectedTiles, 2, 1)
-                if (!tem1) {
-                    //   validarSelecaoIA(camada2, 1, 2)
-                    //   embaralha()
-//TODO
-                }
+                 validarSelecaoIA(selectedTiles, 2, 1)
+
             }
+             limparSelecionados()
 
         }
 
@@ -1743,7 +1814,7 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                         event.x,
                         event.y
                     ) && it.camada == 2 && selectedTiles.filter { it.camada > -3 }.size < 7
-                 }?.let { tile ->
+                }?.let { tile ->
 
                     // carregarCamadas()
 
