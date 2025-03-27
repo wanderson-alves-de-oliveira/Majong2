@@ -21,13 +21,19 @@ class Conection(context: Context?) :
         db.execSQL(
             "create table tile(_id integer primary key autoincrement," +
                     "nivel text ," +
-                    "pontos text); "
+                    "pontos text," +
+                    "luz text ," +
+                    "ima text ," +
+                    "sufle text ); "
         )
 
 
         val valores = ContentValues()
         valores.put("nivel", 0)
-        valores.put("pontos", 0)
+        valores.put("pontos", 3000)
+        valores.put("luz", 3)
+        valores.put("ima", 3)
+        valores.put("sufle", 3)
         db.insert("tile", null, valores)
 
         db.execSQL(
@@ -45,7 +51,7 @@ class Conection(context: Context?) :
 
 
     companion object {
-        private const val nomeDB = "WSZT1"
+        private const val nomeDB = "WSZT2"
         private const val vers = 1
     }
 }

@@ -4,9 +4,11 @@ import android.content.Context
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.BitmapShader
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.RectF
+import android.graphics.Shader
 import android.util.TypedValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
@@ -18,6 +20,7 @@ class Venceu(var context: Context,
 
     var fase:Int =0
     var pontos:Int =0
+    var valorminimo:Int =300
 
 
     private val paint = Paint()
@@ -31,6 +34,7 @@ class Venceu(var context: Context,
 
     var espaco = 0f
     var tileImage = BitmapFactory.decodeResource(context.resources, R.drawable.mahjongtile)
+    val b: Bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
 
     var btm = BotaoM(
         this.context,
@@ -80,9 +84,36 @@ class Venceu(var context: Context,
           btm.camada = 0
 
       }else{
-          paint.color = Color(0xFFD71204).toArgb()
-          btm.stt="REVIVER"
-          btm.camada =2
+          when(tipo) {
+             1-> {
+                 paint.color = Color(0xFFD71204).toArgb()
+                 btm.stt = "REVIVER"
+                 btm.camada = 2
+             }
+              2-> {
+                  paint.color = Color(0xFFD71204).toArgb()
+                  btm.stt =  "+ 3"
+                  btm.camada = 2
+
+
+                  btmCoin.stt =  "+ 3"
+
+              }
+              3-> {
+                  paint.color = Color(0xFFD71204).toArgb()
+                  btm.stt =  "+ 3"
+                  btm.camada = 2
+                  btmCoin.stt =  "+ 3"
+
+              }
+              4-> {
+                  paint.color = Color(0xFFD71204).toArgb()
+                  btm.stt = "+ 3"
+                  btm.camada = 2
+                  btmCoin.stt =  "+ 3"
+
+              }
+          }
       }
 
         paint.alpha = 150
@@ -105,7 +136,7 @@ class Venceu(var context: Context,
             paint.color = Color(0xFF7B68EE).toArgb()
 
         }else{
-            paint.color = Color(0xFFBE7D03).toArgb()
+            paint.color = Color(0xFF919ACE).toArgb()
 
         }
         paint.alpha = 255
@@ -122,7 +153,7 @@ class Venceu(var context: Context,
 
             btm.draw(canvas)
         }else{
-            if(pontos>=100) {
+            if(pontos>=valorminimo) {
                 btm.h = (this.h * 0.08).toInt()
                 btmCoin.h = (this.h * 0.08).toInt()
                 btm.draw(canvas)
@@ -173,16 +204,143 @@ class Venceu(var context: Context,
             canvas.drawText("Nível ${fase - 1}", centroX - (largura / 6), centroY * 0.7f, paint)
             canvas.drawText("Completo", centroX - (largura / 4), centroY * 0.8f, paint)
             paint.color = Color(0xFF15072F).toArgb()
-            if (liberado)
-                canvas.drawText("Coins: $pontos", centroX / 2, centroY, paint)
+
+            if (liberado) {
+                val imgg = BitmapFactory.decodeResource(context.resources, R.drawable.moeda)
+
+                val imggg = Bitmap.createScaledBitmap(
+                    imgg,
+                    ((w * 0.12f) - espaco).toInt(),
+                    ((h * 0.06f) - espaco).toInt(),
+                    false
+                )
+
+                canvas.drawBitmap(imggg,   ((w * 0.33f) + espaco), ((h * 0.45f) + espaco), paint)
+                canvas.drawText(" $pontos", centroX , centroY, paint)
+
+            }
+
+
+
         }else{
 
 
-            canvas.drawText("SEM ESPAÇO", centroX - (largura / 2.5f), centroY * 0.7f, paint)
-            canvas.drawText("Falhou", centroX - (largura / 4), centroY * 0.8f, paint)
+            when(tipo) {
+                1-> {
+
+                    canvas.drawText("SEM ESPAÇO", centroX - (largura / 2.5f), centroY * 0.7f, paint)
+                    canvas.drawText("Falhou", centroX - (largura / 4), centroY * 0.8f, paint)
+
+                }
+                2-> {
+                     tileImage = BitmapFactory.decodeResource(context.resources, R.drawable.lampada)
+
+                    val img = Bitmap.createScaledBitmap(
+                        tileImage,
+                        ((w * 0.15f) - espaco).toInt(),
+                        ((h * 0.1f) - espaco).toInt(),
+                        false
+                    )
+                //    canvas.drawText("+ 3 ", centroX - (largura / 2.5f), centroY * 0.7f, paint)
+                    val canvas2 = Canvas(b)
+
+                    val shader = BitmapShader(img!!, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
+                    paint2.shader = shader
+
+                    val cornerRadius = 360f
+                    paint.color = Color.LightGray.toArgb()
+                    canvas2.drawRoundRect(
+                        RectF(1f, 1f, (img.width).toFloat(), (img.height).toFloat()),
+                        cornerRadius,
+                        cornerRadius,
+                        paint2
+                    )
+
+
+                    canvas.drawBitmap(b,   ((w * 0.4f) + espaco), ((h * 0.3f) + espaco), paint)
+
+                }
+                3-> {
+
+
+                    tileImage = BitmapFactory.decodeResource(context.resources, R.drawable.ima)
+
+                    val img = Bitmap.createScaledBitmap(
+                        tileImage,
+                        ((w * 0.15f) - espaco).toInt(),
+                        ((h * 0.1f) - espaco).toInt(),
+                        false
+                    )
+                    //    canvas.drawText("+ 3 ", centroX - (largura / 2.5f), centroY * 0.7f, paint)
+                    val canvas2 = Canvas(b)
+
+                    val shader = BitmapShader(img!!, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
+                    paint2.shader = shader
+
+                    val cornerRadius = 360f
+                    paint.color = Color.LightGray.toArgb()
+                    canvas2.drawRoundRect(
+                        RectF(1f, 1f, (img.width).toFloat(), (img.height).toFloat()),
+                        cornerRadius,
+                        cornerRadius,
+                        paint2
+                    )
+
+
+                    canvas.drawBitmap(b,   ((w * 0.4f) + espaco), ((h * 0.3f) + espaco), paint)
+
+
+                }
+                4-> {
+
+                    tileImage = BitmapFactory.decodeResource(context.resources, R.drawable.giro)
+
+                    val img = Bitmap.createScaledBitmap(
+                        tileImage,
+                        ((w * 0.15f) - espaco).toInt(),
+                        ((h * 0.1f) - espaco).toInt(),
+                        false
+                    )
+                    //    canvas.drawText("+ 3 ", centroX - (largura / 2.5f), centroY * 0.7f, paint)
+                    val canvas2 = Canvas(b)
+
+                    val shader = BitmapShader(img!!, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
+                    paint2.shader = shader
+
+                    val cornerRadius = 360f
+                    paint.color = Color.LightGray.toArgb()
+                    canvas2.drawRoundRect(
+                        RectF(1f, 1f, (img.width).toFloat(), (img.height).toFloat()),
+                        cornerRadius,
+                        cornerRadius,
+                        paint2
+                    )
+
+
+                    canvas.drawBitmap(b,   ((w * 0.4f) + espaco), ((h * 0.3f) + espaco), paint)
+
+
+                }
+            }
+
+
+
+
             paint.color = Color(0xFF15072F).toArgb()
-            if (liberado)
-                canvas.drawText("Coins: $pontos", centroX / 2, centroY, paint)
+            if (liberado) {
+                val imgg = BitmapFactory.decodeResource(context.resources, R.drawable.moeda)
+
+                val imggg = Bitmap.createScaledBitmap(
+                    imgg,
+                    ((w * 0.12f) - espaco).toInt(),
+                    ((h * 0.06f) - espaco).toInt(),
+                    false
+                )
+
+                canvas.drawBitmap(imggg,   ((w * 0.33f) + espaco), ((h * 0.45f) + espaco), paint)
+                canvas.drawText(" $pontos", centroX , centroY, paint)
+
+            }
 
 
         }

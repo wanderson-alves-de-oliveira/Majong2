@@ -101,11 +101,20 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
     var ima = BitmapFactory.decodeResource(context.resources, R.drawable.ima)
     var giro = BitmapFactory.decodeResource(context.resources, R.drawable.giro)
     val b: Bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
-   // val binit: Bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+    // val binit: Bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
 
     var main = MainView(this.context, (w * 1.1f).toInt(), (h * 1.1f).toInt())
     var venceuP = Venceu(this.context, (w).toInt(), (h).toInt(), 0)
     var perdeuL = Venceu(this.context, (w).toInt(), (h).toInt(), 1)
+
+    var credLuz = Venceu(this.context, (w).toInt(), (h).toInt(), 2)
+    var credIma = Venceu(this.context, (w).toInt(), (h).toInt(), 3)
+    var credSufle = Venceu(this.context, (w).toInt(), (h).toInt(), 4)
+
+
+    var objX = credLuz
+
+    var creditoRecorsus = false
 
     //var b2: Bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
     val b3: Bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
@@ -113,7 +122,11 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
     var pontuacaoNova = 0
     var score = 0
     var limitar = 7
+    var valorminimo = 300
 
+    var luzP = 0
+    var imaP = 0
+    var sufleP = 0
 
     var ultimaFase = 0
 
@@ -221,8 +234,11 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
 
                     if (ultimaFase == 0) {
                         val bd = BDTile(context)
-                        ultimaFase = bd.buscar().nivel
+                        val base = bd.buscar()
+                        ultimaFase = base.nivel
                         fase = ultimaFase
+
+
                     }
                     btm.stt = "Nível $ultimaFase"
 
@@ -263,11 +279,11 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                         bloquerBT =
                             selectedTiles.filter { it.camada < -2 && it.camada >= -4 }
                                 .isEmpty()
-                        if (!corrigirfalha || limparComCredito) {
+                        if (!corrigirfalha && !creditoRecorsus || limparComCredito && !creditoRecorsus  ) {
 
 
-                            if ( !limparComCredito && !(selectedTiles.filter { it.camada > -2 }.size < limitar ||
-                                        selectedTiles.filter { it.camada > -2 }.size > limitar && dica )
+                            if (!limparComCredito && !(selectedTiles.filter { it.camada > -2 }.size < limitar ||
+                                        selectedTiles.filter { it.camada > -2 }.size > limitar && dica)
                             ) {
                                 corrigirfalha = true
                             } else {
@@ -348,7 +364,10 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                                         time1--
                                     } else {
                                         bloquerBT2 = true
-
+                                        if (luzP <= 0) {
+                                            botao1.camada = 1
+                                            botao1.isSelected = true
+                                        }
                                     }
                                     if (time2 > 0) {
                                         botao2.camada = 1
@@ -358,11 +377,10 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                                     } else {
                                         bloquerBT2 = true
 
-                                        if(selectedTiles.isEmpty()){
+                                        if (selectedTiles.isEmpty() || imaP <= 0) {
                                             botao2.camada = 1
                                             botao2.isSelected = true
                                         }
-
 
 
                                     }
@@ -373,13 +391,89 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                                         time3--
                                     } else {
                                         bloquerBT2 = true
-
+                                        if (sufleP <= 0) {
+                                            botao3.camada = 1
+                                            botao3.isSelected = true
+                                        }
                                     }
 
                                     if (!venceu) {
+
                                         botao1.draw(canvas)
+                                        paint.color = Color.Magenta.toArgb()
+                                        paint.alpha = 255
+
+                                        canvas.drawRoundRect(
+                                            RectF(
+                                                (w * 0.265f).toFloat(),
+                                                h * 0.65f,
+                                                (w * 0.315f).toFloat(),
+                                                ((h * 0.675)).toFloat()
+                                            ), 60f, 60f, paint
+                                        )
+
+                                        paint.textSize = spToPx((this.w * 0.012f))
+                                        paint.color = Color.White.toArgb()
+                                        canvas.drawText(
+                                            luzP.toString(),
+                                            (w * 0.277f).toFloat(),
+                                            h * 0.67f,
+                                            paint
+                                        )
+
+
+
+
                                         botao2.draw(canvas)
+
+                                        paint.color = Color.Magenta.toArgb()
+                                        paint.alpha = 255
+
+                                        canvas.drawRoundRect(
+                                            RectF(
+                                                ((w * 0.425f)).toFloat(),
+                                                h * 0.65f,
+                                                (w * 0.475f).toFloat(),
+                                                ((h * 0.675)).toFloat()
+                                            ), 60f, 60f, paint
+                                        )
+
+                                        paint.textSize = spToPx((this.w * 0.012f))
+                                        paint.color = Color.White.toArgb()
+                                        canvas.drawText(
+                                            imaP.toString(),
+                                            ((w * 0.44f)).toFloat(),
+                                            h * 0.67f,
+                                            paint
+                                        )
+
+
+
                                         botao3.draw(canvas)
+
+
+                                        paint.color = Color.Magenta.toArgb()
+                                        paint.alpha = 255
+
+                                        canvas.drawRoundRect(
+                                            RectF(
+                                                ((w * 0.595f)).toFloat(),
+                                                h * 0.65f,
+                                                (w * 0.645f).toFloat(),
+                                                ((h * 0.675)).toFloat()
+                                            ), 60f, 60f, paint
+                                        )
+
+                                        paint.textSize = spToPx((this.w * 0.012f))
+                                        paint.color = Color.White.toArgb()
+                                        canvas.drawText(
+                                            sufleP.toString(),
+                                            ((w * 0.61f)).toFloat(),
+                                            h * 0.67f,
+                                            paint
+                                        )
+
+
                                     }
 
                                 } catch (e: Exception) {
@@ -410,10 +504,10 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                                             )
 
                                             var countEmbaralhar = 0
-                                          //  tiles.forEach {
-                                                for (itty in 0 until tiles.size) {
+                                            //  tiles.forEach {
+                                            for (itty in 0 until tiles.size) {
 
-                                                    val it = tiles[itty]
+                                                val it = tiles[itty]
                                                 if (embaralhando) {
                                                     if (it.girando) {
                                                         countEmbaralhar++
@@ -465,7 +559,6 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                                     }
 
 
-
                                 }
 
 
@@ -481,31 +574,29 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
 
                                     var i = 0
 
-                                    if(tutor) {
-
-
+                                    if (tutor) {
 
 
                                         paint.color = Color.Black.toArgb()
                                         paint.alpha = 230
-                                      //  val canvasG = Canvas(binit)
+                                        //  val canvasG = Canvas(binit)
                                         canvas.drawRoundRect(
                                             RectF(
                                                 0f,
                                                 0f,
                                                 w.toFloat(),
-                                               h*1.3f
+                                                h * 1.3f
                                             ), 0f, 0f, paint
                                         )
-                                     //   canvas.drawBitmap(binit, 0f, 0f, paint)
+                                        //   canvas.drawBitmap(binit, 0f, 0f, paint)
 
                                         paint.color = Color.Blue.toArgb()
                                         paint.alpha = 255
                                         canvas.drawRoundRect(
                                             RectF(
                                                 (w * 0.1).toFloat(),
-                                                (h * 0.1).toFloat() ,
-                                                (w * 0.9 ).toFloat(),
+                                                (h * 0.1).toFloat(),
+                                                (w * 0.9).toFloat(),
                                                 ((h * 0.3)).toFloat()
                                             ), 60f, 60f, paint
                                         )
@@ -541,12 +632,11 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                                     }
 
 
+                                    // selectedTiles.forEach {
 
-                                   // selectedTiles.forEach {
+                                    for (itt in 0 until selectedTiles.size) {
 
-                                        for (itt in 0 until selectedTiles.size) {
-
-                                            val it = selectedTiles[itt]
+                                        val it = selectedTiles[itt]
                                         if (it.camada > -3) {
                                             i++
                                             val velocidade = w * 0.15f
@@ -618,7 +708,7 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                                                 }
                                                 if (it.x >= (w * 0.7f) && it.y <= 20f) {
                                                     it.camada = -5
-                                                   limitar = 7
+                                                    limitar = 7
                                                     tutor = false
                                                     pontos++
 
@@ -770,7 +860,7 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
 
                             if (venceu) {
                                 if (pontuacaoNova < score && venceuP.liberado) {
-                                    pontuacaoNova++
+                                    pontuacaoNova += 3
                                 }
 
                                 venceuP.fase = ultimaFase + 1
@@ -802,7 +892,7 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                                 canvas.drawBitmap(walld[0], 0f, 0f, paint)
                                 falhou = true
 
-                                if (true) {
+                                if (corrigirfalha) {
 
                                     perdeuL.pontos = score
                                     perdeuL.fase = ultimaFase + 1
@@ -820,10 +910,10 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                                         perdeuL.btm.liberar = 0
 
 
-                                    } else if (perdeuL.btmCoin.liberar > 3 && score >= 100) {
+                                    } else if (perdeuL.btmCoin.liberar > 3 && score >= valorminimo) {
                                         //    finalizarFase()
                                         val bd = BDTile(context)
-                                        score = score - 100
+                                        score = score - valorminimo
                                         bd.atualizar(Base(fase.toInt(), score.toLong()))
 
                                         perdeuL =
@@ -833,33 +923,77 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
 
                                     }
 
+                                } else if (creditoRecorsus) {
+                                    if (objX.tipo == 2) {
+
+                                        criditar(credLuz, canvas)
+
+
+                                        if (credLuz.btmCoin.liberar > 3 && score >= valorminimo) {
+                                            posCredito(credLuz)
+                                            credLuz =
+                                                Venceu(this.context, (w).toInt(), (h).toInt(), 2)
+                                            luzP+=3
+                                            credLuz.btmCoin.liberar = 0
+                                            creditoRecorsus = false
+
+                                        } else  if (credLuz.btm.liberar > 3 ){
+                                             credLuz =
+                                                Venceu(this.context, (w).toInt(), (h).toInt(), 2)
+                                            credLuz.btm.liberar = 0
+                                            creditoRecorsus = false
+                                            luzP+=3
+                                        }
+
+                                    }else    if (objX.tipo == 3) {
+
+                                        criditar(credIma, canvas)
+
+
+                                        if (credIma.btmCoin.liberar > 3 && score >= valorminimo) {
+                                            posCredito(credIma)
+                                            credIma =
+                                                Venceu(this.context, (w).toInt(), (h).toInt(), 3)
+                                            imaP+=3
+                                            credIma.btmCoin.liberar = 0
+                                            creditoRecorsus = false
+
+                                        } else  if (credIma.btm.liberar > 3 ){
+                                             credIma =
+                                                Venceu(this.context, (w).toInt(), (h).toInt(), 3)
+                                            credIma.btm.liberar = 0
+                                            creditoRecorsus = false
+                                            imaP+=3
+                                        }
+                                    }else    if (objX.tipo == 4) {
+
+                                        criditar(credSufle, canvas)
+
+
+                                        if (credSufle.btmCoin.liberar > 3 && score >= valorminimo) {
+                                            posCredito(objX)
+                                            credSufle =
+                                                Venceu(this.context, (w).toInt(), (h).toInt(), 4)
+                                            sufleP+=3
+                                            credSufle.btmCoin.liberar = 0
+                                            creditoRecorsus = false
+
+                                        } else  if (credSufle.btm.liberar > 3 ){
+                                             credSufle =
+                                                Venceu(this.context, (w).toInt(), (h).toInt(), 4)
+                                            credSufle.btm.liberar = 0
+                                            creditoRecorsus = false
+                                            sufleP+=3
+                                        }
+
+                                    }
+
+
                                 }
 
 
 
                                 paint.color = Color.Red.toArgb()
-
-//                                    canvas.drawText(
-//                                        "GAME OUVER",
-//                                        100f,
-//                                        (h * 0.5).toFloat(),
-//                                        paint
-//                                    )
-//                                    canvas.drawText(
-//                                        timet.toString(),
-//                                        (w * 0.5).toFloat(),
-//                                        (h * 0.7).toFloat(),
-//                                        paint
-//                                    )
-//                                    timet--
-//                                    Thread.sleep(700)
-//                                    if (timet == 0) {
-//                                        selectedTiles.clear()
-//                                        tiles.clear()
-//                                        popularTiles()
-//                                        timet = 5
-//
-//                                    }
 
 
                             } catch (exx: Exception) {
@@ -903,13 +1037,34 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
 
     }
 
+    private fun criditar(obj: Venceu, canvas: Canvas) {
+
+
+        obj.pontos = score
+        obj.fase = ultimaFase + 1
+        obj.pontos = score.toInt()
+
+        obj.draw(canvas)
+
+
+    }
+
+    private fun posCredito(obj: Venceu) {
+        val bd = BDTile(context)
+        score = score - valorminimo
+        bd.atualizar(Base(fase.toInt(), score.toLong()))
+
+        limparComCredito = true
+        obj.btmCoin.liberar = 0
+    }
+
     private fun finalizarFase() {
 
 
         fase++
 
         val bd = BDTile(context)
-        bd.atualizar(Base(fase.toInt(), score.toLong()))
+        bd.atualizar(Base(fase.toInt(), score.toLong(), luzP, imaP, sufleP))
 
         ultimaFase = fase
 
@@ -1221,6 +1376,13 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
         val bd = BDTile(context)
         ultimaFase = bd.buscar().nivel
 
+
+        val base = bd.buscar()
+
+        luzP = base.luz
+        imaP = base.ima
+        sufleP = base.sufle
+
         fase = ultimaFase
 
         score = bd.buscar().pontos.toInt()
@@ -1407,7 +1569,7 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
             tilesx3.addAll(tilesx2)
             tilesx3.addAll(tilesx1)
             tilesx3.addAll(tilesx)
-limitar =20
+            limitar = 20
             if (s.size > 1) {
                 achou(tilesx3[0])
 
@@ -1548,10 +1710,10 @@ limitar =20
             if (!tem2 && selectedTiles.filter { it.camada != -5 }.isNotEmpty()) {
                 itenImpossivel = false
 
-                 validarSelecaoIA(selectedTiles, 2, 1)
+                validarSelecaoIA(selectedTiles, 2, 1)
 
             }
-             limparSelecionados()
+            limparSelecionados()
 
         }
 
@@ -1864,40 +2026,66 @@ limitar =20
 
                 }
 
-                if (bloquerBT && bloquerBT2) {
+                if (bloquerBT && bloquerBT2 && !corrigirfalha && !venceu) {
                     if (botao1.containsTouch(
                             event.x,
                             event.y
                         ) && time1 == 0 && time3 == 0 && time2 == 0
                     ) {
-                        time1 = 10
-                        botao1.isSelected = true
-                        dica = true
-                        iaJogando()
+
+                        if (luzP > 0 && !botao1.isSelected) {
+                            time1 = 10
+                            botao1.isSelected = true
+                            dica = true
+                            iaJogando()
+                            luzP--
+                        } else {
+                            objX = credLuz
+                            creditoRecorsus = true
+                        }
+
                     } else if (botao2.containsTouch(
                             event.x,
                             event.y
                         )
                         && time1 == 0 && time3 == 0 && time2 == 0
                     ) {
-                        time2 = 10
-                        botao2.isSelected = true
+                        if( imaP > 0 &&  !botao2.isSelected) {
+                            time2 = 10
+                            botao2.isSelected = true
+                            limparSelecionados()
+                            imaP--
+                        }else if(!selectedTiles.isEmpty()){
+                            objX = credIma
+                            creditoRecorsus = true
+                        }
 
-                        limparSelecionados()
+
+
                     } else if (botao3.containsTouch(
                             event.x,
                             event.y
                         )
                         && time1 == 0 && time3 == 0 && time2 == 0
                     ) {
-                        time3 = 10
-                        botao3.isSelected = true
-                        embaralhando = true
-                        embaralha()
+
+                        if(sufleP > 0 && !botao3.isSelected) {
+                            time3 = 10
+                            botao3.isSelected = true
+                            embaralhando = true
+                            embaralha()
+                            sufleP--
+                        } else{
+                        objX = credSufle
+                        creditoRecorsus = true
+                    }
+
+
+
                     }
 
                     bloquerBT2 = false
-
+                    atualizarRecurso()
 
                 }
                 if (venceuP.btm.containsTouch(
@@ -1921,8 +2109,50 @@ limitar =20
                     && falhou
                 ) {
                     perdeuL.btmCoin.animar = true
+                } else if (credLuz.btm.containsTouch(
+                        event.x,
+                        event.y
+                    )
+                    && creditoRecorsus
+                ) {
+                    credLuz.btm.animar = true
+                } else if (credLuz.btmCoin.containsTouch(
+                        event.x,
+                        event.y
+                    )
+                    && creditoRecorsus
+                ) {
+                    credLuz.btmCoin.animar = true
+                }else if (credIma.btm.containsTouch(
+                        event.x,
+                        event.y
+                    )
+                    && creditoRecorsus
+                ) {
+                    credIma.btm.animar = true
+                } else if (credIma.btmCoin.containsTouch(
+                        event.x,
+                        event.y
+                    )
+                    && creditoRecorsus
+                ) {
+                    credIma.btmCoin.animar = true
                 }
-
+                else if (credSufle.btm.containsTouch(
+                        event.x,
+                        event.y
+                    )
+                    && creditoRecorsus
+                ) {
+                    credSufle.btm.animar = true
+                } else if (credSufle.btmCoin.containsTouch(
+                        event.x,
+                        event.y
+                    )
+                    && creditoRecorsus
+                ) {
+                    credSufle.btmCoin.animar = true
+                }
 
 
 
@@ -1943,6 +2173,15 @@ limitar =20
         } catch (e: Exception) {
             e.stackTrace
         }
+    }
+
+    private fun atualizarRecurso() {
+
+        val bd = BDTile(context)
+        val base = Base(fase, score.toLong(), luzP, imaP, sufleP)
+        bd.atualizar(base)
+
+
     }
 
     fun calculoVelocidade(it: MahjongTile, py: Float): Double {

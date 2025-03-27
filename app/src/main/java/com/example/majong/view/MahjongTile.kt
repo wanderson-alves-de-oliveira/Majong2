@@ -184,14 +184,8 @@ class MahjongTile(
                 val shader = BitmapShader(img!!, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
                 paint.shader = shader
 
-
-                // Defina o raio das bordas arredondadas
                 val cornerRadius = 20f
                 paint.color = Color.LightGray.toArgb()
-                //   canvas2.drawRoundRect(0f, 0f, b.width.toFloat(), b.height.toFloat(),40f,40f, paint);
-                // Desenhe um retângulo com bordas arredondadas
-
-
                 canvas2.drawRoundRect(
                     RectF(1f, 1f, (width).toFloat(), (height).toFloat()),
                     cornerRadius,

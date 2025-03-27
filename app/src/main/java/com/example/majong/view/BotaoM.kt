@@ -63,6 +63,10 @@ var xFix = x
                 liberar = 2
             }
 
+//            else{
+//                animar = false
+//            }
+
 
         }else{
 
@@ -136,7 +140,7 @@ var xFix = x
             canvas2.drawBitmap(coinP, (w * 0.35).toFloat(),  (h * 0.55).toFloat(), paint)
 
             canvas2.drawText(
-                "100",
+                "300",
                 (w * 0.45).toFloat(),
                 (h * 0.65).toFloat(),
                 paint

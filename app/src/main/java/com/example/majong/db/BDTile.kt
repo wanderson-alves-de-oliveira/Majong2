@@ -21,6 +21,9 @@ class BDTile(context: Context?) {
         val valores = ContentValues()
         valores.put("nivel", dados.nivel.toString())
         valores.put("pontos", dados.pontos.toString())
+        valores.put("luz", dados.luz.toString())
+        valores.put("ima", dados.ima.toString())
+        valores.put("sufle", dados.sufle.toString())
 
         db.update("tile", valores, null, null)
     }
@@ -28,13 +31,17 @@ class BDTile(context: Context?) {
 
     fun buscar(): Base {
         val cursor = db.rawQuery(
-            "SELECT  nivel,pontos" +
+            "SELECT  nivel,pontos,luz,ima,sufle" +
                     " FROM tile ", null
         )
         cursor.moveToNext()
         val p = Base(
             cursor.getString(0).toInt(),
-            cursor.getString(1).toLong()
+            cursor.getString(1).toLong(),
+                    cursor.getString(2).toInt(),
+                    cursor.getString(3).toInt(),
+                    cursor.getString(4).toInt()
+
         )
 
 
