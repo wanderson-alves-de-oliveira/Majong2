@@ -30,7 +30,7 @@ class Conection(context: Context?) :
 
         val valores = ContentValues()
         valores.put("nivel", 0)
-        valores.put("pontos", 3000)
+        valores.put("pontos", 0)
         valores.put("luz", 3)
         valores.put("ima", 3)
         valores.put("sufle", 3)

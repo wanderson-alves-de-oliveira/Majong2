@@ -113,7 +113,7 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
 
 
     var objX = credLuz
-
+    var timePress =0
     var creditoRecorsus = false
 
     //var b2: Bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
@@ -230,6 +230,10 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
 
             try {
 
+                if(timePress > 0){
+                    timePress--
+
+                }
                 if (index == 0) {
 
                     if (ultimaFase == 0) {
@@ -270,6 +274,7 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
 
                     if (canvas != null) {
                         //     try {
+
 
 
                         validarSelecao(selectedTiles.filter { it.camada != -5 }
@@ -2088,83 +2093,87 @@ class GameLoop(private val surfaceHolder: SurfaceHolder, private val context: Co
                     atualizarRecurso()
 
                 }
-                if (venceuP.btm.containsTouch(
-                        event.x,
-                        event.y
-                    )
-                    && venceu
-                ) {
-                    venceuP.btm.animar = true
-                } else if (perdeuL.btm.containsTouch(
-                        event.x,
-                        event.y
-                    )
-                    && falhou
-                ) {
-                    perdeuL.btm.animar = true
-                } else if (perdeuL.btmCoin.containsTouch(
-                        event.x,
-                        event.y
-                    )
-                    && falhou
-                ) {
-                    perdeuL.btmCoin.animar = true
-                } else if (credLuz.btm.containsTouch(
-                        event.x,
-                        event.y
-                    )
-                    && creditoRecorsus
-                ) {
-                    credLuz.btm.animar = true
-                } else if (credLuz.btmCoin.containsTouch(
-                        event.x,
-                        event.y
-                    )
-                    && creditoRecorsus
-                ) {
-                    credLuz.btmCoin.animar = true
-                }else if (credIma.btm.containsTouch(
-                        event.x,
-                        event.y
-                    )
-                    && creditoRecorsus
-                ) {
-                    credIma.btm.animar = true
-                } else if (credIma.btmCoin.containsTouch(
-                        event.x,
-                        event.y
-                    )
-                    && creditoRecorsus
-                ) {
-                    credIma.btmCoin.animar = true
-                }
-                else if (credSufle.btm.containsTouch(
-                        event.x,
-                        event.y
-                    )
-                    && creditoRecorsus
-                ) {
-                    credSufle.btm.animar = true
-                } else if (credSufle.btmCoin.containsTouch(
-                        event.x,
-                        event.y
-                    )
-                    && creditoRecorsus
-                ) {
-                    credSufle.btmCoin.animar = true
-                }
+
+                if(timePress == 0) {
+                    if (venceuP.btm.containsTouch(
+                            event.x,
+                            event.y
+                        )
+                        && venceu && venceuP.btm.t == 1f
+                    ) {
+                        venceuP.btm.animar = true
+                    } else if (perdeuL.btm.containsTouch(
+                            event.x,
+                            event.y
+                        )
+                        && falhou && perdeuL.btm.t == 1f
+                    ) {
+                        perdeuL.btm.animar = true
+                    } else if (perdeuL.btmCoin.containsTouch(
+                            event.x,
+                            event.y
+                        )
+                        && falhou && perdeuL.btmCoin.t == 1f
+                    ) {
+                        perdeuL.btmCoin.animar = true
+                    } else if (credLuz.btm.containsTouch(
+                            event.x,
+                            event.y
+                        )
+                        && creditoRecorsus && credLuz.btm.t == 1f
+                    ) {
+                        credLuz.btm.animar = true
+                    } else if (credLuz.btmCoin.containsTouch(
+                            event.x,
+                            event.y
+                        )
+                        && creditoRecorsus
+                    ) {
+                        credLuz.btmCoin.animar = true
+                    } else if (credIma.btm.containsTouch(
+                            event.x,
+                            event.y
+                        )
+                        && creditoRecorsus && credIma.btm.t == 1f
+                    ) {
+                        credIma.btm.animar = true
+                    } else if (credIma.btmCoin.containsTouch(
+                            event.x,
+                            event.y
+                        )
+                        && creditoRecorsus && credIma.btmCoin.t == 1f
+                    ) {
+                        credIma.btmCoin.animar = true
+                    } else if (credSufle.btm.containsTouch(
+                            event.x,
+                            event.y
+                        )
+                        && creditoRecorsus && credSufle.btm.t == 1f
+                    ) {
+                        credSufle.btm.animar = true
+                    } else if (credSufle.btmCoin.containsTouch(
+                            event.x,
+                            event.y
+                        )
+                        && creditoRecorsus && credSufle.btmCoin.t == 1f
+                    ) {
+                        credSufle.btmCoin.animar = true
+                    }
 
 
 
 
-                if (btm.containsTouch(
-                        event.x,
-                        event.y
-                    )
-                ) {
+                    if (btm.containsTouch(
+                            event.x,
+                            event.y
+                        )
+                    ) {
 
-                    btm.animar = true
+                        btm.animar = true
 
+                    }
+
+                    timePress=10
                 }
 
 

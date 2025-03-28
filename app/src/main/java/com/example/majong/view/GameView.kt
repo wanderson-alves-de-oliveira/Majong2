@@ -13,6 +13,8 @@ class GameView(context: Context) : SurfaceView(context), SurfaceHolder.Callback 
     private var selectedTiles = mutableListOf<MahjongTile>()
     private var pontos = 0
     private var index = 0
+    private var tutor = false
+
 
     init {
         holder.addCallback(this)
@@ -24,6 +26,7 @@ class GameView(context: Context) : SurfaceView(context), SurfaceHolder.Callback 
             tiles = gameLoop.tiles
             pontos = gameLoop.pontos
             index = gameLoop.index
+            tutor = gameLoop.tutor
 
             selectedTiles = gameLoop.selectedTiles
             selectedTiles.removeAll(gameLoop.removerDaLista)
@@ -37,6 +40,7 @@ class GameView(context: Context) : SurfaceView(context), SurfaceHolder.Callback 
             gameLoop.selectedTiles = this.selectedTiles
             gameLoop.pontos = this.pontos
             gameLoop.index = this.index
+            gameLoop.tutor = this.tutor
         }
         gameLoop.startLoop()
     }
