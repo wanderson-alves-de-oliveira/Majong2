@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
 
     <application
         android:allowBackup="true"
@@ -12,6 +17,7 @@
         android:supportsRtl="true"
         android:largeHeap="true"
         android:hardwareAccelerated="true"
+        android:launchMode="singleTask"
 
         android:theme="@style/Theme.Majong"
         tools:targetApi="31">
@@ -20,7 +26,7 @@
 
 
         <activity
-            android:name=".MainActivity"
+            android:name="com.wao.tile.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.Majong"
             android:screenOrientation="portrait"
@@ -32,6 +38,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <receiver
+            android:name="com.wao.tile.ferramentas.NotificationReceiver"
+            android:exported="false" />
+        <service
+            android:name="androidx.work.impl.foreground.SystemForegroundService"
+            android:permission="android.permission.FOREGROUND_SERVICE"
+            android:exported="false"/>
+
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-1070048556704742~6669483574"/>
     </application>
 
 </manifest>
