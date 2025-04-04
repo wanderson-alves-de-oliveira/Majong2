@@ -12,6 +12,7 @@ import com.google.android.gms.ads.MobileAds
 import com.wao.tile.ferramentas.NotificationScheduler
 
 
+@Suppress("DEPRECATION")
 class MainActivity : Activity() {
     private lateinit var gameView: GameView
     private lateinit var adView: AdView

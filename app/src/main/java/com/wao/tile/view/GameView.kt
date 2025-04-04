@@ -24,6 +24,7 @@ import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 
+@Suppress("DEPRECATION")
 class GameView(context: Context) : SurfaceView(context), SurfaceHolder.Callback {
     lateinit var gameLoop: GameLoop
     private var tiles = mutableListOf<MahjongTile>()

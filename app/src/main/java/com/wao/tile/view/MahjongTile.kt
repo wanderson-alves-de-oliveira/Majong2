@@ -25,7 +25,7 @@ class MahjongTile(
     var h: Int,
     var camada: Int,
     var id: Int,
-    girando: Boolean = false
+    var girando: Boolean = false
 ) {
 
 
@@ -41,7 +41,6 @@ class MahjongTile(
 
     var ty = true
     var espaco = 0f
-    var girando = girando
     private var giroc = 0f
     private val VALLIMITG = 10
     private val VALLIMITGINTRO = 20
