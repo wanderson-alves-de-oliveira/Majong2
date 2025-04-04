@@ -17,10 +17,10 @@ class MainView(   var context: Context,
     private val paint = Paint()
     private val paint2 = Paint()
     var y: Float = 0f
-    var isSelected = false
+    private var isSelected = false
 
-     var inicio = true
-     var xp = w*11f
+     private var inicio = true
+     private var xp = w*11f
 
 
     var espaco = 0f
@@ -39,13 +39,13 @@ class MainView(   var context: Context,
             h = 100
         }
         val b: Bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
-        if (!isSelected) {
-            espaco = 0f
+        espaco = if (!isSelected) {
+            0f
         } else {
-            espaco = w * 0.06f
+            w * 0.06f
 
         }
-        var tileImage = BitmapFactory.decodeResource(context.resources, R.drawable.titulo)
+        val tileImage = BitmapFactory.decodeResource(context.resources, R.drawable.titulo)
         val img = Bitmap.createScaledBitmap(
             tileImage
         ,
@@ -53,14 +53,14 @@ class MainView(   var context: Context,
             ((h * 0.05f) - espaco).toInt(),
             false
         )
-        var x: Float = ((w/2)-(img.width/2)).toFloat()
+        val x: Float = ((w/2)-(img.width/2)).toFloat()
 
-        var main = BitmapFactory.decodeResource(context.resources, R.drawable.main)
+        val main = BitmapFactory.decodeResource(context.resources, R.drawable.main)
         val mainp = Bitmap.createScaledBitmap(
             main
             ,
-            ((w ) ).toInt(),
-            ((h ) ).toInt(),
+            ((w ) ),
+            ((h ) ),
             false
         )
 
@@ -68,8 +68,7 @@ class MainView(   var context: Context,
       paint.color = Color.Red.toArgb()
 
 
-            val cornerRadius = 20f
-            paint.color = Color.LightGray.toArgb()
+        paint.color = Color.LightGray.toArgb()
 
 
             canvas2.drawBitmap(mainp,0f,0f,paint)
@@ -78,7 +77,7 @@ class MainView(   var context: Context,
         if(inicio){
 
             if(xp>x){
-                var dif = (xp-x)/2
+                val dif = (xp-x)/2
                 xp-=dif
                 if(dif<=0.5f){
                     xp = x

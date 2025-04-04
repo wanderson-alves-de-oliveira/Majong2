@@ -23,7 +23,6 @@ import com.wao.tile.view.GameView
 import com.wao.tile.view.MahjongTile
 import com.wao.tile.view.MainView
 import com.wao.tile.view.Venceu
-import com.google.android.gms.ads.AdView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -32,19 +31,16 @@ import kotlinx.coroutines.runBlocking
 class GameLoop(
     private val surfaceHolder: SurfaceHolder,
     private val context: Context,
-    val gameView: GameView
+    private val gameView: GameView
 ) : Thread() {
     private var running = false
 
     private var lastTime = System.nanoTime()
     private val targetFps = 60
-    private var timet = 5
     private var toque = 0
-     var preload = 0
+     private var preload = 0
 
     private val optimalTime = 1_000_000_000 / targetFps
-    private var touchX: Float = 0f
-    private var touchY: Float = 0f
     private var isTouched = false
     private var dica = false
 
@@ -57,44 +53,44 @@ class GameLoop(
     var tiles = mutableListOf<MahjongTile>()
     var selectedTiles = mutableListOf<MahjongTile>()
     var removerDaLista = mutableListOf<MahjongTile>()
-    var selectedTilesRes = mutableListOf<MahjongTile>()
-    var limpando = false
+    private var selectedTilesRes = mutableListOf<MahjongTile>()
+    private var limpando = false
     private val paint = Paint()
     private var itenImpossivel = false
-    private val coroutine: CoroutineScope = CoroutineScope(Dispatchers.Default)
     private val display: DisplayMetrics = context.resources.displayMetrics
     private val h = display.heightPixels
     private val w = display.widthPixels
     private val hp = 0
     private val wp = 0
 
-    var tamPadrao = 0
+    private var tamPadrao = 0
     var tamNovo = 0
-    var ajustarY = true
-    var bloquerBT = false
-    var bloquerBT2 = false
-    var embaralhando = false
+    private var ajustarY = true
+    private var bloquerBT = false
+    private var bloquerBT2 = false
+    private var embaralhando = false
     var pontos = 0
-    var venceu = false
-    var falhou = false
+    private var pontosCont = 0
 
-    var corrigirfalha = false
+    private var venceu = false
+    private var falhou = false
 
-    var limparComCredito = false
+    private var corrigirfalha = false
+
+    private var limparComCredito = false
     var tutor = false
 
-    var fase = 0
+    private var fase = 0
 
-    var time1 = 0
-    var time2 = 0
-    var time3 = 0
+    private var time1 = 0
+    private var time2 = 0
+    private var time3 = 0
     var index = 0
     private var cLocked = false
 
-    val divisor = 3
-    var tileImage = BitmapFactory.decodeResource(context.resources, R.drawable.mahjongtile)
-    var coin = BitmapFactory.decodeResource(context.resources, R.drawable.moeda)
-    val coinP = Bitmap.createScaledBitmap(
+    private val divisor = 3
+    private var coin = BitmapFactory.decodeResource(context.resources, R.drawable.moeda)
+    private val coinP = Bitmap.createScaledBitmap(
         coin,
         ((w * 0.1f)).toInt(),
         ((w * 0.1f)).toInt(),
@@ -102,44 +98,43 @@ class GameLoop(
     )
 
 
-    var lampada = BitmapFactory.decodeResource(context.resources, R.drawable.lampada)
-    var ima = BitmapFactory.decodeResource(context.resources, R.drawable.ima)
-    var giro = BitmapFactory.decodeResource(context.resources, R.drawable.giro)
-    val b: Bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+    private var lampada = BitmapFactory.decodeResource(context.resources, R.drawable.lampada)
+    private var ima = BitmapFactory.decodeResource(context.resources, R.drawable.ima)
+    private var giro = BitmapFactory.decodeResource(context.resources, R.drawable.giro)
+    private val b: Bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
     // val binit: Bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
 
-    var main = MainView(this.context, (w * 1.1f).toInt(), (h * 1.1f).toInt())
-    var venceuP = Venceu(this.context, (w).toInt(), (h).toInt(), 0)
-    var perdeuL = Venceu(this.context, (w).toInt(), (h).toInt(), 1)
+    private var main = MainView(this.context, (w * 1.1f).toInt(), (h * 1.1f).toInt())
+    private var venceuP = Venceu(this.context, (w), (h), 0)
+    var perdeuL = Venceu(this.context, (w), (h), 1)
     var semInternet = false
 
-    var credLuz = Venceu(this.context, (w).toInt(), (h).toInt(), 2)
-    var credIma = Venceu(this.context, (w).toInt(), (h).toInt(), 3)
-    var credSufle = Venceu(this.context, (w).toInt(), (h).toInt(), 4)
-    var premiar = false
+    private var credLuz = Venceu(this.context, (w), (h), 2)
+    private var credIma = Venceu(this.context, (w), (h), 3)
+    private var credSufle = Venceu(this.context, (w), (h), 4)
+    private var premiar = false
 
 
-    var objX = credLuz
-    var timePress = 0
-    var creditoRecorsus = false
+    private var objX = credLuz
+    private var timePress = 0
+    private var creditoRecorsus = false
 
     //var b2: Bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
-    val b3: Bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+    private val b3: Bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
 
-    var pontuacaoNova = 0
-    var score = 0
-    var limitar = 7
-    var valorminimo = 500
+    private var pontuacaoNova = 0
+    private var score = 0
+    private var limitar = 7
+    private var valorminimo = 500
 
-    var luzP = 0
-    var imaP = 0
-    var sufleP = 0
+    private var luzP = 0
+    private var imaP = 0
+    private var sufleP = 0
 
-    var ultimaFase = 0
+    private var ultimaFase = 0
 
-    var btm = BotaoM(
+    private var btm = BotaoM(
         this.context,
-        tileImage,
         ((this.w * 0.9 / 4) * (1)).toFloat(),
         (this.h * 0.6).toFloat(),
         (this.w * 0.6).toInt(),
@@ -148,22 +143,22 @@ class GameLoop(
         ultimaFase.toString()
     )
 
-    var walld: MutableList<Bitmap> = mutableListOf()
+    private var walld: MutableList<Bitmap> = mutableListOf()
     var tileImages = mutableListOf<Bitmap>()
-    val botao1 = MahjongTile(
+    private val botao1 = MahjongTile(
         lampada,
         this.context,
-        (((w * 0.02f) + (w * 0.9f) / 6) * 1.5f).toFloat(),
+        (((w * 0.02f) + (w * 0.9f) / 6) * 1.5f),
         h * 0.83f,
         ((w * 0.8f) / 6).toInt(),
         ((w * 0.9f) / 6).toInt(),
         2,
         5000
     )
-    val botao2 = MahjongTile(
+    private val botao2 = MahjongTile(
         ima,
         this.context,
-        (((w * 0.02f) + (w * 0.9f) / 6) * 2.5f).toFloat(),
+        (((w * 0.02f) + (w * 0.9f) / 6) * 2.5f),
         h * 0.83f,
         ((w * 0.8f) / 6).toInt(),
         ((w * 0.9f) / 6).toInt(),
@@ -171,10 +166,10 @@ class GameLoop(
         2000
 
     )
-    val botao3 = MahjongTile(
+    private val botao3 = MahjongTile(
         giro,
         this.context,
-        (((w * 0.02f) + (w * 0.9f) / 6) * 3.5f).toFloat(),
+        (((w * 0.02f) + (w * 0.9f) / 6) * 3.5f),
         h * 0.83f,
         ((w * 0.8f) / 6).toInt(),
         ((w * 0.9f) / 6).toInt(),
@@ -182,8 +177,8 @@ class GameLoop(
         3000
 
     )
-    val IA_LIMIT = 50
-    var timeValidarIA = IA_LIMIT
+    private  val ialimite:Int = 50
+    private var timeValidarIA = ialimite
 
     fun startLoop() {
         running = true
@@ -195,18 +190,16 @@ class GameLoop(
         join()
     }
 
-    private var adView: AdView? = null
-
     override fun run() {
 
         while (running) {
             val now = System.nanoTime()
-            var deltaTime = (now - lastTime) / 1_000_000_000.0
-            if (deltaTime < 0) deltaTime = 0.1
+            (now - lastTime) / 1_000_000_000.0
+           
             // Convertendo para segundos
             lastTime = now
             try {
-                update(deltaTime)
+                update()
 
             } catch (e: Exception) {
                 e.stackTrace
@@ -220,24 +213,21 @@ class GameLoop(
 
             val sleepTime = optimalTime - (System.nanoTime() - now)
             if (sleepTime > 0) {
-                Thread.sleep(sleepTime / 1_000_000)
+                sleep(sleepTime / 1_000_000)
             }
         }
     }
 
-    var canvas: Canvas? = null
-    private fun update(deltaTime: Double) {
+    private var canvas: Canvas? = null
+    private fun update() {
 
 
         while (running) {
 
-            this.canvas = null
+          //  this.canvas = null
             if (!cLocked) {
-                canvas = this.surfaceHolder.lockCanvas();
-                cLocked = true;
-            }else if(canvas==null && cLocked){
-                canvas = this.surfaceHolder.lockCanvas();
-                cLocked = true;
+                canvas = this.surfaceHolder.lockCanvas()
+                cLocked = true
             }
 
             try {
@@ -269,18 +259,18 @@ class GameLoop(
                                 paint.color = Color.Green.toArgb()
                                 canvas!!.drawRoundRect(
                                     RectF(
-                                        (w * 0.25f).toFloat(),
+                                        (w * 0.25f),
                                         h * 0.45f,
-                                        ((w * 0.45f)+(100*(w*0.003f))).toFloat(),
+                                        ((w * 0.45f)+(100*(w*0.003f))),
                                         ((h * 0.5)).toFloat()
                                     ), 60f, 60f, paint
                                 )
                                 paint.color = Color.Magenta.toArgb()
                                 canvas!!.drawRoundRect(
                                     RectF(
-                                        (w * 0.25f).toFloat(),
+                                        (w * 0.25f),
                                         h * 0.45f,
-                                        ((w * 0.45f)+(preload*(w*0.003f))).toFloat(),
+                                        ((w * 0.45f)+(preload*(w*0.003f))),
                                         ((h * 0.5)).toFloat()
                                     ), 60f, 60f, paint
                                 )
@@ -289,12 +279,12 @@ class GameLoop(
                                 paint.color = Color.White.toArgb()
                                 canvas!!.drawText(
                                     "LOADING...",
-                                    (w * 0.36f).toFloat(),
+                                    (w * 0.36f),
                                     h * 0.48f,
                                     paint
                                 )
 
-                               Thread.sleep(250)
+                               sleep(250)
                                 preload+=20
                             }
 
@@ -310,8 +300,8 @@ class GameLoop(
                     }
 
                     if (cLocked) {
-                        surfaceHolder.unlockCanvasAndPost(canvas);
-                        cLocked = false;
+                        surfaceHolder.unlockCanvasAndPost(canvas)
+                        cLocked = false
                     }
 
 
@@ -320,40 +310,41 @@ class GameLoop(
 
                     if (canvas != null) {
                         //     try {
-                        canvas!!.drawRoundRect(
-                            RectF(
-                                0f,
-                                0f,
-                                (w * 1.2f).toFloat(),
-                                ((h * 1.2f)).toFloat()
-                            ), 0f, 0f, paint
-                        )
-
+                   sleep(30)
                         validarSelecao(selectedTiles.filter { it.camada != -5 }
                             .toMutableList())
 
 
                         bloquerBT =
-                            selectedTiles.filter { it.camada < -2 && it.camada >= -4 }
-                                .isEmpty()
+                            selectedTiles.none { it.camada < -2 && it.camada >= -4 }
                         if (!corrigirfalha && !creditoRecorsus || limparComCredito && !creditoRecorsus) {
 
 
-                            if (!limparComCredito && !(selectedTiles.filter { it.camada > -2 }.size < limitar ||
-                                        selectedTiles.filter { it.camada > -2 }.size > limitar && dica)
+                          val limitador =  selectedTiles.filter { it.camada > -2 }.toMutableList()
+
+                            for (i in 0 until  selectedTiles.filter { it.camada > -2 }.size) {
+                                val limitadorX =  selectedTiles.filter { it.camada > -2 && it.id == selectedTiles[i].id }
+
+                                if(limitadorX.size>=3){
+                                    limitador.removeAll(limitadorX)
+                                             }
+
+                            }
+
+                            if (!limparComCredito && !(limitador.size < limitar ||
+                                        limitador.size > limitar && dica)
                             ) {
                                 corrigirfalha = true
                             } else {
                                 corrigirfalha = false
-                                if ((selectedTiles.filter { it.camada > -2 }.size < 6)) {
+                                if ((selectedTiles.filter { it.camada > -2 }.size < 7)) {
                                     limparComCredito = false
                                 }
                             }
 
 //
                             try {
-//                                if (limparComCredito) {
-//                                         limparSelecionados()
+//
 
                                 if (limparComCredito) {
                                     dica = true
@@ -387,7 +378,7 @@ class GameLoop(
                                 if (!ajustarY) {
                                     timeValidarIA--
                                     if (timeValidarIA < 0) {
-                                        timeValidarIA = IA_LIMIT
+                                        timeValidarIA = ialimite
                                     }
                                 }
                                 // canvas.drawRGB(0, 128, 0) // Fundo verde
@@ -462,9 +453,9 @@ class GameLoop(
 
                                         canvas!!.drawRoundRect(
                                             RectF(
-                                                (w * 0.35f).toFloat(),
+                                                (w * 0.35f),
                                                 h * 0.83f,
-                                                (w * 0.4f).toFloat(),
+                                                (w * 0.4f),
                                                 ((h * 0.855)).toFloat()
                                             ), 60f, 60f, paint
                                         )
@@ -473,7 +464,7 @@ class GameLoop(
                                         paint.color = Color.White.toArgb()
                                         canvas!!.drawText(
                                             luzP.toString(),
-                                            (w * 0.36f).toFloat(),
+                                            (w * 0.36f),
                                             h * 0.85f,
                                             paint
                                         )
@@ -488,9 +479,9 @@ class GameLoop(
 
                                         canvas!!.drawRoundRect(
                                             RectF(
-                                                ((w * 0.52f)).toFloat(),
+                                                ((w * 0.52f)),
                                                 h * 0.83f,
-                                                (w * 0.57f).toFloat(),
+                                                (w * 0.57f),
                                                 ((h * 0.855)).toFloat()
                                             ), 60f, 60f, paint
                                         )
@@ -499,7 +490,7 @@ class GameLoop(
                                         paint.color = Color.White.toArgb()
                                         canvas!!.drawText(
                                             imaP.toString(),
-                                            ((w * 0.535f)).toFloat(),
+                                            ((w * 0.535f)),
                                             h * 0.85f,
                                             paint
                                         )
@@ -514,9 +505,9 @@ class GameLoop(
 
                                         canvas!!.drawRoundRect(
                                             RectF(
-                                                ((w * 0.69f)).toFloat(),
+                                                ((w * 0.69f)),
                                                 h * 0.83f,
-                                                (w * 0.74f).toFloat(),
+                                                (w * 0.74f),
                                                 ((h * 0.855)).toFloat()
                                             ), 60f, 60f, paint
                                         )
@@ -525,7 +516,7 @@ class GameLoop(
                                         paint.color = Color.White.toArgb()
                                         canvas!!.drawText(
                                             sufleP.toString(),
-                                            ((w * 0.7f)).toFloat(),
+                                            ((w * 0.7f)),
                                             h * 0.85f,
                                             paint
                                         )
@@ -553,7 +544,7 @@ class GameLoop(
 
 
                                         if (isTouched || ajustarY || embaralhando || limpando) {
-                                            var canvas2 = Canvas(b)
+                                            val canvas2 = Canvas(b)
                                             limpando = false
                                             canvas2.drawColor(
                                                 Color.Transparent.toArgb(),
@@ -583,8 +574,7 @@ class GameLoop(
                                                     embaralhando = false
                                                 }
                                             }
-                                            if (tiles
-                                                    .filter { it.ty == true }.isEmpty()
+                                            if (tiles.none { it.ty }
                                             ) {
                                                 ajustarY = false
 
@@ -677,8 +667,8 @@ class GameLoop(
 
 
 
-                                        for (i in tiles.size - 3 until tiles.size) {
-                                            tiles[i].draw(canvas!!)
+                                        for (ii in tiles.size - 3 until tiles.size) {
+                                            tiles[ii].draw(canvas!!)
                                         }
 
 
@@ -730,13 +720,13 @@ class GameLoop(
                                                 }
                                             }
                                             if (it.y > py) {
-                                                it.y -= velocidadey.toFloat()
+                                                it.y -= velocidadey
                                                 if (it.y < py) {
                                                     it.y = py
                                                 }
 
                                             } else if (it.y < py) {
-                                                it.y += velocidadey.toFloat()
+                                                it.y += velocidadey
                                                 if (it.y > py) {
                                                     it.y = py
                                                 }
@@ -745,64 +735,71 @@ class GameLoop(
                                                 //  it.bloqueado = true
                                             }
 
-                                        } else if (it.camada <= -3 && it.camada >= -4) {
-                                            val py = (h * 0.6).toFloat()
-                                            val mediay = (it.y - py) / divisor
-                                            val velocidadey =
-                                                if ((mediay) > w * 0.01f) mediay else w * 0.1f
+                                        } else {
+                                            if (it.camada == -3 || it.camada == -4) {
+                                                val py = (h * 0.6).toFloat()
+                                                val mediay = (it.y - py) / divisor
+                                                val velocidadey =
+                                                    if ((mediay) > w * 0.01f) mediay else w * 0.1f
 
 
 
-                                            if (it.camada == -4) {
-                                                val mediax = it.h
-                                                if (it.x < (w * 0.70f)) {
-                                                    it.x += mediax
+                                                if (it.camada == -4) {
+                                                    val mediax = it.h
+                                                    if (it.x < (w * 0.70f)) {
+                                                        it.x += mediax
 
-                                                }
-                                                if (it.y > (h * 0f)) {
-                                                    it.y -= mediax
-
-                                                }
-                                                if (it.x >= (w * 0.7f) && it.y <= 20f) {
-                                                    it.camada = -5
-                                                    limitar = 7
-                                                    tutor = false
-                                                    pontos++
-
-                                                }
-                                            }
-
-                                            if (it.camada > -4) {
-//
-                                                if (it.y > h * 0.0) {
-                                                    it.y -= velocidadey
-
-                                                }
-
-                                                val px = (w * 0.5).toFloat()
-                                                val nivelado =
-                                                    if (px - it.x > 0) px - it.x else (px - it.x) * -1
-                                                val velocidadee =
-                                                    if ((nivelado / divisor) > w * 0.01f) (nivelado) / divisor else w * 0.1f
-
-
-                                                if (it.x < w / 2) {
-
-                                                    it.x += velocidadee
-                                                    if (it.x > w / 2) {
-                                                        it.x = (w / 2).toFloat()
-                                                        it.camada = -4
                                                     }
-                                                } else if (it.x > w / 2) {
+                                                    if (it.y > (h * 0f)) {
+                                                        it.y -= mediax
 
-                                                    it.x -= velocidadee
+                                                    }
+                                                    if (it.x >= (w * 0.7f) && it.y <= 20f) {
+                                                        it.camada = -5
+                                                        limitar = 7
+                                                        tutor = false
+                                                        pontosCont++
+                                                        if(pontosCont>=3){
+                                                            pontos++
+                                                            pontosCont=0
+
+                                                        }
+
+                                                    }
+                                                }
+
+                                                if (it.camada > -4) {
+                                        //
+                                                    if (it.y > h * 0.0) {
+                                                        it.y -= velocidadey
+
+                                                    }
+
+                                                    val px = (w * 0.5).toFloat()
+                                                    val nivelado =
+                                                        if (px - it.x > 0) px - it.x else (px - it.x) * -1
+                                                    val velocidadee =
+                                                        if ((nivelado / divisor) > w * 0.01f) (nivelado) / divisor else w * 0.1f
+
+
                                                     if (it.x < w / 2) {
-                                                        it.x = (w / 2).toFloat()
-                                                        it.camada = -4
+
+                                                        it.x += velocidadee
+                                                        if (it.x > w / 2) {
+                                                            it.x = (w / 2).toFloat()
+                                                            it.camada = -4
+                                                        }
+                                                    } else if (it.x > w / 2) {
+
+                                                        it.x -= velocidadee
+                                                        if (it.x < w / 2) {
+                                                            it.x = (w / 2).toFloat()
+                                                            it.camada = -4
+                                                        }
                                                     }
                                                 }
-                                            }
 
+                                            }
                                         }
                                         if (it.y > h * 0.05f) {
                                             it.draw(canvas!!)
@@ -829,9 +826,9 @@ class GameLoop(
                                 canvas!!.drawRoundRect(
                                     RectF(
                                         (w * 0.72).toFloat(),
-                                        ((h * 0.02).toFloat() - (w * 0.025).toFloat()).toFloat(),
+                                        ((h * 0.02).toFloat() - (w * 0.025).toFloat()),
                                         (w * 0.955).toFloat(),
-                                        ((h * 0.02)).toFloat() + ((((w * 0.05)).toInt()) * 1.22f).toFloat()
+                                        ((h * 0.02)).toFloat() + ((((w * 0.05)).toInt()) * 1.22f)
                                     ), 40f, 40f, paint
                                 )
                                 paint.color = Color.LightGray.toArgb()
@@ -840,9 +837,9 @@ class GameLoop(
                                 canvas!!.drawRoundRect(
                                     RectF(
                                         (w * 0.72).toFloat(),
-                                        ((h * 0.02).toFloat() - (w * 0.02).toFloat()).toFloat(),
+                                        ((h * 0.02).toFloat() - (w * 0.02).toFloat()),
                                         (w * 0.95).toFloat(),
-                                        ((h * 0.02).toFloat()).toFloat() + ((((w * 0.05)).toInt()) * 1.15f).toFloat()
+                                        ((h * 0.02).toFloat()) + ((((w * 0.05)).toInt()) * 1.15f)
                                     ), 40f, 40f, paint
                                 )
 
@@ -860,9 +857,9 @@ class GameLoop(
                                 canvas!!.drawRoundRect(
                                     RectF(
                                         (w * 0.12).toFloat(),
-                                        ((h * 0.02).toFloat() - (w * 0.025).toFloat()).toFloat(),
+                                        ((h * 0.02).toFloat() - (w * 0.025).toFloat()),
                                         (w * 0.35).toFloat() + expandir,
-                                        ((h * 0.02)).toFloat() + ((((w * 0.05)).toInt()) * 1.22f).toFloat()
+                                        ((h * 0.02)).toFloat() + ((((w * 0.05)).toInt()) * 1.22f)
                                     ), 40f, 40f, paint
                                 )
                                 paint.color = Color.LightGray.toArgb()
@@ -870,9 +867,9 @@ class GameLoop(
                                 canvas!!.drawRoundRect(
                                     RectF(
                                         (w * 0.125).toFloat(),
-                                        ((h * 0.02).toFloat() - (w * 0.02).toFloat()).toFloat(),
+                                        ((h * 0.02).toFloat() - (w * 0.02).toFloat()),
                                         (w * 0.345).toFloat() + expandir,
-                                        ((h * 0.02).toFloat()).toFloat() + ((((w * 0.05)).toInt()) * 1.15f).toFloat()
+                                        ((h * 0.02).toFloat()) + ((((w * 0.05)).toInt()) * 1.15f)
                                     ), 40f, 40f, paint
                                 )
                                 paint.color = Color.White.toArgb()
@@ -896,10 +893,7 @@ class GameLoop(
                                 // }
 
 
-                                if (tiles
-                                        .filter { it.camada > 0 }
-                                        .isEmpty() && selectedTiles.filter { it.camada != -5 }
-                                        .isEmpty()
+                                if (tiles.none { it.camada > 0 } && selectedTiles.none { it.camada != -5 }
                                     && !venceu
                                 ) {
 
@@ -917,11 +911,11 @@ class GameLoop(
 
                             if (venceu) {
                                 if (pontuacaoNova < score && venceuP.liberado) {
-                                    pontuacaoNova += 3
+                                    pontuacaoNova ++
                                 }
 
                                 venceuP.fase = ultimaFase + 1
-                                venceuP.pontos = pontuacaoNova.toInt()
+                                venceuP.pontos = pontuacaoNova
 
                                 venceuP.draw(canvas!!)
 
@@ -930,10 +924,14 @@ class GameLoop(
                                     //    finalizarFase()
 
                                      if(fase %5==0 && fase!=0) {
-                                        ADSI()
+                                        adsi()
                                      }else {
                                         finalizarFase()
                                     }
+
+                                }else    if (venceuP.btmCoin.liberar > 3) {
+                                    tipodePremio = 4
+                                    adsr()
 
                                 }
 
@@ -956,7 +954,7 @@ class GameLoop(
 
                                     perdeuL.pontos = score
                                     perdeuL.fase = ultimaFase + 1
-                                    perdeuL.pontos = score.toInt()
+                                    perdeuL.pontos = score
 
                                     perdeuL.draw(canvas!!)
                                     if (semInternet) {
@@ -969,15 +967,15 @@ class GameLoop(
                                     if (perdeuL.btm.liberar > 3) {
                                         //    finalizarFase()
                                         tipodePremio = 0
-                                        ADSR()
+                                        adsr()
                                     } else if (perdeuL.btmCoin.liberar > 3 && score >= valorminimo) {
                                         //    finalizarFase()
                                         val bd = BDTile(context)
-                                        score = score - valorminimo
-                                        bd.atualizar(Base(fase.toInt(), score.toLong()))
+                                        score -= valorminimo
+                                        bd.atualizar(Base(fase, score.toLong()))
 
                                         perdeuL =
-                                            Venceu(this.context, (w).toInt(), (h).toInt(), 1)
+                                            Venceu(this.context, (w), (h), 1)
                                         limparComCredito = true
                                         perdeuL.btmCoin.liberar = 0
 
@@ -992,18 +990,18 @@ class GameLoop(
                                         if (credLuz.btmCoin.liberar > 3 && score >= valorminimo) {
                                             posCredito(credLuz)
                                             credLuz =
-                                                Venceu(this.context, (w).toInt(), (h).toInt(), 2)
+                                                Venceu(this.context, (w), (h), 2)
                                             luzP += 3
                                             credLuz.btmCoin.liberar = 0
                                             creditoRecorsus = false
 
                                         } else if (credLuz.btm.liberar > 3) {
                                             credLuz =
-                                                Venceu(this.context, (w).toInt(), (h).toInt(), 2)
+                                                Venceu(this.context, (w), (h), 2)
                                             credLuz.btm.liberar = 0
                                             creditoRecorsus = false
                                             tipodePremio = 1
-                                            ADSR()
+                                            adsr()
 
 
 
@@ -1016,19 +1014,18 @@ class GameLoop(
 
                                         if (credIma.btmCoin.liberar > 3 && score >= valorminimo) {
                                             posCredito(credIma)
-                                            credIma =
-                                                Venceu(this.context, (w).toInt(), (h).toInt(), 3)
+                                            Venceu(this.context, (w), (h), 3).also { credIma = it }
                                             imaP += 3
                                             credIma.btmCoin.liberar = 0
                                             creditoRecorsus = false
 
                                         } else if (credIma.btm.liberar > 3) {
                                             credIma =
-                                                Venceu(this.context, (w).toInt(), (h).toInt(), 3)
+                                                Venceu(this.context, (w), (h), 3)
                                             credIma.btm.liberar = 0
                                             creditoRecorsus = false
                                             tipodePremio = 2
-                                            ADSR()
+                                            adsr()
 
                                         }
                                     } else if (objX.tipo == 4) {
@@ -1039,18 +1036,18 @@ class GameLoop(
                                         if (credSufle.btmCoin.liberar > 3 && score >= valorminimo) {
                                             posCredito(objX)
                                             credSufle =
-                                                Venceu(this.context, (w).toInt(), (h).toInt(), 4)
+                                                Venceu(this.context, (w), (h), 4)
                                             sufleP += 3
                                             credSufle.btmCoin.liberar = 0
                                             creditoRecorsus = false
 
                                         } else if (credSufle.btm.liberar > 3) {
                                             credSufle =
-                                                Venceu(this.context, (w).toInt(), (h).toInt(), 4)
+                                                Venceu(this.context, (w), (h), 4)
                                             credSufle.btm.liberar = 0
                                             creditoRecorsus = false
                                             tipodePremio = 3
-                                            ADSR()
+                                            adsr()
 
                                         }
 
@@ -1073,8 +1070,8 @@ class GameLoop(
 
 
                             if (cLocked) {
-                                surfaceHolder.unlockCanvasAndPost(canvas);
-                                cLocked = false;
+                                surfaceHolder.unlockCanvasAndPost(canvas)
+                                cLocked = false
                             }
                         } catch (exxg: Exception) {
                             exxg.stackTrace
@@ -1105,7 +1102,7 @@ class GameLoop(
 
     }
 
-    fun ADSR() {
+    private fun adsr() {
         gameView.showRewardedAd(
             onReward = {
                 premiar = true
@@ -1119,7 +1116,7 @@ class GameLoop(
         )
     }
 
-    fun ADSI() {
+    private fun adsi() {
         finalizarFase()
         gameView.showInterstitialAd(
 
@@ -1133,19 +1130,24 @@ class GameLoop(
     }
 
     private fun receberPremio() {
-
+        premiar = false
 
         when(tipodePremio){
             0->reviver()
             1-> luzP += 3
             2->imaP += 3
             3->sufleP += 3
+            4->{
+                score+=50
+
+                venceuP.btmCoin.liberar=0
+             }
         }
     }
 
-    fun reviver() {
+    private fun reviver() {
         perdeuL =
-            Venceu(this.context, (w).toInt(), (h).toInt(), 1)
+            Venceu(this.context, (w), (h), 1)
         limparComCredito = true
         perdeuL.btm.liberar = 0
     }
@@ -1155,7 +1157,7 @@ class GameLoop(
 
         obj.pontos = score
         obj.fase = ultimaFase + 1
-        obj.pontos = score.toInt()
+        obj.pontos = score
 
         obj.draw(canvas)
 
@@ -1164,8 +1166,8 @@ class GameLoop(
 
     private fun posCredito(obj: Venceu) {
         val bd = BDTile(context)
-        score = score - valorminimo
-        bd.atualizar(Base(fase.toInt(), score.toLong()))
+        score -= valorminimo
+        bd.atualizar(Base(fase, score.toLong()))
 
         limparComCredito = true
         obj.btmCoin.liberar = 0
@@ -1174,11 +1176,11 @@ class GameLoop(
     private fun finalizarFase() {
 
         fase++
-        venceu = false
-        venceuP = Venceu(this.context, (w).toInt(), (h).toInt(), 0)
 
+        venceu = false
+        venceuP = Venceu(this.context, (w), (h), 0)
         val bd = BDTile(context)
-        bd.atualizar(Base(fase.toInt(), score.toLong(), luzP, imaP, sufleP))
+        bd.atualizar(Base(fase, score.toLong(), luzP, imaP, sufleP))
 
         ultimaFase = fase
 
@@ -1195,10 +1197,10 @@ class GameLoop(
 
         }
 
-        var listr2 = listr.filter { it.camada == -5 }.toMutableList()
+        val listr2 = listr.filter { it.camada == -5 }.toMutableList()
 
         if (listr2.size > 3 && !limparComCredito) {
-            var listrddd: MutableList<MahjongTile> = mutableListOf()
+            val listrddd: MutableList<MahjongTile> = mutableListOf()
             var o = 0
             for (item in listr2.toList()) { // Criando uma cópia para evitar a modificação direta
                 if (o < 3) {
@@ -1252,9 +1254,7 @@ class GameLoop(
     }
 
     private fun handleInput() {
-        if (isTouched) {
 
-        }
     }
 
     init {
@@ -1263,14 +1263,14 @@ class GameLoop(
 
 
 
-        if (tiles.filter { it.camada >= 0 }.isEmpty()) {
+        if (tiles.none { it.camada >= 0 }) {
             popularTiles()
             walld.add(
                 Bitmap.createScaledBitmap(
                     BitmapFactory.decodeResource(
                         context.resources,
                         R.drawable.neve
-                    ), (w).toInt(), (medida).toInt(), false
+                    ), (w), (medida).toInt(), false
                 )
             )
             walld.add(
@@ -1278,7 +1278,7 @@ class GameLoop(
                     BitmapFactory.decodeResource(
                         context.resources,
                         R.drawable.muralha
-                    ), (w).toInt(), (medida).toInt(), false
+                    ), (w), (medida).toInt(), false
                 )
             )
             walld.add(
@@ -1286,7 +1286,7 @@ class GameLoop(
                     BitmapFactory.decodeResource(
                         context.resources,
                         R.drawable.lago
-                    ), (w).toInt(), (medida).toInt(), false
+                    ), (w), (medida).toInt(), false
                 )
             )
             walld.add(
@@ -1294,7 +1294,7 @@ class GameLoop(
                     BitmapFactory.decodeResource(
                         context.resources,
                         R.drawable.verde
-                    ), (w).toInt(), (medida).toInt(), false
+                    ), (w), (medida).toInt(), false
                 )
             )
             // walld.add(BitmapFactory.decodeResource(context.resources, R.drawable.neve))
@@ -1304,7 +1304,7 @@ class GameLoop(
 
     }
 
-    fun popularTiles() {
+    private fun popularTiles() {
         avaliar3 = false
         ajustarY = true
         pontos = 0
@@ -1316,6 +1316,10 @@ class GameLoop(
                 R.drawable.abutre
             )
         )
+
+
+
+
         tileImages.add(
             BitmapFactory.decodeResource(
                 context.resources,
@@ -1449,9 +1453,9 @@ class GameLoop(
             canvasB.drawRoundRect(
                 RectF(
                     (this.w * 0.08).toFloat(),
-                    ((this.h * 0.75).toFloat() - (this.w * 0.03).toFloat()).toFloat(),
+                    ((this.h * 0.75).toFloat() - (this.w * 0.03).toFloat()),
                     (this.w * 0.93).toFloat(),
-                    ((this.h * 0.75)).toFloat() + (((this.w * 0.9 / 8).toInt()) * 1.22f).toFloat()
+                    ((this.h * 0.75)).toFloat() + (((this.w * 0.9 / 8).toInt()) * 1.22f)
                 ), 30f, 30f, paint
             )
             paint.color = Color(0xFF2F4F4F).toArgb()
@@ -1460,9 +1464,9 @@ class GameLoop(
             canvasB.drawRoundRect(
                 RectF(
                     (this.w * 0.09).toFloat(),
-                    ((this.h * 0.75).toFloat() - (this.w * 0.02).toFloat()).toFloat(),
+                    ((this.h * 0.75).toFloat() - (this.w * 0.02).toFloat()),
                     (this.w * 0.92).toFloat(),
-                    ((this.h * 0.75).toFloat()).toFloat() + (((this.w * 0.9 / 8).toInt()) * 1.15f).toFloat()
+                    ((this.h * 0.75).toFloat()) + (((this.w * 0.9 / 8).toInt()) * 1.15f)
                 ), 30f, 30f, paint
             )
             paint.color = Color(0xFFE6E6FA).toArgb()
@@ -1471,9 +1475,9 @@ class GameLoop(
             canvasB.drawRoundRect(
                 RectF(
                     (this.w * 0.09).toFloat(),
-                    ((this.h * 0.755).toFloat() - (this.w * 0.02).toFloat()).toFloat(),
+                    ((this.h * 0.755).toFloat() - (this.w * 0.02).toFloat()),
                     (this.w * 0.92).toFloat(),
-                    ((this.h * 0.755).toFloat()).toFloat() + (((this.w * 0.9 / 8).toInt()) * 1.0f).toFloat()
+                    ((this.h * 0.755).toFloat()) + (((this.w * 0.9 / 8).toInt()) * 1.0f)
                 ), 30f, 30f, paint
             )
             paint.color = Color.Black.toArgb()
@@ -1484,7 +1488,7 @@ class GameLoop(
         }
 
 
-        var disponiveis: MutableList<Int> = mutableListOf()
+        val disponiveis: MutableList<Int> = mutableListOf()
 
 
         val bd = BDTile(context)
@@ -1666,20 +1670,20 @@ class GameLoop(
     }
 
     private fun limparSelecionados() {
-        if (selectedTiles.filter { it.camada != -5 }.isNotEmpty()) {
-            var s: MutableList<MahjongTile> =
-                selectedTiles.filter { it.id == selectedTiles.filter { it.camada != -5 }[0].id }
+        if (selectedTiles.any { it.camada != -5 }) {
+            val s: MutableList<MahjongTile> =
+                selectedTiles.filter { it -> it.id == selectedTiles.filter { it.camada != -5 }[0].id }
                     .toMutableList()
-            var tilesx: MutableList<MahjongTile> =
+            val tilesx: MutableList<MahjongTile> =
                 tiles
                     .filter { it.camada == 0 && it.id == s[0].id }.toMutableList()
-            var tilesx1: MutableList<MahjongTile> =
+            val tilesx1: MutableList<MahjongTile> =
                 tiles
                     .filter { it.camada == 1 && it.id == s[0].id }.toMutableList()
-            var tilesx2: MutableList<MahjongTile> =
+            val tilesx2: MutableList<MahjongTile> =
                 tiles
                     .filter { it.camada == 2 && it.id == s[0].id }.toMutableList()
-            var tilesx3: MutableList<MahjongTile> = mutableListOf()
+            val tilesx3: MutableList<MahjongTile> = mutableListOf()
             tilesx3.addAll(tilesx2)
             tilesx3.addAll(tilesx1)
             tilesx3.addAll(tilesx)
@@ -1708,8 +1712,8 @@ class GameLoop(
     }
 
     private fun embaralha() {
-        var disponiveis: MutableList<MahjongTile> = mutableListOf()
-        var tilesx: MutableList<MahjongTile> =
+        val disponiveis: MutableList<MahjongTile> = mutableListOf()
+        val tilesx: MutableList<MahjongTile> =
             tiles.filter { !selectedTiles.contains(it) }.filter { it.camada > -1 }.toMutableList()
 
         for (i in 0 until tilesx.size) {
@@ -1739,7 +1743,7 @@ class GameLoop(
     }
 
 
-    fun validarCamadas(
+    private fun validarCamadas(
         list1: MutableList<MahjongTile>,
         list2: MutableList<MahjongTile>,
         grau: Int
@@ -1749,7 +1753,7 @@ class GameLoop(
 
         list1.forEach { it1 ->
             var liberado = true
-            list2.forEach { it ->
+            list2.forEach {
                 if (it1.containsCamada(it.x, it.y)) {
                     liberado = false
 
@@ -1769,7 +1773,7 @@ class GameLoop(
     }
 
 
-    fun validarSelecao(list: MutableList<MahjongTile>) {
+    private fun validarSelecao(list: MutableList<MahjongTile>) {
         var selecionados = 0
         val listr: MutableList<MahjongTile> = mutableListOf()
         var grau = 0
@@ -1808,20 +1812,19 @@ class GameLoop(
 
     }
 
-    fun iaJogando() {
+    private fun iaJogando() {
         val camada2 =
             tiles.filter { !selectedTiles.contains(it) }.filter { it.camada == 2 }.toMutableList()
         val tem3 = validarSelecaoIA(camada2, 3, 0)
         var tem2 = false
-        var tem1 = false
         itenImpossivel = false
         limitar = 20
 
         if (!tem3) {
-            if (selectedTiles.filter { it.camada != -5 }.isEmpty()) {
+            if (selectedTiles.none { it.camada != -5 }) {
                 tem2 = validarSelecaoIA(camada2, 2, 0)
             }
-            if (!tem2 && selectedTiles.filter { it.camada != -5 }.isNotEmpty()) {
+            if (!tem2 && selectedTiles.any { it.camada != -5 }) {
                 itenImpossivel = false
 
                 validarSelecaoIA(selectedTiles, 2, 1)
@@ -1833,14 +1836,14 @@ class GameLoop(
 
     }
 
-    fun validarSelecaoIA(list: MutableList<MahjongTile>, min: Int, modo: Int): Boolean {
+    private fun validarSelecaoIA(list: MutableList<MahjongTile>, min: Int, modo: Int): Boolean {
         val listr: MutableList<MahjongTile> = mutableListOf()
         val listr2: MutableList<MahjongTile> = mutableListOf()
-        var listr3: MutableList<MahjongTile> = mutableListOf()
+        val listr3: MutableList<MahjongTile> = mutableListOf()
 
         if (modo == 0 || modo == 2) {
             list.forEach { it0 ->
-                var listrd = list.filter { it.id == it0.id }.toMutableList()
+                val listrd = list.filter { it.id == it0.id }.toMutableList()
                 if (listrd.size >= min) {
                     listr.add(it0)
                 }
@@ -1870,12 +1873,12 @@ class GameLoop(
                     return false
                 }
 
-                if (i < min) {
+               
                     listr.filter { it.id == listr[0].id }.forEach {
                         achou(it)
                         i++
                     }
-                }
+                 
 
                 return true
 
@@ -1883,7 +1886,7 @@ class GameLoop(
         } else if (modo == 1) {
 
             list.forEach { it0 ->
-                var listrd = list.filter { it.id == it0.id }.toMutableList()
+                val listrd = list.filter { it.id == it0.id }.toMutableList()
                 if (listrd.size >= min) {
                     listr.add(it0)
                 }
@@ -1891,7 +1894,7 @@ class GameLoop(
 
             var i = 0
 
-            for (j in 0..listr.size - 1) {
+            for (j in 0..<listr.size) {
                 if (j % 2 == 0) {
                     listr2.add(listr[j])
 
@@ -1923,7 +1926,7 @@ class GameLoop(
                 val listrr = tiles.filter { !selectedTiles.contains(it) }.filter { it.camada == 2 }
                     .toMutableList()
                 listrr.forEach { it0 ->
-                    var listrd = listrr.filter { it.id == it0.id }.toMutableList()
+                    val listrd = listrr.filter { it.id == it0.id }.toMutableList()
                     if (listrd.size == 2) {
                         listrt.add(it0)
                     }
@@ -1944,20 +1947,20 @@ class GameLoop(
 
                     }
                 }
-                var ii = 0
+              //  var ii = 0
 
                 if (temEspaco < listrv.size) {
                     itenImpossivel = true
                     return false
                 }
 
-                if (ii < 7 - selectedTiles.size && listrv.isNotEmpty()) {
+                //if (ii < 7 - selectedTiles.size && listrv.isNotEmpty()) {
                     listrv.forEach {
                         achou(it)
-                        ii++
+                       // ii++
                     }
                     return true
-                }
+               // }
 
 
             }
@@ -1967,7 +1970,7 @@ class GameLoop(
 
         if (modo == 2) {
 
-            var listrx: MutableList<MahjongTile> = mutableListOf()
+            val listrx: MutableList<MahjongTile> = mutableListOf()
 
             listr.forEach {
                 selectedTiles.forEach { o ->
@@ -1992,8 +1995,8 @@ class GameLoop(
         return false
     }
 
-    fun achou(tile: MahjongTile) {
-        val m: MahjongTile = MahjongTile(
+    private fun achou(tile: MahjongTile) {
+        val m = MahjongTile(
             tile.image,
             this.context,
             tile.x,
@@ -2039,7 +2042,7 @@ class GameLoop(
 
     }
 
-    fun onTocarEfeito(i: Int) {
+    private fun onTocarEfeito(i: Int) {
         val coroutineScope = CoroutineScope(Dispatchers.Default)
 
         coroutineScope.launch {
@@ -2094,7 +2097,7 @@ class GameLoop(
 
                     // carregarCamadas()
 
-                    val m: MahjongTile = MahjongTile(
+                    val m = MahjongTile(
                         tile.image,
                         this.context,
                         tile.x,
@@ -2169,7 +2172,7 @@ class GameLoop(
                             botao2.isSelected = true
                             limparSelecionados()
                             imaP--
-                        } else if (!selectedTiles.isEmpty()) {
+                        } else if (selectedTiles.isNotEmpty()) {
                             objX = credIma
                             creditoRecorsus = true
                         }
@@ -2209,7 +2212,14 @@ class GameLoop(
                         && venceu && venceuP.btm.t == 1f
                     ) {
                         venceuP.btm.animar = true
-                    } else if (perdeuL.btm.containsTouch(
+                    } else  if (venceuP.btmCoin.containsTouch(
+                            event.x,
+                            event.y
+                        )
+                        && venceu && venceuP.btmCoin.t == 1f
+                    ) {
+                        venceuP.btmCoin.animar = true
+                    }else if (perdeuL.btm.containsTouch(
                             event.x,
                             event.y
                         )
@@ -2300,34 +2310,8 @@ class GameLoop(
 
     }
 
-    fun calculoVelocidade(it: MahjongTile, py: Float): Double {
-        var vel =
-            if (it.y > py) {
-                (it.y - py)
-            } else if (it.y < py) {
-                (py - it.y)
-            } else {
-                it.h
-            }
-        var tempo = (vel.toDouble() / it.h).toDouble()
 
-        if (tempo < 1) tempo = 1.0
-
-        return tempo
-    }
-
-
-    fun calcularVelocidadeQuedaLivre(
-        tempo: Float,
-        gravidade: Float = 9.8f // Aceleração da gravidade padrão (m/s²)
-    ): Float {
-        require(tempo >= 0) { "O tempo deve ser um valor não negativo." }
-        return (gravidade * tempo)
-
-    }
-
-
-    fun carregarCamadas() {
+    private fun carregarCamadas() {
 
         val novoFiltro2 =
             tiles
@@ -2354,7 +2338,7 @@ class GameLoop(
 
     }
 
-    fun Float.toDp(resources: Resources): Float {
+    private fun Float.toDp(resources: Resources): Float {
         return TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP,
             this,
@@ -2363,7 +2347,7 @@ class GameLoop(
     }
 
 
-    fun spToPx(sp: Float): Float {
+    private fun spToPx(sp: Float): Float {
         return TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_SP,
             sp,

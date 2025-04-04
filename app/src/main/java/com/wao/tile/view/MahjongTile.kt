@@ -20,7 +20,7 @@ class MahjongTile(
     var image: Bitmap,
     val context: Context,
     var x: Float,
-    var yp: Float,
+    private var yp: Float,
     var w: Int,
     var h: Int,
     var camada: Int,
@@ -33,7 +33,7 @@ class MahjongTile(
     private val paint2 = Paint()
     var y: Float = if (id >= 1000) yp else Random.nextInt((-100 * id), 0).toFloat()
     var isSelected = false
-    var intro = true
+    private var intro = true
     var bloqueado = false
     var ref = -1
 
@@ -42,15 +42,13 @@ class MahjongTile(
     var ty = true
     var espaco = 0f
     var girando = girando
-    var giroc = 0f
-    private val imutw = w
-    private val imuth = h
-    private val VAL_LIMITG = 10
-    private val VAL_LIMITG_INTRO = 20
+    private var giroc = 0f
+    private val VALLIMITG = 10
+    private val VALLIMITGINTRO = 20
     private var coinp: Bitmap? = null
 
 
-    var timeG = if (intro) VAL_LIMITG_INTRO else VAL_LIMITG
+    private var timeG = if (intro) VALLIMITGINTRO else VALLIMITG
     fun draw(canvas: Canvas) {
         paint.textSize = 80f
 
@@ -63,10 +61,10 @@ class MahjongTile(
             h = 100
         }
         val b: Bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
-        if (!isSelected) {
-            espaco = 0f
+        espaco = if (!isSelected) {
+            0f
         } else {
-            espaco = w * 0.06f
+            w * 0.06f
 
         }
 
@@ -78,7 +76,7 @@ class MahjongTile(
         )
         if (naLista) {
 
-            val coin = BitmapFactory.decodeResource(context.resources, R.drawable.moeda)
+            val coin = BitmapFactory.decodeResource(context.resources, R.drawable.moedaprata)
             coinp = Bitmap.createScaledBitmap(
                 coin!!,
                 ((w * 0.9f) - espaco).toInt(),
@@ -91,7 +89,7 @@ class MahjongTile(
         val canvas2 = Canvas(b)
 
         //canvas2.drawRGB(250, 250, 0)
-        val colorCamada = when (camada) {
+        when (camada) {
             0 -> Color.Green
             1 -> Color.Yellow
             2 -> Color.Blue
@@ -106,101 +104,102 @@ class MahjongTile(
 //
 
 
+        val width = img.width
+        val height = img.height
+        if (camada <=-3 && naLista) {
+            val shader = BitmapShader(coinp!!, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
+            paint.shader = shader
 
-        if (img != null) {
-            var width = img.width
-            var height = img.height
-            if (camada <=-3 && naLista) {
-                val shader = BitmapShader(coinp!!, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
-                paint.shader = shader
+            canvas2.drawRoundRect(
+                RectF(1f, 1f, (width).toFloat(), (height).toFloat()),
+                0f,
+                0f,
+                paint
+            )
+        } else {
 
-                canvas2.drawRoundRect(
-                    RectF(1f, 1f, (width).toFloat(), (height).toFloat()),
-                    0f,
-                    0f,
-                    paint
-                )
-            } else {
+            if (isSelected) {
+                paint2.color = Color.Gray.toArgb()
+            }
+            paint2.alpha = 180
 
-                if (isSelected) {
-                    paint2.color = Color.Gray.toArgb()
+            canvas2.drawRoundRect(
+                0f,
+                0f,
+                img.width.toFloat(),
+                b.height.toFloat() - espaco,
+                20f,
+                20f,
+                paint2
+            )
+
+
+        val matrix = ColorMatrix()
+
+            when (camada) {
+                0 -> {
+                    matrix.set(
+                        floatArrayOf(
+                            0.6f, 0f, 0f, 0f, 0f, // Red
+                            0f, 0.6f, 0f, 0f, 0f, // Green
+                            0f, 0f, 0.6f, 0f, 0f, // Blue
+                            0f, 0f, 0f, 1f, 0f  // Alpha
+                        )
+                    )
                 }
-                paint2.alpha = 180
-
-                canvas2.drawRoundRect(
-                    0f,
-                    0f,
-                    img.width.toFloat(),
-                    b.height.toFloat() - espaco,
-                    20f,
-                    20f,
-                    paint2
-                )
-
-
-            val matrix = ColorMatrix()
-
-            if (camada == 0) {
-                matrix.set(
-                    floatArrayOf(
-                        0.6f, 0f, 0f, 0f, 0f, // Red
-                        0f, 0.6f, 0f, 0f, 0f, // Green
-                        0f, 0f, 0.6f, 0f, 0f, // Blue
-                        0f, 0f, 0f, 1f, 0f  // Alpha
+                1 -> {
+                    matrix.set(
+                        floatArrayOf(
+                            0.8f, 0f, 0f, 0f, 0f, // Red
+                            0f, 0.8f, 0f, 0f, 0f, // Green
+                            0f, 0f, 0.8f, 0f, 0f, // Blue
+                            0f, 0f, 0f, 1f, 0f  // Alpha
+                        )
                     )
-                )
-            } else if (camada == 1) {
-                matrix.set(
-                    floatArrayOf(
-                        0.8f, 0f, 0f, 0f, 0f, // Red
-                        0f, 0.8f, 0f, 0f, 0f, // Green
-                        0f, 0f, 0.8f, 0f, 0f, // Blue
-                        0f, 0f, 0f, 1f, 0f  // Alpha
+                }
+                else -> {
+                    matrix.set(
+                        floatArrayOf(
+                            1.0f, 0f, 0f, 0f, 0f, // Red
+                            0f, 1.0f, 0f, 0f, 0f, // Green
+                            0f, 0f, 1.0f, 0f, 0f, // Blue
+                            0f, 0f, 0f, 1f, 0f  // Alpha
+                        )
                     )
-                )
-            } else {
-                matrix.set(
-                    floatArrayOf(
-                        1.0f, 0f, 0f, 0f, 0f, // Red
-                        0f, 1.0f, 0f, 0f, 0f, // Green
-                        0f, 0f, 1.0f, 0f, 0f, // Blue
-                        0f, 0f, 0f, 1f, 0f  // Alpha
-                    )
-                )
+                }
             }
 
 
-            paint.colorFilter = ColorMatrixColorFilter(matrix)
+        paint.colorFilter = ColorMatrixColorFilter(matrix)
 
-            // Obtenha as dimensões da View
-
-
-            // Crie um BitmapShader com a imagem
+        // Obtenha as dimensões da View
 
 
+        // Crie um BitmapShader com a imagem
 
-                val shader = BitmapShader(img!!, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
-                paint.shader = shader
 
-                val cornerRadius = 20f
-                paint.color = Color.LightGray.toArgb()
-                canvas2.drawRoundRect(
-                    RectF(1f, 1f, (width).toFloat(), (height).toFloat()),
-                    cornerRadius,
-                    cornerRadius,
-                    paint
-                )
 
-            }
+            val shader = BitmapShader(img, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
+            paint.shader = shader
+
+            val cornerRadius = 20f
+            paint.color = Color.LightGray.toArgb()
+            canvas2.drawRoundRect(
+                RectF(1f, 1f, (width).toFloat(), (height).toFloat()),
+                cornerRadius,
+                cornerRadius,
+                paint
+            )
+
         }
         if (intro) {
             if (girando) {
-                giroc--;
+                giroc--
                 timeG--
                 if (timeG <= 0 && giroc <= 0) {
                     girando = false
                     giroc = 0f
-                    timeG = VAL_LIMITG
+                    timeG = VALLIMITG
                     intro = false
                     y = yp
                     ty = false
@@ -214,7 +213,7 @@ class MahjongTile(
                         y = yp
                         girando = false
                         giroc = 0f
-                        timeG = VAL_LIMITG
+                        timeG = VALLIMITG
                         intro = false
                         y = yp
                         ty = false
@@ -238,7 +237,7 @@ class MahjongTile(
                 if (timeG <= 0 && giroc <= 0) {
                     girando = false
                     giroc = 0f
-                    timeG = VAL_LIMITG
+                    timeG = VALLIMITG
                 }
 //                canvas.save()
 //                canvas.translate((x - (w * 0.5f)), (y + espaco) + giroc)
@@ -274,10 +273,6 @@ class MahjongTile(
         val t2 = touchX + w > x && touchX + w < x + w && touchY > y && touchY < y + h
         val t3 = touchX > x && touchX < x + w && touchY + h > y && touchY + h < y + h
         val t4 = touchX + w > x && touchX + w < x + w && touchY + h > y && touchY + h < y + h
-        if (t1 || t2 || t3 || t4) {
-            return true
-        }
-
-        return false
+        return t1 || t2 || t3 || t4
     }
 }

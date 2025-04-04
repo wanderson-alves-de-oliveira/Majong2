@@ -19,14 +19,14 @@ class QuadradoAleatorio {
 
         var initialize = 0
         var grau = 0
-        var tiles = mutableListOf<MahjongTile>()
+        val tiles = mutableListOf<MahjongTile>()
 
-        var pY = mutableListOf<Float>()
-        var pX = mutableListOf<Float>()
-        var pXY0 = mutableListOf<Offset>()
-        var pXY1 = mutableListOf<Offset>()
-        var pXY2 = mutableListOf<Offset>()
-        var ran = mutableListOf<Int>()
+        val pY = mutableListOf<Float>()
+        val pX = mutableListOf<Float>()
+        val pXY0 = mutableListOf<Offset>()
+        val pXY1 = mutableListOf<Offset>()
+        val pXY2 = mutableListOf<Offset>()
+        val ran = mutableListOf<Int>()
         for (i in 20 until 79) {
             if(i%3==0){
                 ran.add(i)
@@ -36,25 +36,25 @@ class QuadradoAleatorio {
       //  ran[0] = 78
         val tamNovo = ((w * 0.9f) / 6.5f).toInt()
         val espaco = w * 0.03f
-        val h = tamNovo
-        val w = tamNovo
+        val h = tamNovo+0
+        //val w = tamNovo+0
 
         for (i in 0 until 6) {
             pY.add(tamNovo.toFloat() * (i + 3))
-            if (i < 6) {
+
 
                 pX.add(espaco + (tamNovo.toFloat() * i))
-            }
+
         }
 
         for (i in 0 until pY.size) {
             for (j in 0 until pX.size) {
-                var o = Offset(pX[j], pY[i])
-                var o1 = Offset(
+                val o = Offset(pX[j], pY[i])
+                val o1 = Offset(
                     pX[j] + (tamNovo.toFloat() * (0.5f)),
                     pY[i] + (tamNovo.toFloat() * (0.5f))
                 )
-                var o2 = Offset(
+                val o2 = Offset(
                     pX[j] + (tamNovo.toFloat() * (0.75f)),
                     pY[i] + (tamNovo.toFloat() * (0.75f))
                 )
@@ -73,20 +73,20 @@ class QuadradoAleatorio {
         var camada2 = 0
         val resultado =   gerarValoresAleatorios(ran[0])
 
-        var index0 = resultado.first
-        var index1 = resultado.first+resultado.second
+        val index0 = resultado.first
+        val index1 = resultado.first+resultado.second
 
         for (i in 0 until ran[0]+1) {
             disponiveis.add(i)
         }
-        var maximo = disponiveis.size
+        val maximo = disponiveis.size
 
 
         for (i in 0 until ran[0]) {
             if (i % 3 == 0) {
                 initialize = -1
                 grau++
-                if (grau > ((maximo / 3) / 2).toInt()) {
+                if (grau > ((maximo / 3) / 2)) {
                     grau = 1
                 }
             }
@@ -99,9 +99,9 @@ class QuadradoAleatorio {
                 in 0..index0 -> {
                     camadaP = 0
 
-                    y = pXY0.get(camada0).y
+                    y = pXY0[camada0].y
 
-                    x = pXY0.get(camada0).x
+                    x = pXY0[camada0].x
                     if (camada0 < pXY0.size-1) {
 
                         camada0++
@@ -110,9 +110,9 @@ class QuadradoAleatorio {
 
                 in index0+1..index1 -> {
                     camadaP = 1
-                    y = pXY1.get(camada1).y
+                    y = pXY1[camada1].y
 
-                    x = pXY1.get(camada1).x
+                    x = pXY1[camada1].x
 
                     if (camada1 < pXY1.size-1) {
                         camada1++
@@ -122,9 +122,9 @@ class QuadradoAleatorio {
 
                 in index1+1..ran[0] -> {
                     camadaP = 2
-                    y = pXY2.get(camada2).y
+                    y = pXY2[camada2].y
 
-                    x = pXY2.get(camada2).x
+                    x = pXY2[camada2].x
 
                     if (camada2 < pXY2.size-1) {
 
@@ -218,7 +218,7 @@ class QuadradoAleatorio {
 
     }
 
-    fun gerarValoresAleatorios(valor: Int): Triple<Int, Int, Int>{
+    private fun gerarValoresAleatorios(valor: Int): Triple<Int, Int, Int>{
 
 
         val random = Random.Default

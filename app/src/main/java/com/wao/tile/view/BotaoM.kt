@@ -11,7 +11,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import com.example.majong.R
 
-class BotaoM(val contexte: Context,val image: Bitmap, var x: Float, var y: Float, var w:Int, var h:Int, var camada:Int, var stt:String) {
+class BotaoM(
+    val contexte: Context,
+    var x: Float,
+    var y: Float,
+    var w: Int,
+    var h: Int,
+    var camada: Int,
+    var stt: String
+) {
     private val paint = Paint()
 
 var animar = false
@@ -23,7 +31,7 @@ var xFix = x
     fun draw(canvas: Canvas ) {
          paint.textSize = spToPx(w*0.04f)
        val b: Bitmap = Bitmap.createBitmap(w,h, Bitmap.Config.ARGB_8888)
-        var coin = BitmapFactory.decodeResource(contexte.resources, R.drawable.moeda)
+        val coin = BitmapFactory.decodeResource(contexte.resources, R.drawable.moeda)
         val coinP = Bitmap.createScaledBitmap(
             coin,
             ((w * 0.1f)).toInt(),
@@ -31,7 +39,7 @@ var xFix = x
             false
         )
 
-        var vid = BitmapFactory.decodeResource(contexte.resources, R.drawable.ad)
+        val vid = BitmapFactory.decodeResource(contexte.resources, R.drawable.ad)
         val videP = Bitmap.createScaledBitmap(
             vid,
             ((w * 0.25f)).toInt(),
@@ -68,7 +76,7 @@ var xFix = x
             if(inicio){
 
                 if(yp>y){
-                    var dif = (yp-y)/2
+                    val dif = (yp-y)/2
                     yp-=dif
                     if(dif<=0.5f){
                         yp = y
@@ -101,6 +109,9 @@ var xFix = x
         }else  if(camada==2) {
             paint.color = Color(0xFFF44336).toArgb()
 
+        }else  if(camada==3) {
+            paint.color = Color(0xFF8BC34A).toArgb()
+
         }
          canvas2.drawRoundRect(RectF(b.width.toFloat()*0.05f, b.height.toFloat()*0.05f, b.width.toFloat()*0.95f, b.height.toFloat()*0.95f), 70f, 70f, paint)
 
@@ -111,6 +122,9 @@ var xFix = x
 
         }else  if(camada==2) {
             paint.color = Color(0xFFE91E63).toArgb()
+
+        }else  if(camada==3) {
+            paint.color = Color(0xFF4CAF50).toArgb()
 
         }
         canvas2.drawRoundRect(RectF(b.width.toFloat()*0.05f, b.height.toFloat()*0.1f, b.width.toFloat()*0.95f, b.height.toFloat()*0.95f), 70f, 70f, paint)
@@ -148,6 +162,16 @@ var xFix = x
                 paint
             )
             canvas2.drawBitmap(videP, (w * 0.35).toFloat(),  (h * 0.55).toFloat(), paint)
+
+        }else   if(camada==3) {
+            canvas2.drawText(
+                stt,
+                (w * 0.25).toFloat(),
+                (h * 0.4).toFloat(),
+                paint
+            )
+            canvas2.drawBitmap(videP, (w * 0.35).toFloat(),  (h * 0.55).toFloat(), paint)
+            canvas2.drawBitmap(coinP, (w * 0.82).toFloat(),  (h * 0.25).toFloat(), paint)
 
         }
 

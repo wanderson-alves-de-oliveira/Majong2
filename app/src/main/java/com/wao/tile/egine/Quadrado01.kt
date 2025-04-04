@@ -12,22 +12,22 @@ class Quadrado01 {
     fun quadrado(context: Context, w:Int, disponiveis: MutableList<Int>, tileImages: MutableList<Bitmap>) :MutableList<MahjongTile>{
         var initialize = 0
         var grau = 0
-        var tiles = mutableListOf<MahjongTile>()
+        val tiles = mutableListOf<MahjongTile>()
 
         val tamNovo = ((w * 0.9f) / 6).toInt()
         val espaco = w * 0.05f
-        val h = tamNovo
-        val w = tamNovo
+        val h = tamNovo+0
+        val w1 = tamNovo+0
         for (i in 0 until 40) {
             disponiveis.add(i)
         }
-        var maximo = disponiveis.size
+        val maximo = disponiveis.size
 
         for (i in 0 until 39) {
             if (i % 3 == 0) {
                 initialize = -1
                 grau++
-                if (grau > ((maximo / 3) / 2).toInt()) {
+                if (grau > ((maximo / 3) / 2)) {
                     grau = 1
                 }
             }
@@ -144,7 +144,7 @@ class Quadrado01 {
                     context,
                     x,
                     y,
-                    w,
+                    w1,
                     h,
                     camadaP,
                     grau,

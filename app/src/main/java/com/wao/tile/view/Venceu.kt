@@ -19,25 +19,20 @@ class Venceu(var context: Context,
 
     var fase:Int =0
     var pontos:Int =0
-    var valorminimo:Int =500
+    private var valorminimo:Int =500
     var semInternet = false
  var internetR = "Sem Internet"
     private val paint = Paint()
     private val paint2 = Paint()
     var y: Float = 0f
-    var isSelected = false
-
-    var inicio = true
-    var xp = w*11f
 
 
     var espaco = 0f
-    var tileImage = BitmapFactory.decodeResource(context.resources, R.drawable.mahjongtile)
-    val b: Bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+    private var tileImage: Bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.mahjongtile)
+    private val b: Bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
 
     var btm = BotaoM(
         this.context,
-        tileImage,
         ((this.w * 0.55)).toFloat(),
         (this.h * 0.6).toFloat(),
         (this.w * 0.3).toInt(),
@@ -48,7 +43,6 @@ class Venceu(var context: Context,
 
     var btmCoin = BotaoM(
         this.context,
-        tileImage,
         ((this.w * 0.2) ).toFloat(),
         (this.h * 0.6).toFloat(),
         (this.w * 0.3).toInt(),
@@ -58,8 +52,7 @@ class Venceu(var context: Context,
     )
 
 
-    var alpha = 0f
-    var tam = 0f
+    private var tam = 0f
     var liberado = false
 
     fun draw(canvas: Canvas) {
@@ -77,10 +70,17 @@ class Venceu(var context: Context,
 
         desenharRetanguloArredondadoCentralizado(canvasB, (this.w * 0.15f)*tam, (this.h * 0.1f)*tam, 70f,1f, paint)
       if(tipo==0) {
+          paint.color = Color(0xFF4CAF50).toArgb()
+
+          btmCoin.stt="Obter + 50"
+          btmCoin.camada = 3
+
+
           paint.color = Color(0xFFFFA500).toArgb()
           btm.stt="Nível $fase"
           btm.w =  (this.w * 0.6).toInt()
           btm.camada = 0
+
 
       }else{
           when(tipo) {
@@ -151,6 +151,15 @@ class Venceu(var context: Context,
             btm.xFix = ((this.w * 0.2)).toFloat()
 
             btm.draw(canvas)
+
+
+            btmCoin.x = ((this.w * 0.2)+(this.w * 0.15f)).toFloat()
+            btmCoin.xFix = ((this.w * 0.2)+(this.w * 0.15f)).toFloat()
+            btmCoin.y = (this.h * 0.52f)
+
+            btmCoin.h = (this.h * 0.08).toInt()
+            btmCoin.draw(canvas)
+
         }else{
             if(pontos>=valorminimo) {
                 btm.h = (this.h * 0.08).toInt()
@@ -159,8 +168,8 @@ class Venceu(var context: Context,
                 btmCoin.draw(canvas)
             }else{
                 btm.h = (this.h * 0.08).toInt()
-                btm.x = (this.w * 0.35f).toFloat()
-                btm.xFix = (this.w * 0.35f).toFloat()
+                btm.x = (this.w * 0.35f)
+                btm.xFix = (this.w * 0.35f)
 
                 btm.draw(canvas)
             }
@@ -168,7 +177,7 @@ class Venceu(var context: Context,
         }
     }
 
-    fun desenharRetanguloArredondadoCentralizado(canvas: Canvas, largura: Float, altura: Float, raio: Float,alt:Float, paint: Paint) {
+    private fun desenharRetanguloArredondadoCentralizado(canvas: Canvas, largura: Float, altura: Float, raio: Float, alt:Float, paint: Paint) {
         // Calcula o centro da tela
         val centroX = canvas.width / 2f
         val centroY = canvas.height / 2f
@@ -185,7 +194,7 @@ class Venceu(var context: Context,
         canvas.drawRoundRect(rect, raio, raio, paint)
     }
 
-    fun desenharTextoCentralizado(canvas: Canvas, largura: Float, altura: Float, paint: Paint) {
+    private fun desenharTextoCentralizado(canvas: Canvas, largura: Float, altura: Float, paint: Paint) {
         // Calcula o centro da tela
         val centroX = canvas.width / 2f
         val centroY = canvas.height / 2f
@@ -197,7 +206,7 @@ class Venceu(var context: Context,
         val inferior = centroY + altura / 2f
 
         // Cria um objeto RectF com os limites calculados
-        val rect = RectF(esquerda, topo, direita, inferior)
+        RectF(esquerda, topo, direita, inferior)
         paint.textSize = spToPx(altura*0.03f)
         if(tipo==0) {
             canvas.drawText("Nível ${fase - 1}", centroX - (largura / 6), centroY * 0.7f, paint)
@@ -213,6 +222,7 @@ class Venceu(var context: Context,
                     ((h * 0.06f) - espaco).toInt(),
                     false
                 )
+                paint.color = Color(0xFFFFC107).toArgb()
 
                 canvas.drawBitmap(imggg,   ((w * 0.33f) + espaco), ((h * 0.45f) + espaco), paint)
                 canvas.drawText(" $pontos", centroX , centroY, paint)
@@ -230,7 +240,7 @@ if(!semInternet) {
     canvas.drawText("SEM ESPAÇO", centroX - (largura / 2.5f), centroY * 0.7f, paint)
     canvas.drawText("Falhou", centroX - (largura / 4), centroY * 0.8f, paint)
 }else{
-    canvas.drawText("$internetR", centroX - (largura / 2.5f), centroY * 0.7f, paint)
+    canvas.drawText(internetR, centroX - (largura / 2.5f), centroY * 0.7f, paint)
     //canvas.drawText("Falhou", centroX - (largura / 4), centroY * 0.8f, paint)
 
 
@@ -249,7 +259,7 @@ if(!semInternet) {
                 //    canvas.drawText("+ 3 ", centroX - (largura / 2.5f), centroY * 0.7f, paint)
                     val canvas2 = Canvas(b)
 
-                    val shader = BitmapShader(img!!, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
+                    val shader = BitmapShader(img, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
                     paint2.shader = shader
 
                     val cornerRadius = 360f
@@ -279,7 +289,7 @@ if(!semInternet) {
                     //    canvas.drawText("+ 3 ", centroX - (largura / 2.5f), centroY * 0.7f, paint)
                     val canvas2 = Canvas(b)
 
-                    val shader = BitmapShader(img!!, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
+                    val shader = BitmapShader(img, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
                     paint2.shader = shader
 
                     val cornerRadius = 360f
@@ -309,7 +319,7 @@ if(!semInternet) {
                     //    canvas.drawText("+ 3 ", centroX - (largura / 2.5f), centroY * 0.7f, paint)
                     val canvas2 = Canvas(b)
 
-                    val shader = BitmapShader(img!!, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
+                    val shader = BitmapShader(img, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
                     paint2.shader = shader
 
                     val cornerRadius = 360f
@@ -353,7 +363,7 @@ if(!semInternet) {
 
     }
 
-    fun spToPx(sp: Float): Float {
+    private fun spToPx(sp: Float): Float {
         return TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_SP,
             sp,

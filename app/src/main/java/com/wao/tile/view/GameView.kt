@@ -1,5 +1,6 @@
 package com.wao.tile.view
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.IntentFilter
@@ -95,7 +96,7 @@ class GameView(context: Context) : SurfaceView(context), SurfaceHolder.Callback 
 
     }
 
-    // Método para exibir o anúncio intersticial (exemplo: após o Game Over)
+
     fun showInterstitialAd(onAdClosed: () -> Unit) {
         val activity = context as? Activity
 
@@ -215,6 +216,7 @@ class GameView(context: Context) : SurfaceView(context), SurfaceHolder.Callback 
 
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
 
         gameLoop.onTouchEvent(event)
