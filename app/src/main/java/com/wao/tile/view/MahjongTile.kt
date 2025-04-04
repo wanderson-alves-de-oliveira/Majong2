@@ -1,5 +1,6 @@
 package com.wao.tile.view
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -48,6 +49,7 @@ class MahjongTile(
 
 
     private var timeG = if (intro) VALLIMITGINTRO else VALLIMITG
+    @SuppressLint("SuspiciousIndentation")
     fun draw(canvas: Canvas) {
         paint.textSize = 80f
 
