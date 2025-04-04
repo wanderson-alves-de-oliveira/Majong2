@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.IntentFilter
 import android.net.ConnectivityManager
+import android.net.ConnectivityManager.CONNECTIVITY_ACTION
 import android.os.Handler
 import android.os.Looper
 import android.view.MotionEvent
@@ -45,7 +46,7 @@ class GameView(context: Context) : SurfaceView(context), SurfaceHolder.Callback 
         holder.addCallback(this)
 
         // Registra o receiver para monitorar a conexão de rede
-        val filter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
+        val filter = IntentFilter(CONNECTIVITY_ACTION)
         context.registerReceiver(networkReceiver, filter)
     }
 
@@ -59,12 +60,10 @@ class GameView(context: Context) : SurfaceView(context), SurfaceHolder.Callback 
             object : InterstitialAdLoadCallback() {
                 override fun onAdLoaded(ad: InterstitialAd) {
                     interstitialAd = ad
-                      println("AdMob: Anúncio intersticial carregado!")
-                }
+                 }
 
                 override fun onAdFailedToLoad(error: LoadAdError) {
-                    println("AdMob: Falha ao carregar anúncio - ${error.message}")
-                }
+                 }
             }
         )
     }
@@ -83,12 +82,10 @@ class GameView(context: Context) : SurfaceView(context), SurfaceHolder.Callback 
                         override fun onAdLoaded(ad: RewardedAd) {
                             rewardedAd = ad
                             carregado = true
-                              println("AdMob: Anúncio premiado carregado!")
-                        }
+                         }
 
                         override fun onAdFailedToLoad(error: LoadAdError) {
-                            println("AdMob: Erro ao carregar anúncio - ${error.message}")
-                        }
+                         }
                     }
                 )
 

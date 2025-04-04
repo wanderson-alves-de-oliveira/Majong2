@@ -1,5 +1,6 @@
 package com.wao.tile.view
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -27,6 +28,7 @@ class MainView(   var context: Context,
 
 
 
+    @SuppressLint("SuspiciousIndentation")
     fun draw(canvas: Canvas) {
         paint.textSize = 80f
 
@@ -71,7 +73,7 @@ class MainView(   var context: Context,
         paint.color = Color.LightGray.toArgb()
 
 
-            canvas2.drawBitmap(mainp,0f,0f,paint)
+        canvas2.drawBitmap(mainp,0f,0f,paint)
 
 
         if(inicio){
