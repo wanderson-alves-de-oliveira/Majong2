@@ -13,7 +13,7 @@ import android.graphics.RectF
 import android.graphics.Shader
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import com.example.majong.R
+import com.wao.majong.R
 import kotlin.random.Random
 
 

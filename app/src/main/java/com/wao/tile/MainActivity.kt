@@ -9,6 +9,7 @@ import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
+import com.wao.tile.ferramentas.BillingManager
 import com.wao.tile.ferramentas.NotificationScheduler
 
 
@@ -67,7 +68,24 @@ class MainActivity : Activity() {
         adParams.bottomMargin = 0  // Alinhar ao rodapé
 
 
-        gameView = GameView(this)
+        val billingManager = BillingManager(
+            context = this,
+            onCoinsPurchased = { qtd ->
+                gameView.adicionarMoedas(qtd)
+            },
+            onRemoveAdsPurchased = {
+                // Por exemplo, desativar banner ou rewarded ads
+                gameView.removerAnuncios()
+            }
+        )
+
+        if (billingManager.foiComprado("remove_ads")) {
+            gameView.removerAnuncios()
+        }
+
+
+        gameView = GameView(this, billingManager)
+
         layout.addView(gameView, gameParams) // Adiciona o jogo
             layout.addView(this.adView ,adParams)
 

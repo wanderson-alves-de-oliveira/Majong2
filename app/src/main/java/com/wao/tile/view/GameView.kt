@@ -4,6 +4,9 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.IntentFilter
+import android.graphics.Bitmap
+import android.graphics.Paint
+import android.graphics.Rect
 import android.net.ConnectivityManager.CONNECTIVITY_ACTION
 import android.os.Handler
 import android.os.Looper
@@ -21,11 +24,12 @@ import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.gms.ads.rewarded.RewardItem
 import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
+import com.wao.tile.ferramentas.BillingManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 
 @Suppress("DEPRECATION")
-class GameView(context: Context) : SurfaceView(context), SurfaceHolder.Callback {
+class GameView(context: Context, val billingManager: BillingManager) : SurfaceView(context), SurfaceHolder.Callback {
     lateinit var gameLoop: GameLoop
     private var tiles = mutableListOf<MahjongTile>()
     private var selectedTiles = mutableListOf<MahjongTile>()
@@ -36,6 +40,10 @@ class GameView(context: Context) : SurfaceView(context), SurfaceHolder.Callback 
     private val networkReceiver = NetworkReceiver { loadRewardedAd() }
     private var carregado = false
     private var interstitialAd: InterstitialAd? = null
+    private var walld: MutableList<Bitmap> = mutableListOf()
+    private val paint = Paint()
+    private val buttonRect = Rect(100, 100, 500, 250)
+    private var coinCount = carregarMoedas()
     init {
         // Inicializa o AdMob
         MobileAds.initialize(context) {
@@ -183,7 +191,7 @@ class GameView(context: Context) : SurfaceView(context), SurfaceHolder.Callback 
             pontos = gameLoop.pontos
             index = gameLoop.index
             tutor = gameLoop.tutor
-
+            walld = gameLoop.walld
             selectedTiles = gameLoop.selectedTiles
             selectedTiles.removeAll(gameLoop.removerDaLista)
             gameLoop.removerDaLista.clear()
@@ -198,6 +206,7 @@ class GameView(context: Context) : SurfaceView(context), SurfaceHolder.Callback 
             gameLoop.pontos = this.pontos
             gameLoop.index = this.index
             gameLoop.tutor = this.tutor
+            gameLoop.walld = this.walld
         }
         gameLoop.startLoop()
     }
@@ -213,12 +222,40 @@ class GameView(context: Context) : SurfaceView(context), SurfaceHolder.Callback 
 
     }
 
+   fun comprar(){
+
+
+               (context as Activity).let {
+                   billingManager.launchPurchaseFlow(it, "coins_1000")
+               }
+
+
+
+   }
+
+
+
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
-
         gameLoop.onTouchEvent(event)
 
 
         return true
+    }
+
+    fun removerAnuncios() {
+
+    }
+    fun adicionarMoedas(qtd: Int) {
+        coinCount += qtd
+        salvarMoedas()
+    }
+    private fun salvarMoedas() {
+        val prefs = context.getSharedPreferences("jogo", Context.MODE_PRIVATE)
+        prefs.edit().putInt("moedas", coinCount).apply()
+    }
+    private fun carregarMoedas(): Int {
+        val prefs = context.getSharedPreferences("jogo", Context.MODE_PRIVATE)
+        return prefs.getInt("moedas", 0)
     }
 }

@@ -8,7 +8,7 @@ import android.graphics.BitmapFactory
  import android.graphics.Paint
  import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import com.example.majong.R
+import com.wao.majong.R
 
 class MainView(   var context: Context,
                   var w: Int,

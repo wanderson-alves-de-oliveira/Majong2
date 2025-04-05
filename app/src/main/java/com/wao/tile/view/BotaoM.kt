@@ -9,7 +9,7 @@ import android.graphics.RectF
 import android.util.TypedValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import com.example.majong.R
+import com.wao.majong.R
 
 class BotaoM(
     val contexte: Context,

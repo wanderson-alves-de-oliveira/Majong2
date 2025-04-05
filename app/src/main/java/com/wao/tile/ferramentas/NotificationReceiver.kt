@@ -13,7 +13,7 @@ import android.media.RingtoneManager
 import android.os.Build
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
-import com.example.majong.R
+import com.wao.majong.R
 import com.wao.tile.MainActivity
 
 class NotificationReceiver : BroadcastReceiver() {

@@ -5,15 +5,15 @@ plugins {
 }
 
 android {
-    namespace = "com.example.majong"
+    namespace = "com.wao.majong"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.majong"
+        applicationId = "com.wao.majong"
         minSdk = 24
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 6
+        versionName = "1.6"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -59,5 +59,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation("com.google.android.gms:play-services-ads:24.1.0")
+    implementation ("com.android.billingclient:billing:6.1.0")
+
 
 }
