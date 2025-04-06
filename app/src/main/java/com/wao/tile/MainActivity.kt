@@ -17,6 +17,7 @@ import com.wao.tile.ferramentas.NotificationScheduler
 class MainActivity : Activity() {
     private lateinit var gameView: GameView
     private lateinit var adView: AdView
+    private  var semanuncio = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,15 +44,6 @@ class MainActivity : Activity() {
         val adRequest = AdRequest.Builder().build()
         adView.loadAd(adRequest)
 
-
-
-        // Criando o AdView
-
-//        adView = AdView(this).apply {
-//              AdSize.BANNER
-//            adUnitId = "ca-app-pub-3940256099942544/6300978111" // Substitua pelo seu ID real
-//            loadAd(AdRequest.Builder().build())
-//        }
 
 
 
@@ -81,18 +73,17 @@ class MainActivity : Activity() {
 
         if (billingManager.foiComprado("remove_ads")) {
             gameView.removerAnuncios()
+            semanuncio = true
         }
 
 
         gameView = GameView(this, billingManager)
 
         layout.addView(gameView, gameParams) // Adiciona o jogo
-            layout.addView(this.adView ,adParams)
+        if(!semanuncio) {
+            layout.addView(this.adView, adParams)
+        }
 
-
-
-
-        // Adicionando o AdView ao
         setContentView(layout)
 
     }

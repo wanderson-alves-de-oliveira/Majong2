@@ -96,13 +96,6 @@ class MahjongTile(
             2 -> Color.Blue
             else -> Color.Magenta
         }
-        //   canvas2.drawRoundRect(0f, 0f, b.width.toFloat(), b.height.toFloat(),40f,40f, paint2);
-//        paint.color = colorCamada.toArgb()
-//        canvas2.drawRoundRect(5f, 5f, (b.width-5).toFloat(), (b.height-5).toFloat(),40f,40f, paint);
-//        paint.color = Color.Black.toArgb()
-
-        //canvas2.drawText(id.toString(),(10).toFloat(),(b.height/1.5f).toFloat(),paint)
-//
 
 
         val width = img.width

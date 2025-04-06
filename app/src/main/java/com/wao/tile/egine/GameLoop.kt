@@ -62,7 +62,7 @@ class GameLoop(
     private val w = display.widthPixels
     private val hp = 0
     private val wp = 0
-
+    var semanuncio = false
     private var tamPadrao = 0
     var tamNovo = 0
     private var ajustarY = true
@@ -89,6 +89,8 @@ class GameLoop(
     private var cLocked = false
 
     private val divisor = 3
+    private var carrinho = BitmapFactory.decodeResource(context.resources, R.drawable.carrinho)
+
     private var coin = BitmapFactory.decodeResource(context.resources, R.drawable.moeda)
     private val coinP = Bitmap.createScaledBitmap(
         coin,
@@ -96,25 +98,31 @@ class GameLoop(
         ((w * 0.1f)).toInt(),
         false
     )
-    var compraBT = BotaoM(
+
+
+    private var compraBT = MahjongTile(
+        carrinho,
         this.context,
-        ((this.w * 0.3)).toFloat(),
-        (this.h * 0.05).toFloat(),
-        (this.w * 0.3).toInt(),
-        (this.h * 0.1).toInt(),
-        0,
-        fase.toString()
+        (w * 0.45f ),
+        h * 0.75f,
+        ((w * 1.0f) / 6).toInt(),
+        ((w * 0.9f) / 6).toInt(),
+        2,
+        2000
+
     )
+
 
     private var lampada = BitmapFactory.decodeResource(context.resources, R.drawable.lampada)
     private var ima = BitmapFactory.decodeResource(context.resources, R.drawable.ima)
     private var giro = BitmapFactory.decodeResource(context.resources, R.drawable.giro)
     private val b: Bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
-    // val binit: Bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
 
     private var main = MainView(this.context, (w * 1.1f).toInt(), (h * 1.1f).toInt())
     private var venceuP = Venceu(this.context, (w), (h), 0)
     var perdeuL = Venceu(this.context, (w), (h), 1)
+    var lojaWAO = Loja(this.context, gameView,(w), (h))
+
     var semInternet = false
 
     private var credLuz = Venceu(this.context, (w), (h), 2)
@@ -133,7 +141,7 @@ class GameLoop(
     private var pontuacaoNova = 0
     private var score = 0
     private var limitar = 7
-    private var valorminimo = 500
+    private var valorminimo = 300
 
     private var luzP = 0
     private var imaP = 0
@@ -257,55 +265,72 @@ class GameLoop(
                     btm.stt = "Nível $ultimaFase"
 
                     if (canvas != null) {
+
                         try {
+                            if(!lojaWAO.abrirLoja) {
+                                main.draw(this.canvas!!)
 
-                            main.draw(this.canvas!!)
+                                if (preload >= 100) {
+                                    compraBT.draw(canvas!!)
+                                    btm.draw(this.canvas!!)
+                                } else {
+                                    paint.color = Color.Green.toArgb()
+                                    canvas!!.drawRoundRect(
+                                        RectF(
+                                            (w * 0.25f),
+                                            h * 0.45f,
+                                            ((w * 0.45f) + (100 * (w * 0.003f))),
+                                            ((h * 0.5)).toFloat()
+                                        ), 60f, 60f, paint
+                                    )
+                                    paint.color = Color.Magenta.toArgb()
+                                    canvas!!.drawRoundRect(
+                                        RectF(
+                                            (w * 0.25f),
+                                            h * 0.45f,
+                                            ((w * 0.45f) + (preload * (w * 0.003f))),
+                                            ((h * 0.5)).toFloat()
+                                        ), 60f, 60f, paint
+                                    )
 
-                            if (preload >= 100) {
-                                btm.draw(this.canvas!!)
-                            } else {
-                                paint.color = Color.Green.toArgb()
-                                canvas!!.drawRoundRect(
-                                    RectF(
-                                        (w * 0.25f),
-                                        h * 0.45f,
-                                        ((w * 0.45f) + (100 * (w * 0.003f))),
-                                        ((h * 0.5)).toFloat()
-                                    ), 60f, 60f, paint
-                                )
-                                paint.color = Color.Magenta.toArgb()
-                                canvas!!.drawRoundRect(
-                                    RectF(
-                                        (w * 0.25f),
-                                        h * 0.45f,
-                                        ((w * 0.45f) + (preload * (w * 0.003f))),
-                                        ((h * 0.5)).toFloat()
-                                    ), 60f, 60f, paint
-                                )
+                                    paint.textSize = spToPx((this.w * 0.014f))
+                                    paint.color = Color.White.toArgb()
+                                    canvas!!.drawText(
+                                        "LOADING...",
+                                        (w * 0.36f),
+                                        h * 0.48f,
+                                        paint
+                                    )
 
-                                paint.textSize = spToPx((this.w * 0.014f))
-                                paint.color = Color.White.toArgb()
-                                canvas!!.drawText(
-                                    "LOADING...",
-                                    (w * 0.36f),
-                                    h * 0.48f,
-                                    paint
-                                )
+                                    sleep(250)
+                                    preload += 20
+                                }
 
-                                sleep(250)
-                                preload += 20
+                                if (btm.liberar > 3) {
+                                    index = 1
+                                    btm.liberar = 0
+                                    compraBT.y=h*0.06f
+                                    compraBT.x=w*0.78f
+
+                                }
+
+                            }else{
+                                lojaWAO.semanuncio=semanuncio
+                                lojaWAO.draw(canvas!!)
                             }
+                ///////////////////////////////////////////
 
-                            if (btm.liberar > 3) {
-                                index = 1
-                                btm.liberar = 0
-
-                            }
 
                         } catch (ew: Exception) {
                             ew.stackTrace
                         }
+
+
+
                     }
+
+
+
 
                     if (cLocked) {
                         surfaceHolder.unlockCanvasAndPost(canvas)
@@ -325,57 +350,59 @@ class GameLoop(
 
                         bloquerBT =
                             selectedTiles.none { it.camada < -2 && it.camada >= -4 }
-                        if (!corrigirfalha && !creditoRecorsus || limparComCredito && !creditoRecorsus) {
+                        if(!lojaWAO.abrirLoja) {
+                            if (!corrigirfalha && !creditoRecorsus || limparComCredito && !creditoRecorsus) {
 
 
-                            val limitador = selectedTiles.filter { it.camada > -2 }.toMutableList()
+                                val limitador =
+                                    selectedTiles.filter { it.camada > -2 }.toMutableList()
 
-                            for (i in 0 until selectedTiles.filter { it.camada > -2 }.size) {
-                                val limitadorX =
-                                    selectedTiles.filter { it.camada > -2 && it.id == selectedTiles[i].id }
+                                for (i in 0 until selectedTiles.filter { it.camada > -2 }.size) {
+                                    val limitadorX =
+                                        selectedTiles.filter { it.camada > -2 && it.id == selectedTiles[i].id }
 
-                                if (limitadorX.size >= 3) {
-                                    limitador.removeAll(limitadorX)
+                                    if (limitadorX.size >= 3) {
+                                        limitador.removeAll(limitadorX)
+                                    }
+
                                 }
 
-                            }
-
-                            if (!limparComCredito && !(limitador.size < limitar ||
-                                        limitador.size > limitar && dica)
-                            ) {
-                                corrigirfalha = true
-                            } else {
-                                corrigirfalha = false
-                                if ((selectedTiles.filter { it.camada > -2 }.size < 7)) {
-                                    limparComCredito = false
+                                if (!limparComCredito && !(limitador.size < limitar ||
+                                            limitador.size > limitar && dica)
+                                ) {
+                                    corrigirfalha = true
+                                } else {
+                                    corrigirfalha = false
+                                    if ((selectedTiles.filter { it.camada > -2 }.size < 7)) {
+                                        limparComCredito = false
+                                    }
                                 }
-                            }
 
 //
-                            try {
+                                try {
 //
 
-                                if (limparComCredito) {
-                                    dica = true
-                                    limitar = 20
-                                    if (selectedTilesRes.isEmpty()) {
-                                        selectedTilesRes =
-                                            selectedTiles.filter { it.id == selectedTiles[0].id }
-                                                .toMutableList()
-                                        for (i in 0 until 3 - selectedTilesRes.size) {
-                                            // achou(tiles.filter { it.id == selectedTilesRes[0].id && it.camada == 1}[i])
-                                            limparSelecionados()
+                                    if (limparComCredito) {
+                                        dica = true
+                                        limitar = 20
+                                        if (selectedTilesRes.isEmpty()) {
+                                            selectedTilesRes =
+                                                selectedTiles.filter { it.id == selectedTiles[0].id }
+                                                    .toMutableList()
+                                            for (i in 0 until 3 - selectedTilesRes.size) {
+                                                // achou(tiles.filter { it.id == selectedTilesRes[0].id && it.camada == 1}[i])
+                                                limparSelecionados()
+
+                                            }
 
                                         }
 
-                                    }
-
 //                                    if(selectedTiles.filter { it.camada == -1 }.size < 7 + (selectedTilesRes.size)) {
 //                                    }
-                                    selectedTilesRes.clear()
+                                        selectedTilesRes.clear()
 
 
-                                }
+                                    }
 
 
 //
@@ -384,166 +411,167 @@ class GameLoop(
 //                                }
 
 
-                                if (!ajustarY) {
-                                    timeValidarIA--
-                                    if (timeValidarIA < 0) {
-                                        timeValidarIA = ialimite
-                                    }
-                                }
-                                // canvas.drawRGB(0, 128, 0) // Fundo verde
-                                canvas!!.drawBitmap(walld[0], 0f, 0f, paint)
-
-                                if (!venceu) {
-                                    canvas!!.drawBitmap(b3, 0f, 0f, paint)
-                                }
-                                try {
-
-
-                                    if (!bloquerBT) {
-                                        botao1.camada = 1
-                                        botao2.camada = 1
-                                        botao3.camada = 1
-
-                                    } else {
-                                        botao1.camada = 2
-                                        botao2.camada = 2
-                                        botao3.camada = 2
-                                        botao1.isSelected = false
-                                        botao2.isSelected = false
-                                        botao3.isSelected = false
-
-
-                                    }
-
-                                    if (time1 > 0) {
-                                        botao1.camada = 1
-                                        botao1.isSelected = true
-                                        time1--
-                                    } else {
-                                        bloquerBT2 = true
-                                        if (luzP <= 0) {
-                                            botao1.camada = 1
-                                            botao1.isSelected = true
+                                    if (!ajustarY) {
+                                        timeValidarIA--
+                                        if (timeValidarIA < 0) {
+                                            timeValidarIA = ialimite
                                         }
                                     }
-                                    if (time2 > 0) {
-                                        botao2.camada = 1
-                                        botao2.isSelected = true
-
-                                        time2--
-                                    } else {
-                                        bloquerBT2 = true
-
-                                        if (selectedTiles.isEmpty() || imaP <= 0) {
-                                            botao2.camada = 1
-                                            botao2.isSelected = true
-                                        }
-
-
-                                    }
-                                    if (time3 > 0) {
-                                        botao3.camada = 1
-                                        botao3.isSelected = true
-
-                                        time3--
-                                    } else {
-                                        bloquerBT2 = true
-                                        if (sufleP <= 0) {
-                                            botao3.camada = 1
-                                            botao3.isSelected = true
-                                        }
-                                    }
+                                    // canvas.drawRGB(0, 128, 0) // Fundo verde
+                                    canvas!!.drawBitmap(walld[0], 0f, 0f, paint)
 
                                     if (!venceu) {
-
-                                        botao1.draw(canvas!!)
-                                        paint.color = Color.Magenta.toArgb()
-                                        paint.alpha = 255
-
-                                        canvas!!.drawRoundRect(
-                                            RectF(
-                                                (w * 0.35f),
-                                                h * 0.83f,
-                                                (w * 0.4f),
-                                                ((h * 0.855)).toFloat()
-                                            ), 60f, 60f, paint
-                                        )
-
-                                        paint.textSize = spToPx((this.w * 0.012f))
-                                        paint.color = Color.White.toArgb()
-                                        canvas!!.drawText(
-                                            luzP.toString(),
-                                            (w * 0.36f),
-                                            h * 0.85f,
-                                            paint
-                                        )
+                                        canvas!!.drawBitmap(b3, 0f, 0f, paint)
+                                    }
+                                    try {
 
 
+                                        if (!bloquerBT) {
+                                            botao1.camada = 1
+                                            botao2.camada = 1
+                                            botao3.camada = 1
 
+                                        } else {
+                                            botao1.camada = 2
+                                            botao2.camada = 2
+                                            botao3.camada = 2
+                                            botao1.isSelected = false
+                                            botao2.isSelected = false
+                                            botao3.isSelected = false
 
-                                        botao2.draw(canvas!!)
-
-                                        paint.color = Color.Magenta.toArgb()
-                                        paint.alpha = 255
-
-                                        canvas!!.drawRoundRect(
-                                            RectF(
-                                                ((w * 0.52f)),
-                                                h * 0.83f,
-                                                (w * 0.57f),
-                                                ((h * 0.855)).toFloat()
-                                            ), 60f, 60f, paint
-                                        )
-
-                                        paint.textSize = spToPx((this.w * 0.012f))
-                                        paint.color = Color.White.toArgb()
-                                        canvas!!.drawText(
-                                            imaP.toString(),
-                                            ((w * 0.535f)),
-                                            h * 0.85f,
-                                            paint
-                                        )
-
-
-
-                                        botao3.draw(canvas!!)
-
-
-                                        paint.color = Color.Magenta.toArgb()
-                                        paint.alpha = 255
-
-                                        canvas!!.drawRoundRect(
-                                            RectF(
-                                                ((w * 0.69f)),
-                                                h * 0.83f,
-                                                (w * 0.74f),
-                                                ((h * 0.855)).toFloat()
-                                            ), 60f, 60f, paint
-                                        )
-
-                                        paint.textSize = spToPx((this.w * 0.012f))
-                                        paint.color = Color.White.toArgb()
-                                        canvas!!.drawText(
-                                            sufleP.toString(),
-                                            ((w * 0.7f)),
-                                            h * 0.85f,
-                                            paint
-                                        )
-
-                                        compraBT.draw(canvas!!)
-
-                                        if (compraBT.liberar > 3) {
-                                            compraBT.liberar = 0
-                                            loja()
 
                                         }
 
+                                        if (time1 > 0) {
+                                            botao1.camada = 1
+                                            botao1.isSelected = true
+                                            time1--
+                                        } else {
+                                            bloquerBT2 = true
+                                            if (luzP <= 0) {
+                                                botao1.camada = 1
+                                                botao1.isSelected = true
+                                            }
+                                        }
+                                        if (time2 > 0) {
+                                            botao2.camada = 1
+                                            botao2.isSelected = true
 
+                                            time2--
+                                        } else {
+                                            bloquerBT2 = true
+
+                                            if (selectedTiles.isEmpty() || imaP <= 0) {
+                                                botao2.camada = 1
+                                                botao2.isSelected = true
+                                            }
+
+
+                                        }
+                                        if (time3 > 0) {
+                                            botao3.camada = 1
+                                            botao3.isSelected = true
+
+                                            time3--
+                                        } else {
+                                            bloquerBT2 = true
+                                            if (sufleP <= 0) {
+                                                botao3.camada = 1
+                                                botao3.isSelected = true
+                                            }
+                                        }
+
+                                        if (!venceu) {
+
+                                            botao1.draw(canvas!!)
+                                            paint.color = Color.Magenta.toArgb()
+                                            paint.alpha = 255
+
+                                            canvas!!.drawRoundRect(
+                                                RectF(
+                                                    (w * 0.35f),
+                                                    h * 0.83f,
+                                                    (w * 0.4f),
+                                                    ((h * 0.855)).toFloat()
+                                                ), 60f, 60f, paint
+                                            )
+
+                                            paint.textSize = spToPx((this.w * 0.012f))
+                                            paint.color = Color.White.toArgb()
+                                            canvas!!.drawText(
+                                                luzP.toString(),
+                                                (w * 0.36f),
+                                                h * 0.85f,
+                                                paint
+                                            )
+
+
+
+
+                                            botao2.draw(canvas!!)
+
+                                            paint.color = Color.Magenta.toArgb()
+                                            paint.alpha = 255
+
+                                            canvas!!.drawRoundRect(
+                                                RectF(
+                                                    ((w * 0.52f)),
+                                                    h * 0.83f,
+                                                    (w * 0.57f),
+                                                    ((h * 0.855)).toFloat()
+                                                ), 60f, 60f, paint
+                                            )
+
+                                            paint.textSize = spToPx((this.w * 0.012f))
+                                            paint.color = Color.White.toArgb()
+                                            canvas!!.drawText(
+                                                imaP.toString(),
+                                                ((w * 0.535f)),
+                                                h * 0.85f,
+                                                paint
+                                            )
+
+
+
+                                            botao3.draw(canvas!!)
+
+
+                                            paint.color = Color.Magenta.toArgb()
+                                            paint.alpha = 255
+
+                                            canvas!!.drawRoundRect(
+                                                RectF(
+                                                    ((w * 0.69f)),
+                                                    h * 0.83f,
+                                                    (w * 0.74f),
+                                                    ((h * 0.855)).toFloat()
+                                                ), 60f, 60f, paint
+                                            )
+
+                                            paint.textSize = spToPx((this.w * 0.012f))
+                                            paint.color = Color.White.toArgb()
+                                            canvas!!.drawText(
+                                                sufleP.toString(),
+                                                ((w * 0.7f)),
+                                                h * 0.85f,
+                                                paint
+                                            )
+
+                                            compraBT.draw(canvas!!)
+
+//                                            if (compraBT.liberar > 3) {
+//                                                compraBT.liberar = 0
+//
+//                                                lojaWAO.abrirLoja = true
+//
+//                                            }
+
+
+                                        }
+
+                                    } catch (e: Exception) {
+                                        e.stackTrace
                                     }
-
-                                } catch (e: Exception) {
-                                    e.stackTrace
-                                }
 
 
 //                            runBlocking {
@@ -554,76 +582,76 @@ class GameLoop(
 
 //////////////////////////////////////////////
 
-                                runBlocking {
+                                    runBlocking {
 
 
-                                    launch(Dispatchers.Default) {
+                                        launch(Dispatchers.Default) {
 
 
-                                        if (isTouched || ajustarY || embaralhando || limpando) {
-                                            val canvas2 = Canvas(b)
-                                            limpando = false
-                                            canvas2.drawColor(
-                                                Color.Transparent.toArgb(),
-                                                PorterDuff.Mode.CLEAR
-                                            )
+                                            if (isTouched || ajustarY || embaralhando || limpando) {
+                                                val canvas2 = Canvas(b)
+                                                limpando = false
+                                                canvas2.drawColor(
+                                                    Color.Transparent.toArgb(),
+                                                    PorterDuff.Mode.CLEAR
+                                                )
 
-                                            var countEmbaralhar = 0
-                                            //  tiles.forEach {
-                                            for (itty in 0 until tiles.size) {
+                                                var countEmbaralhar = 0
+                                                //  tiles.forEach {
+                                                for (itty in 0 until tiles.size) {
 
-                                                val it = tiles[itty]
+                                                    val it = tiles[itty]
+                                                    if (embaralhando) {
+                                                        if (it.girando) {
+                                                            countEmbaralhar++
+                                                        }
+                                                    }
+
+                                                    if (!(it.w <= 0 || it.h <= 0) && it.camada >= 0) {
+                                                        it.draw(canvas2)
+                                                        // canvas2=canvas
+                                                    }
+                                                    // }
+
+                                                }
                                                 if (embaralhando) {
-                                                    if (it.girando) {
-                                                        countEmbaralhar++
+                                                    if (countEmbaralhar <= 0) {
+                                                        embaralhando = false
                                                     }
                                                 }
+                                                if (tiles.none { it.ty }
+                                                ) {
+                                                    ajustarY = false
 
-                                                if (!(it.w <= 0 || it.h <= 0) && it.camada >= 0) {
-                                                    it.draw(canvas2)
-                                                    // canvas2=canvas
                                                 }
-                                                // }
 
-                                            }
-                                            if (embaralhando) {
-                                                if (countEmbaralhar <= 0) {
-                                                    embaralhando = false
+                                                isTouched = false
+                                                launch(Dispatchers.Default) {
+                                                    canvas!!.drawBitmap(b, 0f, 0f, paint)
+                                                    //      canvas.drawBitmap(b2, 0f, 0f, paint)
                                                 }
-                                            }
-                                            if (tiles.none { it.ty }
-                                            ) {
-                                                ajustarY = false
 
-                                            }
-
-                                            isTouched = false
-                                            launch(Dispatchers.Default) {
+                                            } else {
                                                 canvas!!.drawBitmap(b, 0f, 0f, paint)
-                                                //      canvas.drawBitmap(b2, 0f, 0f, paint)
-                                            }
+                                                //  canvas.drawBitmap(b2, 0f, 0f, paint)
+                                                launch(Dispatchers.Default) {
 
-                                        } else {
-                                            canvas!!.drawBitmap(b, 0f, 0f, paint)
-                                            //  canvas.drawBitmap(b2, 0f, 0f, paint)
-                                            launch(Dispatchers.Default) {
+                                                    try {
+                                                        carregarCamadas()
 
-                                                try {
-                                                    carregarCamadas()
+                                                    } catch (eeee: Exception) {
+                                                        eeee.stackTrace
+                                                        //  b2 = bk
+                                                    }
 
-                                                } catch (eeee: Exception) {
-                                                    eeee.stackTrace
-                                                    //  b2 = bk
                                                 }
-
                                             }
+
+
                                         }
 
 
                                     }
-
-
-                                }
 
 
 //
@@ -633,89 +661,89 @@ class GameLoop(
 //                                    launch(Dispatchers.Default) {
 
 
-                                try {
+                                    try {
 
 
-                                    var i = 0
+                                        var i = 0
 
-                                    if (tutor) {
-
-
-                                        paint.color = Color.Black.toArgb()
-                                        paint.alpha = 230
-                                        //  val canvasG = Canvas(binit)
-                                        canvas!!.drawRoundRect(
-                                            RectF(
-                                                0f,
-                                                0f,
-                                                w.toFloat(),
-                                                h * 1.3f
-                                            ), 0f, 0f, paint
-                                        )
-                                        //   canvas.drawBitmap(binit, 0f, 0f, paint)
-
-                                        paint.color = Color.Green.toArgb()
-                                        paint.alpha = 255
-                                        canvas!!.drawRoundRect(
-                                            RectF(
-                                                (w * 0.1).toFloat(),
-                                                (h * 0.1).toFloat(),
-                                                (w * 0.9).toFloat(),
-                                                ((h * 0.3)).toFloat()
-                                            ), 60f, 60f, paint
-                                        )
-
-                                        paint.textSize = spToPx((this.w * 0.017f))
-                                        paint.color = Color.Magenta.toArgb()
-                                        canvas!!.drawText(
-                                            "Selecione três peças iguais ",
-                                            w * 0.15f,
-                                            h * 0.15f,
-                                            paint
-                                        )
+                                        if (tutor) {
 
 
-                                        canvas!!.drawText(
-                                            "para limpar",
-                                            w * 0.2f,
-                                            h * 0.2f,
-                                            paint
-                                        )
+                                            paint.color = Color.Black.toArgb()
+                                            paint.alpha = 230
+                                            //  val canvasG = Canvas(binit)
+                                            canvas!!.drawRoundRect(
+                                                RectF(
+                                                    0f,
+                                                    0f,
+                                                    w.toFloat(),
+                                                    h * 1.3f
+                                                ), 0f, 0f, paint
+                                            )
+                                            //   canvas.drawBitmap(binit, 0f, 0f, paint)
+
+                                            paint.color = Color.Green.toArgb()
+                                            paint.alpha = 255
+                                            canvas!!.drawRoundRect(
+                                                RectF(
+                                                    (w * 0.1).toFloat(),
+                                                    (h * 0.1).toFloat(),
+                                                    (w * 0.9).toFloat(),
+                                                    ((h * 0.3)).toFloat()
+                                                ), 60f, 60f, paint
+                                            )
+
+                                            paint.textSize = spToPx((this.w * 0.017f))
+                                            paint.color = Color.Magenta.toArgb()
+                                            canvas!!.drawText(
+                                                "Selecione três peças iguais ",
+                                                w * 0.15f,
+                                                h * 0.15f,
+                                                paint
+                                            )
+
+
+                                            canvas!!.drawText(
+                                                "para limpar",
+                                                w * 0.2f,
+                                                h * 0.2f,
+                                                paint
+                                            )
 
 
 
-                                        for (ii in tiles.size - 3 until tiles.size) {
-                                            tiles[ii].draw(canvas!!)
+                                            for (ii in tiles.size - 3 until tiles.size) {
+                                                tiles[ii].draw(canvas!!)
+                                            }
+
+
+
+
+
+                                            paint.alpha = 255
                                         }
 
 
+                                        // selectedTiles.forEach {
+
+                                        for (itt in 0 until selectedTiles.size) {
+
+                                            val it = selectedTiles[itt]
+                                            if (it.camada > -3) {
+                                                i++
+                                                val velocidade = w * 0.15f
+
+                                                val p = ((w * 0.9 / 8) * i).toFloat()
 
 
+                                                val py = (h * 0.75).toFloat()
+                                                //val mediay = (h) * 0.05
 
-                                        paint.alpha = 255
-                                    }
-
-
-                                    // selectedTiles.forEach {
-
-                                    for (itt in 0 until selectedTiles.size) {
-
-                                        val it = selectedTiles[itt]
-                                        if (it.camada > -3) {
-                                            i++
-                                            val velocidade = w * 0.15f
-
-                                            val p = ((w * 0.9 / 8) * i).toFloat()
-
-
-                                            val py = (h * 0.75).toFloat()
-                                            //val mediay = (h) * 0.05
-
-                                            //  val tempoQueda = calculoVelocidade(it,py)// Tempo em segundos
-                                            val resources = context.resources
-                                            val velocidadey =
-                                                (it.h / 2).toFloat().toDp(resources)
-                                            // var velocidadey = calculoVelocidade(it,py)
+                                                //  val tempoQueda = calculoVelocidade(it,py)// Tempo em segundos
+                                                val resources = context.resources
+                                                val velocidadey =
+                                                    (it.h / 2).toFloat().toDp(resources)
+                                                // var velocidadey = calculoVelocidade(it,py)
 
 
 //
@@ -724,362 +752,367 @@ class GameLoop(
 //                                                    }
 
 
-                                            if (it.x > p) {
-                                                it.x -= velocidade
-                                                if (it.x < p) {
-                                                    it.x = p
-                                                }
-
-                                            } else if (it.x < p) {
-                                                it.x += velocidade
                                                 if (it.x > p) {
-                                                    it.x = p
-                                                }
-                                            }
-                                            if (it.y > py) {
-                                                it.y -= velocidadey
-                                                if (it.y < py) {
-                                                    it.y = py
-                                                }
+                                                    it.x -= velocidade
+                                                    if (it.x < p) {
+                                                        it.x = p
+                                                    }
 
-                                            } else if (it.y < py) {
-                                                it.y += velocidadey
+                                                } else if (it.x < p) {
+                                                    it.x += velocidade
+                                                    if (it.x > p) {
+                                                        it.x = p
+                                                    }
+                                                }
                                                 if (it.y > py) {
-                                                    it.y = py
+                                                    it.y -= velocidadey
+                                                    if (it.y < py) {
+                                                        it.y = py
+                                                    }
+
+                                                } else if (it.y < py) {
+                                                    it.y += velocidadey
+                                                    if (it.y > py) {
+                                                        it.y = py
+                                                    }
+                                                } else if (it.y == py && it.x == p) {
+                                                    it.camada = -1
+                                                    //  it.bloqueado = true
                                                 }
-                                            } else if (it.y == py && it.x == p) {
-                                                it.camada = -1
-                                                //  it.bloqueado = true
-                                            }
 
-                                        } else {
-                                            if (it.camada == -3 || it.camada == -4) {
-                                                val py = (h * 0.6).toFloat()
-                                                val mediay = (it.y - py) / divisor
-                                                val velocidadey =
-                                                    if ((mediay) > w * 0.01f) mediay else w * 0.1f
+                                            } else {
+                                                if (it.camada == -3 || it.camada == -4) {
+                                                    val py = (h * 0.6).toFloat()
+                                                    val mediay = (it.y - py) / divisor
+                                                    val velocidadey =
+                                                        if ((mediay) > w * 0.01f) mediay else w * 0.1f
 
 
 
-                                                if (it.camada == -4) {
-                                                    val mediax = it.h
-                                                    if (it.x < (w * 0.70f)) {
-                                                        it.x += mediax
+                                                    if (it.camada == -4) {
+                                                        val mediax = it.h
+                                                        if (it.x < (w * 0.70f)) {
+                                                            it.x += mediax
 
+                                                        }
+                                                        if (it.y > (h * 0f)) {
+                                                            it.y -= mediax
+
+                                                        }
+                                                        if (it.x >= (w * 0.7f) && it.y <= 20f) {
+                                                            it.camada = -5
+                                                            limitar = 7
+                                                            tutor = false
+                                                            pontosCont++
+                                                            if (pontosCont >= 3) {
+                                                                pontos++
+                                                                pontosCont = 0
+
+                                                            }
+
+                                                        }
                                                     }
-                                                    if (it.y > (h * 0f)) {
-                                                        it.y -= mediax
 
-                                                    }
-                                                    if (it.x >= (w * 0.7f) && it.y <= 20f) {
-                                                        it.camada = -5
-                                                        limitar = 7
-                                                        tutor = false
-                                                        pontosCont++
-                                                        if (pontosCont >= 3) {
-                                                            pontos++
-                                                            pontosCont = 0
+                                                    if (it.camada > -4) {
+                                                        //
+                                                        if (it.y > h * 0.0) {
+                                                            it.y -= velocidadey
 
                                                         }
 
-                                                    }
-                                                }
-
-                                                if (it.camada > -4) {
-                                                    //
-                                                    if (it.y > h * 0.0) {
-                                                        it.y -= velocidadey
-
-                                                    }
-
-                                                    val px = (w * 0.5).toFloat()
-                                                    val nivelado =
-                                                        if (px - it.x > 0) px - it.x else (px - it.x) * -1
-                                                    val velocidadee =
-                                                        if ((nivelado / divisor) > w * 0.01f) (nivelado) / divisor else w * 0.1f
+                                                        val px = (w * 0.5).toFloat()
+                                                        val nivelado =
+                                                            if (px - it.x > 0) px - it.x else (px - it.x) * -1
+                                                        val velocidadee =
+                                                            if ((nivelado / divisor) > w * 0.01f) (nivelado) / divisor else w * 0.1f
 
 
-                                                    if (it.x < w / 2) {
-
-                                                        it.x += velocidadee
-                                                        if (it.x > w / 2) {
-                                                            it.x = (w / 2).toFloat()
-                                                            it.camada = -4
-                                                        }
-                                                    } else if (it.x > w / 2) {
-
-                                                        it.x -= velocidadee
                                                         if (it.x < w / 2) {
-                                                            it.x = (w / 2).toFloat()
-                                                            it.camada = -4
+
+                                                            it.x += velocidadee
+                                                            if (it.x > w / 2) {
+                                                                it.x = (w / 2).toFloat()
+                                                                it.camada = -4
+                                                            }
+                                                        } else if (it.x > w / 2) {
+
+                                                            it.x -= velocidadee
+                                                            if (it.x < w / 2) {
+                                                                it.x = (w / 2).toFloat()
+                                                                it.camada = -4
+                                                            }
                                                         }
                                                     }
+
                                                 }
-
                                             }
-                                        }
-                                        if (it.y > h * 0.05f) {
-                                            it.draw(canvas!!)
-                                        }
+                                            if (it.y > h * 0.05f) {
+                                                it.draw(canvas!!)
+                                            }
 
 
+                                        }
+                                    } catch (e: Exception) {
+                                        e.stackTrace
+                                        //  b2 = bk
                                     }
-                                } catch (e: Exception) {
-                                    e.stackTrace
-                                    //  b2 = bk
-                                }
-                                try {
+                                    try {
 
-                                    eliminarSelecao()
-                                } catch (eeee: Exception) {
-                                    eeee.stackTrace
-                                    //  b2 = bk
-                                }
+                                        eliminarSelecao()
+                                    } catch (eeee: Exception) {
+                                        eeee.stackTrace
+                                        //  b2 = bk
+                                    }
 
-                                paint.color = Color.Magenta.toArgb()
-                                paint.alpha = 150
+                                    paint.color = Color.Magenta.toArgb()
+                                    paint.alpha = 150
 
 
-                                canvas!!.drawRoundRect(
-                                    RectF(
-                                        (w * 0.72).toFloat(),
-                                        ((h * 0.02).toFloat() - (w * 0.025).toFloat()),
-                                        (w * 0.955).toFloat(),
-                                        ((h * 0.02)).toFloat() + ((((w * 0.05)).toInt()) * 1.22f)
-                                    ), 40f, 40f, paint
-                                )
-                                paint.color = Color.LightGray.toArgb()
-                                paint.alpha = 150
+                                    canvas!!.drawRoundRect(
+                                        RectF(
+                                            (w * 0.72).toFloat(),
+                                            ((h * 0.02).toFloat() - (w * 0.025).toFloat()),
+                                            (w * 0.955).toFloat(),
+                                            ((h * 0.02)).toFloat() + ((((w * 0.05)).toInt()) * 1.22f)
+                                        ), 40f, 40f, paint
+                                    )
+                                    paint.color = Color.LightGray.toArgb()
+                                    paint.alpha = 150
 
-                                canvas!!.drawRoundRect(
-                                    RectF(
-                                        (w * 0.72).toFloat(),
-                                        ((h * 0.02).toFloat() - (w * 0.02).toFloat()),
-                                        (w * 0.95).toFloat(),
-                                        ((h * 0.02).toFloat()) + ((((w * 0.05)).toInt()) * 1.15f)
-                                    ), 40f, 40f, paint
-                                )
+                                    canvas!!.drawRoundRect(
+                                        RectF(
+                                            (w * 0.72).toFloat(),
+                                            ((h * 0.02).toFloat() - (w * 0.02).toFloat()),
+                                            (w * 0.95).toFloat(),
+                                            ((h * 0.02).toFloat()) + ((((w * 0.05)).toInt()) * 1.15f)
+                                        ), 40f, 40f, paint
+                                    )
 
-                                paint.textSize = spToPx((this.w * 0.016f))
-                                paint.color = Color.White.toArgb()
-                                canvas!!.drawText(
-                                    pontos.toString(),
-                                    w * 0.81f,
-                                    h * 0.04f,
-                                    paint
-                                )
-                                val expandir = (false.toString().length) * 10
-                                paint.color = Color.Magenta.toArgb()
-                                paint.alpha = 150
-                                canvas!!.drawRoundRect(
-                                    RectF(
-                                        (w * 0.12).toFloat(),
-                                        ((h * 0.02).toFloat() - (w * 0.025).toFloat()),
-                                        (w * 0.35).toFloat() + expandir,
-                                        ((h * 0.02)).toFloat() + ((((w * 0.05)).toInt()) * 1.22f)
-                                    ), 40f, 40f, paint
-                                )
-                                paint.color = Color.LightGray.toArgb()
-                                paint.alpha = 150
-                                canvas!!.drawRoundRect(
-                                    RectF(
-                                        (w * 0.125).toFloat(),
-                                        ((h * 0.02).toFloat() - (w * 0.02).toFloat()),
-                                        (w * 0.345).toFloat() + expandir,
-                                        ((h * 0.02).toFloat()) + ((((w * 0.05)).toInt()) * 1.15f)
-                                    ), 40f, 40f, paint
-                                )
-                                paint.color = Color.White.toArgb()
-                                canvas!!.drawText(
-                                    "Nível $fase",
-                                    w * 0.15f,
-                                    h * 0.04f,
-                                    paint
-                                )
+                                    paint.textSize = spToPx((this.w * 0.016f))
+                                    paint.color = Color.White.toArgb()
+                                    canvas!!.drawText(
+                                        pontos.toString(),
+                                        w * 0.81f,
+                                        h * 0.04f,
+                                        paint
+                                    )
+                                    val expandir = (false.toString().length) * 10
+                                    paint.color = Color.Magenta.toArgb()
+                                    paint.alpha = 150
+                                    canvas!!.drawRoundRect(
+                                        RectF(
+                                            (w * 0.12).toFloat(),
+                                            ((h * 0.02).toFloat() - (w * 0.025).toFloat()),
+                                            (w * 0.35).toFloat() + expandir,
+                                            ((h * 0.02)).toFloat() + ((((w * 0.05)).toInt()) * 1.22f)
+                                        ), 40f, 40f, paint
+                                    )
+                                    paint.color = Color.LightGray.toArgb()
+                                    paint.alpha = 150
+                                    canvas!!.drawRoundRect(
+                                        RectF(
+                                            (w * 0.125).toFloat(),
+                                            ((h * 0.02).toFloat() - (w * 0.02).toFloat()),
+                                            (w * 0.345).toFloat() + expandir,
+                                            ((h * 0.02).toFloat()) + ((((w * 0.05)).toInt()) * 1.15f)
+                                        ), 40f, 40f, paint
+                                    )
+                                    paint.color = Color.White.toArgb()
+                                    canvas!!.drawText(
+                                        "Nível $fase",
+                                        w * 0.15f,
+                                        h * 0.04f,
+                                        paint
+                                    )
 
-                                paint.alpha = 255
-                                canvas!!.drawBitmap(coinP, w * 0.7f, 0f, paint)
+                                    paint.alpha = 255
+                                    canvas!!.drawBitmap(coinP, w * 0.7f, 0f, paint)
 
 
-                                //  }
+                                    //  }
 //                                launch(Dispatchers.Default) {
 //                                    Thread.sleep(30)
 //
 //
 //                                }
-                                // }
+                                    // }
 
 
-                                if (tiles.none { it.camada > 0 } && selectedTiles.none { it.camada != -5 }
-                                    && !venceu
-                                ) {
+                                    if (tiles.none { it.camada > 0 } && selectedTiles.none { it.camada != -5 }
+                                        && !venceu
+                                    ) {
 
 
-                                    venceu = true
-                                    val bd = BDTile(context)
+                                        venceu = true
+                                        val bd = BDTile(context)
 
-                                    pontuacaoNova = bd.buscar().pontos.toInt()
-                                    score = pontuacaoNova + pontos
+                                        pontuacaoNova = bd.buscar().pontos.toInt()
+                                        score = pontuacaoNova + pontos
 
-                                }
-                            } catch (exx: Exception) {
-                                exx.stackTrace
-                            }
-
-                            if (venceu) {
-                                if (pontuacaoNova < score && venceuP.liberado) {
-                                    pontuacaoNova++
+                                    }
+                                } catch (exx: Exception) {
+                                    exx.stackTrace
                                 }
 
-                                venceuP.fase = ultimaFase + 1
-                                venceuP.pontos = pontuacaoNova
-
-                                venceuP.draw(canvas!!)
-
-
-                                if (venceuP.btm.liberar > 3) {
-                                    //    finalizarFase()
-
-                                    if (fase % 5 == 0 && fase != 0) {
-                                        adsi()
-                                    } else {
-                                        finalizarFase()
+                                if (venceu) {
+                                    if (pontuacaoNova < score && venceuP.liberado) {
+                                        pontuacaoNova++
                                     }
 
-                                } else if (venceuP.btmCoin.liberar > 3) {
-                                    tipodePremio = 4
-                                    adsr()
+                                    venceuP.fase = ultimaFase + 1
+                                    venceuP.pontos = pontuacaoNova
+
+                                    venceuP.draw(canvas!!)
+
+
+                                    if (venceuP.btm.liberar > 3) {
+                                        //    finalizarFase()
+
+                                        if (fase % 5 == 0 && fase != 0 && !semanuncio) {
+                                            adsi()
+                                        } else {
+                                            finalizarFase()
+                                        }
+
+                                    } else if (venceuP.btmCoin.liberar > 3) {
+                                        tipodePremio = 4
+                                        adsr()
+
+                                    }
 
                                 }
-
-                            }
 
 
 /////////////////////////////////////////////////////////////////////////////
-                        } else {
-                            // validarSelecao(selectedTiles.filter { it.camada !=-5}.toMutableList())
+                            } else {
+                                // validarSelecao(selectedTiles.filter { it.camada !=-5}.toMutableList())
 
-                            try {
-
-
-                                val paint = Paint()
-                                paint.textSize = 150f
-                                canvas!!.drawBitmap(walld[0], 0f, 0f, paint)
-                                falhou = true
-
-                                if (corrigirfalha) {
-
-                                    perdeuL.pontos = score
-                                    perdeuL.fase = ultimaFase + 1
-                                    perdeuL.pontos = score
-
-                                    perdeuL.draw(canvas!!)
-                                    if (semInternet) {
-                                        semInternet = false
-                                        perdeuL.btm.liberar = 0
-                                        perdeuL.btmCoin.liberar = 0
-                                        perdeuL.semInternet = true
-                                    }
-
-                                    if (perdeuL.btm.liberar > 3) {
-                                        //    finalizarFase()
-                                        tipodePremio = 0
-                                        adsr()
-                                    } else if (perdeuL.btmCoin.liberar > 3 && score >= valorminimo) {
-                                        //    finalizarFase()
-                                        val bd = BDTile(context)
-                                        score -= valorminimo
-                                        bd.atualizar(Base(fase, score.toLong()))
-
-                                        perdeuL =
-                                            Venceu(this.context, (w), (h), 1)
-                                        limparComCredito = true
-                                        perdeuL.btmCoin.liberar = 0
-
-                                    }
-
-                                } else if (creditoRecorsus) {
-                                    if (objX.tipo == 2) {
-
-                                        criditar(credLuz, canvas!!)
+                                try {
 
 
-                                        if (credLuz.btmCoin.liberar > 3 && score >= valorminimo) {
-                                            posCredito(credLuz)
-                                            credLuz =
-                                                Venceu(this.context, (w), (h), 2)
-                                            luzP += 3
-                                            credLuz.btmCoin.liberar = 0
-                                            creditoRecorsus = false
+                                    val paint = Paint()
+                                    paint.textSize = 150f
+                                    canvas!!.drawBitmap(walld[0], 0f, 0f, paint)
+                                    falhou = true
 
-                                        } else if (credLuz.btm.liberar > 3) {
-                                            credLuz =
-                                                Venceu(this.context, (w), (h), 2)
-                                            credLuz.btm.liberar = 0
-                                            creditoRecorsus = false
-                                            tipodePremio = 1
+                                    if (corrigirfalha) {
+
+                                        perdeuL.pontos = score
+                                        perdeuL.fase = ultimaFase + 1
+                                        perdeuL.pontos = score
+
+                                        perdeuL.draw(canvas!!)
+                                        if (semInternet) {
+                                            semInternet = false
+                                            perdeuL.btm.liberar = 0
+                                            perdeuL.btmCoin.liberar = 0
+                                            perdeuL.semInternet = true
+                                        }
+
+                                        if (perdeuL.btm.liberar > 3) {
+                                            //    finalizarFase()
+                                            tipodePremio = 0
                                             adsr()
+                                        } else if (perdeuL.btmCoin.liberar > 3 && score >= valorminimo) {
+                                            //    finalizarFase()
+                                            val bd = BDTile(context)
+                                            score -= valorminimo
+                                            bd.atualizar(Base(fase, score.toLong()))
 
+                                            perdeuL =
+                                                Venceu(this.context, (w), (h), 1)
+                                            limparComCredito = true
+                                            perdeuL.btmCoin.liberar = 0
 
                                         }
 
-                                    } else if (objX.tipo == 3) {
+                                    } else if (creditoRecorsus) {
+                                        if (objX.tipo == 2) {
 
-                                        criditar(credIma, canvas!!)
+                                            criditar(credLuz, canvas!!)
 
 
-                                        if (credIma.btmCoin.liberar > 3 && score >= valorminimo) {
-                                            posCredito(credIma)
-                                            Venceu(this.context, (w), (h), 3).also { credIma = it }
-                                            imaP += 3
-                                            credIma.btmCoin.liberar = 0
-                                            creditoRecorsus = false
+                                            if (credLuz.btmCoin.liberar > 3 && score >= valorminimo) {
+                                                posCredito(credLuz)
+                                                credLuz =
+                                                    Venceu(this.context, (w), (h), 2)
+                                                luzP += 3
+                                                credLuz.btmCoin.liberar = 0
+                                                creditoRecorsus = false
 
-                                        } else if (credIma.btm.liberar > 3) {
-                                            credIma =
-                                                Venceu(this.context, (w), (h), 3)
-                                            credIma.btm.liberar = 0
-                                            creditoRecorsus = false
-                                            tipodePremio = 2
-                                            adsr()
+                                            } else if (credLuz.btm.liberar > 3) {
+                                                credLuz =
+                                                    Venceu(this.context, (w), (h), 2)
+                                                credLuz.btm.liberar = 0
+                                                creditoRecorsus = false
+                                                tipodePremio = 1
+                                                adsr()
+
+
+                                            }
+
+                                        } else if (objX.tipo == 3) {
+
+                                            criditar(credIma, canvas!!)
+
+
+                                            if (credIma.btmCoin.liberar > 3 && score >= valorminimo) {
+                                                posCredito(credIma)
+                                                Venceu(this.context, (w), (h), 3).also {
+                                                    credIma = it
+                                                }
+                                                imaP += 3
+                                                credIma.btmCoin.liberar = 0
+                                                creditoRecorsus = false
+
+                                            } else if (credIma.btm.liberar > 3) {
+                                                credIma =
+                                                    Venceu(this.context, (w), (h), 3)
+                                                credIma.btm.liberar = 0
+                                                creditoRecorsus = false
+                                                tipodePremio = 2
+                                                adsr()
+
+                                            }
+                                        } else if (objX.tipo == 4) {
+
+                                            criditar(credSufle, canvas!!)
+
+
+                                            if (credSufle.btmCoin.liberar > 3 && score >= valorminimo) {
+                                                posCredito(objX)
+                                                credSufle =
+                                                    Venceu(this.context, (w), (h), 4)
+                                                sufleP += 3
+                                                credSufle.btmCoin.liberar = 0
+                                                creditoRecorsus = false
+
+                                            } else if (credSufle.btm.liberar > 3) {
+                                                credSufle =
+                                                    Venceu(this.context, (w), (h), 4)
+                                                credSufle.btm.liberar = 0
+                                                creditoRecorsus = false
+                                                tipodePremio = 3
+                                                adsr()
+
+                                            }
 
                                         }
-                                    } else if (objX.tipo == 4) {
 
-                                        criditar(credSufle, canvas!!)
-
-
-                                        if (credSufle.btmCoin.liberar > 3 && score >= valorminimo) {
-                                            posCredito(objX)
-                                            credSufle =
-                                                Venceu(this.context, (w), (h), 4)
-                                            sufleP += 3
-                                            credSufle.btmCoin.liberar = 0
-                                            creditoRecorsus = false
-
-                                        } else if (credSufle.btm.liberar > 3) {
-                                            credSufle =
-                                                Venceu(this.context, (w), (h), 4)
-                                            credSufle.btm.liberar = 0
-                                            creditoRecorsus = false
-                                            tipodePremio = 3
-                                            adsr()
-
-                                        }
 
                                     }
 
 
+
+                                    paint.color = Color.Red.toArgb()
+
+
+                                } catch (exx: Exception) {
+                                    exx.stackTrace
                                 }
-
-
-
-                                paint.color = Color.Red.toArgb()
-
-
-                            } catch (exx: Exception) {
-                                exx.stackTrace
                             }
+                        }else{
+                            lojaWAO.draw(canvas)
                         }
 
                         try {
@@ -1118,10 +1151,6 @@ class GameLoop(
 
     }
 
-
-    private fun loja() {
-        gameView.comprar()
-    }
 
 
     private fun adsr() {
@@ -2101,229 +2130,236 @@ class GameLoop(
     fun onTouchEvent(event: MotionEvent) {
         try {
 
-            if (toque > 3) {
-                return
-            }
-            isTouched = true
-            toque++
-
-            if (event.action == MotionEvent.ACTION_DOWN && !limparComCredito) {
+            if (!lojaWAO.abrirLoja) {
 
 
-                tiles.filter { !selectedTiles.contains(it) }.find {
-                    it.containsTouch(
-                        event.x,
-                        event.y
-                    ) && it.camada == 2 && selectedTiles.filter { it.camada > -3 }.size < 7
-                }?.let { tile ->
+                if (toque > 3) {
+                    return
+                }
+                isTouched = true
+                toque++
 
-                    // carregarCamadas()
+                if (event.action == MotionEvent.ACTION_DOWN && !limparComCredito) {
 
-                    val m = MahjongTile(
-                        tile.image,
-                        this.context,
-                        tile.x,
-                        tile.y,
-                        (this.w * 0.9 / 8).toInt(),
-                        (this.w * 0.9 / 8).toInt(),
-                        -2,
-                        tile.id
 
-                    )
-                    m.y = tile.y
-                    m.ty = false
-                    m.naLista = true
-                    tile.ty = false
-                    tile.camada = -2
-                    tile.w = (this.w * 0.9 / 8).toInt()
-                    tile.h = (this.w * 0.9 / 8).toInt()
+                    tiles.filter { !selectedTiles.contains(it) }.find {
+                        it.containsTouch(
+                            event.x,
+                            event.y
+                        ) && it.camada == 2 && selectedTiles.filter { it.camada > -3 }.size < 7
+                    }?.let { tile ->
+
+                        // carregarCamadas()
+
+                        val m = MahjongTile(
+                            tile.image,
+                            this.context,
+                            tile.x,
+                            tile.y,
+                            (this.w * 0.9 / 8).toInt(),
+                            (this.w * 0.9 / 8).toInt(),
+                            -2,
+                            tile.id
+
+                        )
+                        m.y = tile.y
+                        m.ty = false
+                        m.naLista = true
+                        tile.ty = false
+                        tile.camada = -2
+                        tile.w = (this.w * 0.9 / 8).toInt()
+                        tile.h = (this.w * 0.9 / 8).toInt()
 //                    val selectedTilesNovo = mutableListOf<MahjongTile>()
 //                    selectedTilesNovo.addAll(selectedTiles)
-                    tile.ref = tiles.indexOf(tile)
+                        tile.ref = tiles.indexOf(tile)
 
 
-                    val novosItens = mutableListOf<MahjongTile>()
+                        val novosItens = mutableListOf<MahjongTile>()
 
-                    for (item in selectedTiles) {
-                        novosItens.add(item)
+                        for (item in selectedTiles) {
+                            novosItens.add(item)
 
-                    }
-                    novosItens.add(m)
-                    selectedTiles.clear()
-                    selectedTiles.addAll(novosItens)
+                        }
+                        novosItens.add(m)
+                        selectedTiles.clear()
+                        selectedTiles.addAll(novosItens)
 
 
 //
 //                    selectedTiles.clear()
 //                    selectedTiles.addAll(selectedTilesNovo)
 
-                    tile.camada = -1
-                    tile.x -= 5000f
-                    onTocarEfeito(0)
-                    selectedTiles.sortBy { it.id }
-
-
-                }
-
-                if (bloquerBT && bloquerBT2 && !corrigirfalha && !venceu) {
-                    if (botao1.containsTouch(
-                            event.x,
-                            event.y
-                        ) && time1 == 0 && time3 == 0 && time2 == 0
-                    ) {
-
-                        if (luzP > 0 && !botao1.isSelected) {
-                            time1 = 10
-                            botao1.isSelected = true
-                            dica = true
-                            iaJogando()
-                            luzP--
-                        } else {
-                            objX = credLuz
-                            creditoRecorsus = true
-                        }
-
-                    } else if (botao2.containsTouch(
-                            event.x,
-                            event.y
-                        )
-                        && time1 == 0 && time3 == 0 && time2 == 0
-                    ) {
-                        if (imaP > 0 && !botao2.isSelected) {
-                            time2 = 10
-                            botao2.isSelected = true
-                            limparSelecionados()
-                            imaP--
-                        } else if (selectedTiles.isNotEmpty()) {
-                            objX = credIma
-                            creditoRecorsus = true
-                        }
-
-
-                    } else if (botao3.containsTouch(
-                            event.x,
-                            event.y
-                        )
-                        && time1 == 0 && time3 == 0 && time2 == 0
-                    ) {
-
-                        if (sufleP > 0 && !botao3.isSelected) {
-                            time3 = 10
-                            botao3.isSelected = true
-                            embaralhando = true
-                            embaralha()
-                            sufleP--
-                        } else {
-                            objX = credSufle
-                            creditoRecorsus = true
-                        }
+                        tile.camada = -1
+                        tile.x -= 5000f
+                        onTocarEfeito(0)
+                        selectedTiles.sortBy { it.id }
 
 
                     }
 
-                    bloquerBT2 = false
-                    atualizarRecurso()
+                    if (bloquerBT && bloquerBT2 && !corrigirfalha && !venceu) {
+                        if (botao1.containsTouch(
+                                event.x,
+                                event.y
+                            ) && time1 == 0 && time3 == 0 && time2 == 0
+                        ) {
 
-                }
+                            if (luzP > 0 && !botao1.isSelected) {
+                                time1 = 10
+                                botao1.isSelected = true
+                                dica = true
+                                iaJogando()
+                                luzP--
+                            } else {
+                                objX = credLuz
+                                creditoRecorsus = true
+                            }
 
-                if (timePress == 0) {
-                    if (venceuP.btm.containsTouch(
-                            event.x,
-                            event.y
-                        )
-                        && venceu && venceuP.btm.t == 1f
-                    ) {
-                        venceuP.btm.animar = true
-                    } else if (venceuP.btmCoin.containsTouch(
-                            event.x,
-                            event.y
-                        )
-                        && venceu && venceuP.btmCoin.t == 1f
-                    ) {
-                        venceuP.btmCoin.animar = true
-                    } else if (perdeuL.btm.containsTouch(
-                            event.x,
-                            event.y
-                        )
-                        && falhou && perdeuL.btm.t == 1f
-                    ) {
-                        perdeuL.btm.animar = true
-                    } else if (perdeuL.btmCoin.containsTouch(
-                            event.x,
-                            event.y
-                        )
-                        && falhou && perdeuL.btmCoin.t == 1f
-                    ) {
-                        perdeuL.btmCoin.animar = true
-                    } else if (credLuz.btm.containsTouch(
-                            event.x,
-                            event.y
-                        )
-                        && creditoRecorsus && credLuz.btm.t == 1f
-                    ) {
-                        credLuz.btm.animar = true
-                    } else if (credLuz.btmCoin.containsTouch(
-                            event.x,
-                            event.y
-                        )
-                        && creditoRecorsus
-                    ) {
-                        credLuz.btmCoin.animar = true
-                    } else if (credIma.btm.containsTouch(
-                            event.x,
-                            event.y
-                        )
-                        && creditoRecorsus && credIma.btm.t == 1f
-                    ) {
-                        credIma.btm.animar = true
-                    } else if (credIma.btmCoin.containsTouch(
-                            event.x,
-                            event.y
-                        )
-                        && creditoRecorsus && credIma.btmCoin.t == 1f
-                    ) {
-                        credIma.btmCoin.animar = true
-                    } else if (credSufle.btm.containsTouch(
-                            event.x,
-                            event.y
-                        )
-                        && creditoRecorsus && credSufle.btm.t == 1f
-                    ) {
-                        credSufle.btm.animar = true
-                    } else if (credSufle.btmCoin.containsTouch(
-                            event.x,
-                            event.y
-                        )
-                        && creditoRecorsus && credSufle.btmCoin.t == 1f
-                    ) {
-                        credSufle.btmCoin.animar = true
-                    }
+                        } else if (botao2.containsTouch(
+                                event.x,
+                                event.y
+                            )
+                            && time1 == 0 && time3 == 0 && time2 == 0
+                        ) {
+                            if (imaP > 0 && !botao2.isSelected) {
+                                time2 = 10
+                                botao2.isSelected = true
+                                limparSelecionados()
+                                imaP--
+                            } else if (selectedTiles.isNotEmpty()) {
+                                objX = credIma
+                                creditoRecorsus = true
+                            }
 
 
+                        } else if (botao3.containsTouch(
+                                event.x,
+                                event.y
+                            )
+                            && time1 == 0 && time3 == 0 && time2 == 0
+                        ) {
+
+                            if (sufleP > 0 && !botao3.isSelected) {
+                                time3 = 10
+                                botao3.isSelected = true
+                                embaralhando = true
+                                embaralha()
+                                sufleP--
+                            } else {
+                                objX = credSufle
+                                creditoRecorsus = true
+                            }
 
 
-                    if (btm.containsTouch(
-                            event.x,
-                            event.y
-                        )
-                    ) {
+                        }
 
-                        btm.animar = true
-
-                    }else   if (compraBT.containsTouch(
-                            event.x,
-                            event.y
-                        )
-                    ) {
-
-                        compraBT.animar = true
+                        bloquerBT2 = false
+                        atualizarRecurso()
 
                     }
 
-                    timePress = 10
+                    if (timePress == 0) {
+                        if (venceuP.btm.containsTouch(
+                                event.x,
+                                event.y
+                            )
+                            && venceu && venceuP.btm.t == 1f
+                        ) {
+                            venceuP.btm.animar = true
+                        } else if (venceuP.btmCoin.containsTouch(
+                                event.x,
+                                event.y
+                            )
+                            && venceu && venceuP.btmCoin.t == 1f
+                        ) {
+                            venceuP.btmCoin.animar = true
+                        } else if (perdeuL.btm.containsTouch(
+                                event.x,
+                                event.y
+                            )
+                            && falhou && perdeuL.btm.t == 1f
+                        ) {
+                            perdeuL.btm.animar = true
+                        } else if (perdeuL.btmCoin.containsTouch(
+                                event.x,
+                                event.y
+                            )
+                            && falhou && perdeuL.btmCoin.t == 1f
+                        ) {
+                            perdeuL.btmCoin.animar = true
+                        } else if (credLuz.btm.containsTouch(
+                                event.x,
+                                event.y
+                            )
+                            && creditoRecorsus && credLuz.btm.t == 1f
+                        ) {
+                            credLuz.btm.animar = true
+                        } else if (credLuz.btmCoin.containsTouch(
+                                event.x,
+                                event.y
+                            )
+                            && creditoRecorsus
+                        ) {
+                            credLuz.btmCoin.animar = true
+                        } else if (credIma.btm.containsTouch(
+                                event.x,
+                                event.y
+                            )
+                            && creditoRecorsus && credIma.btm.t == 1f
+                        ) {
+                            credIma.btm.animar = true
+                        } else if (credIma.btmCoin.containsTouch(
+                                event.x,
+                                event.y
+                            )
+                            && creditoRecorsus && credIma.btmCoin.t == 1f
+                        ) {
+                            credIma.btmCoin.animar = true
+                        } else if (credSufle.btm.containsTouch(
+                                event.x,
+                                event.y
+                            )
+                            && creditoRecorsus && credSufle.btm.t == 1f
+                        ) {
+                            credSufle.btm.animar = true
+                        } else if (credSufle.btmCoin.containsTouch(
+                                event.x,
+                                event.y
+                            )
+                            && creditoRecorsus && credSufle.btmCoin.t == 1f
+                        ) {
+                            credSufle.btmCoin.animar = true
+                        }
+
+
+
+
+                        if (btm.containsTouch(
+                                event.x,
+                                event.y
+                            )
+                        ) {
+
+                            btm.animar = true
+
+                        } else if (compraBT.containsTouch(
+                                event.x,
+                                event.y
+                            )
+                        ) {
+
+                            lojaWAO.abrirLoja = true
+
+
+                        }
+
+                        timePress = 10
+                    }
+
+
                 }
-
-
+            }else{
+                lojaWAO.onTouchEvent(event)
             }
 
         } catch (e: Exception) {

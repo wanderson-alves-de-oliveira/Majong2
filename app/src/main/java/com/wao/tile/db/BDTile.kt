@@ -28,6 +28,15 @@ class BDTile(context: Context?) {
         db.update("tile", valores, null, null)
     }
 
+    fun atualizarRecursos(moedas: Int, luz: Int, ima: Int, sufle: Int) {
+        val valores = ContentValues()
+         valores.put("pontos", moedas.toString())
+        valores.put("luz", luz.toString())
+        valores.put("ima", ima.toString())
+        valores.put("sufle", sufle.toString())
+
+        db.update("tile", valores, null, null)
+    }
 
     fun buscar(): Base {
         val cursor = db.rawQuery(

@@ -1,3 +1,3 @@
 package com.wao.tile.db
 
-data class Base(val nivel:Int,val pontos:Long,val  luz:Int=0,val ima:Int=0,val sufle:Int=0)
+data class Base(val nivel:Int,var pontos:Long,var  luz:Int=0,var ima:Int=0,var sufle:Int=0)

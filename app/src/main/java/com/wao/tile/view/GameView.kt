@@ -24,6 +24,7 @@ import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.gms.ads.rewarded.RewardItem
 import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
+import com.wao.tile.db.BDTile
 import com.wao.tile.ferramentas.BillingManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -222,15 +223,10 @@ class GameView(context: Context, val billingManager: BillingManager) : SurfaceVi
 
     }
 
-   fun comprar(){
-
-
+   fun comprar( id: String){
                (context as Activity).let {
-                   billingManager.launchPurchaseFlow(it, "coins_1000")
+                   billingManager.launchPurchaseFlow(it, id)
                }
-
-
-
    }
 
 
@@ -244,18 +240,19 @@ class GameView(context: Context, val billingManager: BillingManager) : SurfaceVi
     }
 
     fun removerAnuncios() {
-
+        gameLoop.semanuncio = true
     }
     fun adicionarMoedas(qtd: Int) {
         coinCount += qtd
         salvarMoedas()
     }
     private fun salvarMoedas() {
-        val prefs = context.getSharedPreferences("jogo", Context.MODE_PRIVATE)
-        prefs.edit().putInt("moedas", coinCount).apply()
+        val bd = BDTile(context)
+        val base = BDTile(context).buscar()
+        base.pontos = coinCount.toLong()
+        bd.atualizar(base)
     }
     private fun carregarMoedas(): Int {
-        val prefs = context.getSharedPreferences("jogo", Context.MODE_PRIVATE)
-        return prefs.getInt("moedas", 0)
+         return  BDTile(context).buscar().pontos.toInt()
     }
 }

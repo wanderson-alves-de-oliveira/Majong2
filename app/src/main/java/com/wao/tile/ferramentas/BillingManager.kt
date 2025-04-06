@@ -1,6 +1,7 @@
 package com.wao.tile.ferramentas
 
 
+
 import android.content.Context
 import com.android.billingclient.api.*
 
@@ -20,17 +21,11 @@ class BillingManager(
     init {
         billingClient.startConnection(object : BillingClientStateListener {
             override fun onBillingSetupFinished(billingResult: BillingResult) {
-                // Opcional: verificar compras pendentes ou não reconhecidas
                 billingClient.queryPurchasesAsync(
                     QueryPurchasesParams.newBuilder().setProductType(BillingClient.ProductType.INAPP).build()
-                ) { _, purchases ->
-                    purchases?.forEach { handlePurchase(it) }
-                }
+                ) { _, purchases -> purchases?.forEach { handlePurchase(it) } }
             }
-
-            override fun onBillingServiceDisconnected() {
-                // Tentar reconectar se necessário
-            }
+            override fun onBillingServiceDisconnected() {}
         })
     }
 
@@ -66,49 +61,50 @@ class BillingManager(
     private fun handlePurchase(purchase: Purchase) {
         if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED) {
             when (purchase.products[0]) {
-
-                // 🔁 Produto consumível: pode comprar várias vezes
-                "coins_1000" -> {
-                    val consumeParams = ConsumeParams.newBuilder()
-                        .setPurchaseToken(purchase.purchaseToken)
-                        .build()
-
-                    billingClient.consumeAsync(consumeParams) { billingResult, _ ->
-                        if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
-                            onCoinsPurchased(1000)
-                        }
-                    }
-                }
-
-                // ✅ Produto não consumível: só compra uma vez
-                "remove_ads" -> {
-                    if (!purchase.isAcknowledged) {
-                        val acknowledgeParams = AcknowledgePurchaseParams.newBuilder()
-                            .setPurchaseToken(purchase.purchaseToken)
-                            .build()
-
-                        billingClient.acknowledgePurchase(acknowledgeParams) { billingResult ->
-                            if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
-                                salvarCompra("remove_ads")
-                                onRemoveAdsPurchased()
-                            }
-                        }
-                    } else {
-                        // Caso já esteja reconhecido
-                        onRemoveAdsPurchased()
-                    }
-                }
+                "coins_1000" -> consumirCompra(purchase, 1000)
+                "coins_5000" -> consumirCompra(purchase, 5000)
+                "coins_10000" -> consumirCompra(purchase, 10000)
+                "remove_ads" -> reconhecerCompraUnica(purchase)
             }
         }
     }
 
+    private fun consumirCompra(purchase: Purchase, quantidade: Int) {
+        val consumeParams = ConsumeParams.newBuilder()
+            .setPurchaseToken(purchase.purchaseToken)
+            .build()
+
+        billingClient.consumeAsync(consumeParams) { billingResult, _ ->
+            if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
+                onCoinsPurchased(quantidade)
+            }
+        }
+    }
+
+    private fun reconhecerCompraUnica(purchase: Purchase) {
+        if (!purchase.isAcknowledged) {
+            val acknowledgeParams = AcknowledgePurchaseParams.newBuilder()
+                .setPurchaseToken(purchase.purchaseToken)
+                .build()
+            billingClient.acknowledgePurchase(acknowledgeParams) { billingResult ->
+                if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
+                    salvarCompra("remove_ads")
+                    onRemoveAdsPurchased()
+                }
+            }
+        } else {
+            onRemoveAdsPurchased()
+        }
+    }
+
     private fun salvarCompra(produto: String) {
-        val prefs = context.getSharedPreferences("jogo", Context.MODE_PRIVATE)
-        prefs.edit().putBoolean(produto, true).apply()
+        context.getSharedPreferences("jogo", Context.MODE_PRIVATE)
+            .edit().putBoolean(produto, true).apply()
     }
 
     fun foiComprado(produto: String): Boolean {
-        val prefs = context.getSharedPreferences("jogo", Context.MODE_PRIVATE)
-        return prefs.getBoolean(produto, false)
+        return context.getSharedPreferences("jogo", Context.MODE_PRIVATE)
+            .getBoolean(produto, false)
     }
 }
+

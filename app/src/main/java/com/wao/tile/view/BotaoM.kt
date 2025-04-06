@@ -75,14 +75,19 @@ var xFix = x
 
             if(inicio){
 
-                if(yp>y){
-                    val dif = (yp-y)/2
-                    yp-=dif
-                    if(dif<=0.5f){
-                        yp = y
-                    }
+                if(camada<4) {
+                    if (yp > y) {
+                        val dif = (yp - y) / 2
+                        yp -= dif
+                        if (dif <= 0.5f) {
+                            yp = y
+                        }
 
+                    } else {
+                        inicio = false
+                    }
                 }else{
+                    yp = y
                     inicio = false
                 }
 
@@ -112,6 +117,12 @@ var xFix = x
         }else  if(camada==3) {
             paint.color = Color(0xFF8BC34A).toArgb()
 
+        }else  if(camada==4) {
+            paint.color = Color(0xFF8BC34A).toArgb()
+
+        }else  if(camada>=5) {
+            paint.color = Color(0xFFF44336).toArgb()
+
         }
          canvas2.drawRoundRect(RectF(b.width.toFloat()*0.05f, b.height.toFloat()*0.05f, b.width.toFloat()*0.95f, b.height.toFloat()*0.95f), 70f, 70f, paint)
 
@@ -125,6 +136,12 @@ var xFix = x
 
         }else  if(camada==3) {
             paint.color = Color(0xFF4CAF50).toArgb()
+
+        }else  if(camada==4) {
+            paint.color = Color(0xFF4CAF50).toArgb()
+
+        }else  if(camada>=5) {
+            paint.color = Color(0xFFE91E63).toArgb()
 
         }
         canvas2.drawRoundRect(RectF(b.width.toFloat()*0.05f, b.height.toFloat()*0.1f, b.width.toFloat()*0.95f, b.height.toFloat()*0.95f), 70f, 70f, paint)
@@ -149,7 +166,7 @@ var xFix = x
             canvas2.drawBitmap(coinP, (w * 0.35).toFloat(),  (h * 0.55).toFloat(), paint)
 
             canvas2.drawText(
-                "500",
+                "300",
                 (w * 0.45).toFloat(),
                 (h * 0.65).toFloat(),
                 paint
@@ -173,6 +190,36 @@ var xFix = x
             canvas2.drawBitmap(videP, (w * 0.35).toFloat(),  (h * 0.55).toFloat(), paint)
             canvas2.drawBitmap(coinP, (w * 0.82).toFloat(),  (h * 0.25).toFloat(), paint)
 
+        }else   if(camada==4) {
+            paint.textSize =  spToPx(w*0.06f)
+
+            canvas2.drawText(
+                stt,
+                (w * 0.1).toFloat(),
+                (h * 0.6).toFloat(),
+                paint
+            )
+
+        }else   if(camada==5) {
+
+            canvas2.drawBitmap(coinP, (w * 0.35).toFloat(),  (h * 0.55).toFloat(), paint)
+
+            canvas2.drawText(
+                "100",
+                (w * 0.45).toFloat(),
+                (h * 0.65).toFloat(),
+                paint
+            )
+        }else   if(camada==6) {
+
+            paint.textSize =  spToPx(w*0.12f)
+
+            canvas2.drawText(
+                "X",
+                (w * 0.4).toFloat(),
+                (h * 0.65).toFloat(),
+                paint
+            )
         }
 
 
