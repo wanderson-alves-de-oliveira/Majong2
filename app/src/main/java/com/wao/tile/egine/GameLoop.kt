@@ -267,6 +267,18 @@ class GameLoop(
                     if (canvas != null) {
 
                         try {
+                            if(lojaWAO.atualizar) {
+                                val bd = BDTile(context)
+                                val base = bd.buscar()
+                                luzP = base.luz
+                                imaP = base.ima
+                                sufleP = base.sufle
+                                score = bd.buscar().pontos.toInt()
+                                lojaWAO.atualizar=false
+
+                            }
+
+
                             if(!lojaWAO.abrirLoja) {
                                 main.draw(this.canvas!!)
 
@@ -317,6 +329,7 @@ class GameLoop(
                             }else{
                                 lojaWAO.semanuncio=semanuncio
                                 lojaWAO.draw(canvas!!)
+
                             }
                 ///////////////////////////////////////////
 
@@ -350,6 +363,17 @@ class GameLoop(
 
                         bloquerBT =
                             selectedTiles.none { it.camada < -2 && it.camada >= -4 }
+
+                        if(lojaWAO.atualizar) {
+                            val bd = BDTile(context)
+                            val base = bd.buscar()
+                            luzP = base.luz
+                            imaP = base.ima
+                            sufleP = base.sufle
+                            score = bd.buscar().pontos.toInt()
+                            lojaWAO.atualizar=false
+                        }
+
                         if(!lojaWAO.abrirLoja) {
                             if (!corrigirfalha && !creditoRecorsus || limparComCredito && !creditoRecorsus) {
 
@@ -1552,10 +1576,11 @@ class GameLoop(
         luzP = base.luz
         imaP = base.ima
         sufleP = base.sufle
+        score = bd.buscar().pontos.toInt()
 
         fase = ultimaFase
 
-        score = bd.buscar().pontos.toInt()
+
 
 
         when (fase) {

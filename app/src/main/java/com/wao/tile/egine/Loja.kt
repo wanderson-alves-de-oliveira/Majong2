@@ -26,6 +26,7 @@ class Loja(val context: Context, val gameView: GameView, val w: Int, val h: Int)
 
 
     var abrirLoja = false
+    var atualizar = false
 
     var wal = Bitmap.createScaledBitmap(
         BitmapFactory.decodeResource(
@@ -302,17 +303,21 @@ class Loja(val context: Context, val gameView: GameView, val w: Int, val h: Int)
             bd.atualizar(base)
         } else if (fecharLoja.liberar > 3) {
             fecharLoja.liberar = 0
+            atualizar = true
             abrirLoja = false
         }else if (semAds.btm.liberar > 3) {
             semAds.btm.liberar = 0
 
             gameView.comprar("remove_ads")
+            atualizar = true
+
             abrirLoja = false
 
 
         }else if (coien1000.btm.liberar > 3) {
             coien1000.btm.liberar = 0
 
+            atualizar = true
 
             abrirLoja = false
             Log.d("GameView", "Adicionando 1000 moedas")
@@ -320,12 +325,16 @@ class Loja(val context: Context, val gameView: GameView, val w: Int, val h: Int)
             gameView.comprar("coins_1000")
         }else if (coien5000.btm.liberar > 3) {
             coien5000.btm.liberar = 0
+            atualizar = true
+
             abrirLoja = false
 
             gameView.comprar("coins_5000")
 
         }else if (coien10000.btm.liberar > 3) {
             coien10000.btm.liberar = 0
+            atualizar = true
+
             abrirLoja = false
 
             gameView.comprar("coins_10000")
