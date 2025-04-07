@@ -24,7 +24,7 @@ class BillingManager(
             override fun onBillingSetupFinished(billingResult: BillingResult) {
                 billingClient.queryPurchasesAsync(
                     QueryPurchasesParams.newBuilder().setProductType(BillingClient.ProductType.INAPP).build()
-                ) { _, purchases -> purchases?.forEach { handlePurchase(it) } }
+                ) { _, purchases -> purchases.forEach { handlePurchase(it) } }
             }
             override fun onBillingServiceDisconnected() {}
         })

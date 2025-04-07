@@ -5,8 +5,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.IntentFilter
 import android.graphics.Bitmap
-import android.graphics.Paint
-import android.graphics.Rect
+
 import android.net.ConnectivityManager.CONNECTIVITY_ACTION
 import android.os.Handler
 import android.os.Looper
@@ -32,6 +31,7 @@ import com.wao.tile.ferramentas.BillingManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 
+@SuppressLint("ViewConstructor")
 @Suppress("DEPRECATION")
 class GameView(context: Context, val billingManager: BillingManager) : SurfaceView(context), SurfaceHolder.Callback {
     lateinit var gameLoop: GameLoop
@@ -48,7 +48,6 @@ class GameView(context: Context, val billingManager: BillingManager) : SurfaceVi
 
     var compraBTx = 0f
     var compraBTy = 0f
-    private val prefs = context.getSharedPreferences("jogo", Context.MODE_PRIVATE)
 
 
     init {
@@ -260,13 +259,11 @@ class GameView(context: Context, val billingManager: BillingManager) : SurfaceVi
         Log.d("GameView", "adicionarMoedas $qtd moedas")
 
         val bd = BDTile(context)
-        var base = BDTile(context).buscar()
+        val base = BDTile(context).buscar()
         base.pontos +=qtd
         bd.atualizar(base)
        // prefs.edit().putInt("moedas", base.pontos.toInt() ).apply()
     }
 
-    private fun carregarMoedas(): Int {
-         return  BDTile(context).buscar().pontos.toInt()
-    }
+
 }
