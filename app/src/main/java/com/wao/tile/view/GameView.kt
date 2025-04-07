@@ -45,14 +45,11 @@ class GameView(context: Context, val billingManager: BillingManager) : SurfaceVi
     private var carregado = false
     private var interstitialAd: InterstitialAd? = null
     private var walld: MutableList<Bitmap> = mutableListOf()
-    private val paint = Paint()
-    private val buttonRect = Rect(100, 100, 500, 250)
-    private var coinCount = carregarMoedas()
+
     var compraBTx = 0f
     var compraBTy = 0f
     private val prefs = context.getSharedPreferences("jogo", Context.MODE_PRIVATE)
 
-    private var moedas = prefs.getInt("moedas", 0)
 
     init {
         // Inicializa o AdMob
