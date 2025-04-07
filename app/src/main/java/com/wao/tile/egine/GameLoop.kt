@@ -100,7 +100,7 @@ class GameLoop(
     )
 
 
-    private var compraBT = MahjongTile(
+    var compraBT = MahjongTile(
         carrinho,
         this.context,
         (w * 0.45f ),
@@ -1112,6 +1112,7 @@ class GameLoop(
                                 }
                             }
                         }else{
+                            lojaWAO.semanuncio=semanuncio
                             lojaWAO.draw(canvas)
                         }
 
@@ -2254,7 +2255,6 @@ class GameLoop(
                         }
 
                         bloquerBT2 = false
-                        atualizarRecurso()
 
                     }
 
@@ -2348,6 +2348,7 @@ class GameLoop(
                             )
                         ) {
 
+                            lojaWAO.moedas=-2
                             lojaWAO.abrirLoja = true
 
 
@@ -2367,14 +2368,7 @@ class GameLoop(
         }
     }
 
-    private fun atualizarRecurso() {
 
-        val bd = BDTile(context)
-        val base = Base(fase, score.toLong(), luzP, imaP, sufleP)
-        bd.atualizar(base)
-
-
-    }
 
 
     private fun carregarCamadas() {

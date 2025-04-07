@@ -10,9 +10,12 @@ import android.graphics.Rect
 import android.net.ConnectivityManager.CONNECTIVITY_ACTION
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
+
 import android.view.MotionEvent
 import android.view.SurfaceHolder
 import android.view.SurfaceView
+
 import com.wao.tile.egine.GameLoop
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.AdRequest
@@ -45,6 +48,12 @@ class GameView(context: Context, val billingManager: BillingManager) : SurfaceVi
     private val paint = Paint()
     private val buttonRect = Rect(100, 100, 500, 250)
     private var coinCount = carregarMoedas()
+    var compraBTx = 0f
+    var compraBTy = 0f
+    private val prefs = context.getSharedPreferences("jogo", Context.MODE_PRIVATE)
+
+    private var moedas = prefs.getInt("moedas", 0)
+
     init {
         // Inicializa o AdMob
         MobileAds.initialize(context) {
@@ -196,6 +205,8 @@ class GameView(context: Context, val billingManager: BillingManager) : SurfaceVi
             selectedTiles = gameLoop.selectedTiles
             selectedTiles.removeAll(gameLoop.removerDaLista)
             gameLoop.removerDaLista.clear()
+             compraBTx = gameLoop.compraBT.x
+             compraBTy = gameLoop.compraBT.y
 
         } catch (_: Exception) {
         }
@@ -208,6 +219,10 @@ class GameView(context: Context, val billingManager: BillingManager) : SurfaceVi
             gameLoop.index = this.index
             gameLoop.tutor = this.tutor
             gameLoop.walld = this.walld
+
+             gameLoop.compraBT.x = compraBTx
+             gameLoop.compraBT.y = compraBTy
+
         }
         gameLoop.startLoop()
     }
@@ -225,6 +240,8 @@ class GameView(context: Context, val billingManager: BillingManager) : SurfaceVi
 
    fun comprar( id: String){
                (context as Activity).let {
+                   Log.d("GameView", "comprar 1000 moedas")
+
                    billingManager.launchPurchaseFlow(it, id)
                }
    }
@@ -243,15 +260,15 @@ class GameView(context: Context, val billingManager: BillingManager) : SurfaceVi
         gameLoop.semanuncio = true
     }
     fun adicionarMoedas(qtd: Int) {
-        coinCount += qtd
-        salvarMoedas()
-    }
-    private fun salvarMoedas() {
+        Log.d("GameView", "adicionarMoedas $qtd moedas")
+
         val bd = BDTile(context)
-        val base = BDTile(context).buscar()
-        base.pontos = coinCount.toLong()
+        var base = BDTile(context).buscar()
+        base.pontos +=qtd
         bd.atualizar(base)
+       // prefs.edit().putInt("moedas", base.pontos.toInt() ).apply()
     }
+
     private fun carregarMoedas(): Int {
          return  BDTile(context).buscar().pontos.toInt()
     }

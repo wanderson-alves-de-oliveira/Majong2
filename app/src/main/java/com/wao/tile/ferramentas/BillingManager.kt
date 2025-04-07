@@ -3,6 +3,7 @@ package com.wao.tile.ferramentas
 
 
 import android.content.Context
+
 import com.android.billingclient.api.*
 
 class BillingManager(
@@ -60,12 +61,15 @@ class BillingManager(
 
     private fun handlePurchase(purchase: Purchase) {
         if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED) {
+
             when (purchase.products[0]) {
                 "coins_1000" -> consumirCompra(purchase, 1000)
                 "coins_5000" -> consumirCompra(purchase, 5000)
                 "coins_10000" -> consumirCompra(purchase, 10000)
                 "remove_ads" -> reconhecerCompraUnica(purchase)
             }
+
+
         }
     }
 
@@ -76,6 +80,7 @@ class BillingManager(
 
         billingClient.consumeAsync(consumeParams) { billingResult, _ ->
             if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
+
                 onCoinsPurchased(quantidade)
             }
         }

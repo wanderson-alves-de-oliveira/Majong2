@@ -5,9 +5,10 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Paint
 import android.graphics.RectF
+import android.util.Log
 import android.util.TypedValue
 import android.view.MotionEvent
-import androidx.compose.ui.graphics.Color
+ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import com.wao.majong.R
 import com.wao.tile.db.BDTile
@@ -311,18 +312,23 @@ class Loja(val context: Context, val gameView: GameView, val w: Int, val h: Int)
 
         }else if (coien1000.btm.liberar > 3) {
             coien1000.btm.liberar = 0
-            gameView.comprar("coins_1000")
-            abrirLoja = false
 
+
+            abrirLoja = false
+            Log.d("GameView", "Adicionando 1000 moedas")
+
+            gameView.comprar("coins_1000")
         }else if (coien5000.btm.liberar > 3) {
             coien5000.btm.liberar = 0
-            gameView.comprar("coins_5000")
             abrirLoja = false
+
+            gameView.comprar("coins_5000")
 
         }else if (coien10000.btm.liberar > 3) {
             coien10000.btm.liberar = 0
-            gameView.comprar("coins_10000")
             abrirLoja = false
+
+            gameView.comprar("coins_10000")
 
 
         }

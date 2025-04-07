@@ -2,8 +2,10 @@ package com.wao.tile
 
 import android.app.Activity
 import android.os.Bundle
+import android.util.Log
 import android.view.WindowManager
 import android.widget.FrameLayout
+
 import com.wao.tile.view.GameView
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
@@ -17,7 +19,6 @@ import com.wao.tile.ferramentas.NotificationScheduler
 class MainActivity : Activity() {
     private lateinit var gameView: GameView
     private lateinit var adView: AdView
-    private  var semanuncio = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,6 +37,28 @@ class MainActivity : Activity() {
 
         val layout = FrameLayout(this)
 
+
+        val gameParams = FrameLayout.LayoutParams(
+            FrameLayout.LayoutParams.MATCH_PARENT,
+            FrameLayout.LayoutParams.WRAP_CONTENT
+        )
+
+        val billingManager = BillingManager(
+            context = this,
+            onCoinsPurchased = { qtd ->
+                Log.d("GameView", "MainActivity $qtd moedas")
+
+                gameView.adicionarMoedas(qtd)
+            },
+            onRemoveAdsPurchased = {
+                // Por exemplo, desativar banner ou rewarded ads
+                gameView.removerAnuncios()
+                layout.removeView(adView)
+            }
+        )
+        gameView = GameView(this, billingManager)
+        layout.addView(gameView, gameParams) // Adiciona o jogo
+
         val adView = AdView(this)
         adView.adUnitId = "ca-app-pub-1070048556704742/5734943336"
         adView.setAdSize(AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(this, 360))
@@ -43,14 +66,6 @@ class MainActivity : Activity() {
 
         val adRequest = AdRequest.Builder().build()
         adView.loadAd(adRequest)
-
-
-
-
-        val gameParams = FrameLayout.LayoutParams(
-            FrameLayout.LayoutParams.MATCH_PARENT,
-            FrameLayout.LayoutParams.WRAP_CONTENT
-        )
         val adParams = FrameLayout.LayoutParams(
             FrameLayout.LayoutParams.MATCH_PARENT,
             FrameLayout.LayoutParams.WRAP_CONTENT
@@ -59,29 +74,14 @@ class MainActivity : Activity() {
         }
         adParams.bottomMargin = 0  // Alinhar ao rodapé
 
+        layout.addView(this.adView, adParams)
 
-        val billingManager = BillingManager(
-            context = this,
-            onCoinsPurchased = { qtd ->
-                gameView.adicionarMoedas(qtd)
-            },
-            onRemoveAdsPurchased = {
-                // Por exemplo, desativar banner ou rewarded ads
-                gameView.removerAnuncios()
-            }
-        )
+
+
 
         if (billingManager.foiComprado("remove_ads")) {
+            layout.removeView(adView)
             gameView.removerAnuncios()
-            semanuncio = true
-        }
-
-
-        gameView = GameView(this, billingManager)
-
-        layout.addView(gameView, gameParams) // Adiciona o jogo
-        if(!semanuncio) {
-            layout.addView(this.adView, adParams)
         }
 
         setContentView(layout)
