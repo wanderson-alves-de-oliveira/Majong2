@@ -283,29 +283,7 @@ class Loja(val context: Context, val gameView: GameView, val w: Int, val h: Int)
         }
 
 
-        if (luzP.btm.liberar > 3) {
-            luzP.btm.liberar = 0
-            base.luz++
-            base.pontos -= 100
-            moedas = base.pontos.toInt()
-            bd.atualizar(base)
-        } else if (imaP.btm.liberar > 3) {
-            imaP.btm.liberar = 0
-            base.ima++
-            base.pontos -= 100
-            moedas = base.pontos.toInt()
-            bd.atualizar(base)
-        } else if (sufleP.btm.liberar > 3) {
-            sufleP.btm.liberar = 0
-            base.sufle++
-            base.pontos -= 100
-            moedas = base.pontos.toInt()
-            bd.atualizar(base)
-        } else if (fecharLoja.liberar > 3) {
-            fecharLoja.liberar = 0
-            atualizar = true
-            abrirLoja = false
-        }else if (semAds.btm.liberar > 3) {
+        if (semAds.btm.liberar > 3) {
             semAds.btm.liberar = 0
 
             gameView.comprar("remove_ads")
@@ -320,7 +298,6 @@ class Loja(val context: Context, val gameView: GameView, val w: Int, val h: Int)
             atualizar = true
 
             abrirLoja = false
-            Log.d("GameView", "Adicionando 1000 moedas")
 
             gameView.comprar("coins_1000")
         }else if (coien5000.btm.liberar > 3) {
@@ -355,7 +332,9 @@ class Loja(val context: Context, val gameView: GameView, val w: Int, val h: Int)
                 )
             ) {
 
-                fecharLoja.animar = true
+                fecharLoja.liberar = 0
+                atualizar = true
+                abrirLoja = false
 
             } else if (semAds.btm.containsTouch(
                     event.x,
@@ -395,7 +374,12 @@ class Loja(val context: Context, val gameView: GameView, val w: Int, val h: Int)
                         event.y
                     )
                 ) {
-                    luzP.btm.animar = true
+                    luzP.btm.liberar = 0
+                    base = bd.buscar()
+                    base.luz++
+                    base.pontos -= 100
+                    moedas = base.pontos.toInt()
+                    bd.atualizar(base)
 
 
                 } else if (imaP.btm.containsTouch(
@@ -403,7 +387,12 @@ class Loja(val context: Context, val gameView: GameView, val w: Int, val h: Int)
                         event.y
                     )
                 ) {
-                    imaP.btm.animar = true
+                    imaP.btm.liberar = 0
+                    base = bd.buscar()
+                    base.ima++
+                    base.pontos -= 100
+                    moedas = base.pontos.toInt()
+                    bd.atualizar(base)
 
 
                 } else if (sufleP.btm.containsTouch(
@@ -411,7 +400,12 @@ class Loja(val context: Context, val gameView: GameView, val w: Int, val h: Int)
                         event.y
                     )
                 ) {
-                    sufleP.btm.animar = true
+                    sufleP.btm.liberar = 0
+                    base = bd.buscar()
+                    base.sufle++
+                    base.pontos -= 100
+                    moedas = base.pontos.toInt()
+                    bd.atualizar(base)
 
 
                 }

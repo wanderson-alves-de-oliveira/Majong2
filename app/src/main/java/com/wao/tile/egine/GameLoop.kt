@@ -90,6 +90,7 @@ class GameLoop(
 
     private val divisor = 3
     private var carrinho = BitmapFactory.decodeResource(context.resources, R.drawable.carrinho)
+    private var noadsP = BitmapFactory.decodeResource(context.resources, R.drawable.noads)
 
     private var coin = BitmapFactory.decodeResource(context.resources, R.drawable.moeda)
     private val coinP = Bitmap.createScaledBitmap(
@@ -112,7 +113,17 @@ class GameLoop(
 
     )
 
+    var noADS = MahjongTile(
+        noadsP,
+        this.context,
+        (w * 0.55f ),
+        h * 0.75f,
+        ((w * 1.0f) / 6).toInt(),
+        ((w * 0.9f) / 6).toInt(),
+        2,
+        2000
 
+    )
     private var lampada = BitmapFactory.decodeResource(context.resources, R.drawable.lampada)
     private var ima = BitmapFactory.decodeResource(context.resources, R.drawable.ima)
     private var giro = BitmapFactory.decodeResource(context.resources, R.drawable.giro)
@@ -139,7 +150,7 @@ class GameLoop(
     private val b3: Bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
 
     private var pontuacaoNova = 0
-    private var score = 0
+    var score = 0
     private var limitar = 7
     private var valorminimo = 300
 
@@ -283,8 +294,23 @@ class GameLoop(
                                 main.draw(this.canvas!!)
 
                                 if (preload >= 100) {
+
+                                    if(!semanuncio){
+
+                                        noADS.draw(canvas!!)
+                                        compraBT.x =  (w * 0.35f )
+                                    }else{
+                                        compraBT.x =  (w * 0.45f )
+
+                                    }
+
+
                                     compraBT.draw(canvas!!)
                                     btm.draw(this.canvas!!)
+
+
+
+
                                 } else {
                                     paint.color = Color.Green.toArgb()
                                     canvas!!.drawRoundRect(
@@ -583,12 +609,7 @@ class GameLoop(
 
                                             compraBT.draw(canvas!!)
 
-//                                            if (compraBT.liberar > 3) {
-//                                                compraBT.liberar = 0
-//
-//                                                lojaWAO.abrirLoja = true
-//
-//                                            }
+
 
 
                                         }
@@ -1041,7 +1062,11 @@ class GameLoop(
                                             //    finalizarFase()
                                             val bd = BDTile(context)
                                             score -= valorminimo
-                                            bd.atualizar(Base(fase, score.toLong()))
+
+                                            val base = bd.buscar()
+                                            base.pontos = score.toLong()
+                                            bd.atualizar(base)
+
 
                                             perdeuL =
                                                 Venceu(this.context, (w), (h), 1)
@@ -1057,10 +1082,11 @@ class GameLoop(
 
 
                                             if (credLuz.btmCoin.liberar > 3 && score >= valorminimo) {
+                                                luzP += 3
+
                                                 posCredito(credLuz)
                                                 credLuz =
                                                     Venceu(this.context, (w), (h), 2)
-                                                luzP += 3
                                                 credLuz.btmCoin.liberar = 0
                                                 creditoRecorsus = false
 
@@ -1081,11 +1107,12 @@ class GameLoop(
 
 
                                             if (credIma.btmCoin.liberar > 3 && score >= valorminimo) {
+                                                imaP += 3
+
                                                 posCredito(credIma)
                                                 Venceu(this.context, (w), (h), 3).also {
                                                     credIma = it
                                                 }
-                                                imaP += 3
                                                 credIma.btmCoin.liberar = 0
                                                 creditoRecorsus = false
 
@@ -1104,10 +1131,11 @@ class GameLoop(
 
 
                                             if (credSufle.btmCoin.liberar > 3 && score >= valorminimo) {
-                                                posCredito(objX)
+                                                sufleP += 3
+                                                posCredito(credSufle)
                                                 credSufle =
                                                     Venceu(this.context, (w), (h), 4)
-                                                sufleP += 3
+
                                                 credSufle.btmCoin.liberar = 0
                                                 creditoRecorsus = false
 
@@ -1219,6 +1247,11 @@ class GameLoop(
                 venceuP.btmCoin.liberar = 0
             }
         }
+
+        val bd = BDTile(context)
+       // val base = bd.buscar()
+        bd.atualizar(Base(fase, score.toLong(), luzP, imaP, sufleP))
+
     }
 
     private fun reviver() {
@@ -1243,7 +1276,12 @@ class GameLoop(
     private fun posCredito(obj: Venceu) {
         val bd = BDTile(context)
         score -= valorminimo
-        bd.atualizar(Base(fase, score.toLong()))
+        val base = bd.buscar()
+        base.pontos = score.toLong()
+        base.luz=luzP
+        base.ima=imaP
+        base.sufle=sufleP
+        bd.atualizar(base)
 
         limparComCredito = true
         obj.btmCoin.liberar = 0
@@ -1256,7 +1294,8 @@ class GameLoop(
         venceu = false
         venceuP = Venceu(this.context, (w), (h), 0)
         val bd = BDTile(context)
-        bd.atualizar(Base(fase, score.toLong(), luzP, imaP, sufleP))
+        val base = bd.buscar()
+        bd.atualizar(Base(fase, score.toLong(), base.luz, base.ima, base.sufle))
 
         ultimaFase = fase
 
@@ -1299,17 +1338,7 @@ class GameLoop(
             }
 
 
-//            var i = 0
-//            while (i < selectedTiles.size) {
-//                val lValue: MahjongTile = selectedTiles[i]
-//                if (listr2.contains(lValue)) {
-//                   // selectedTiles.remove(lValue)
-//                    selectedTiles[i].camada=-6
-//                    i--
-//                    // Adiciona sem erro
-//                }
-//                i++
-//            }
+
 
             avaliar3 = false
         }
@@ -2236,6 +2265,9 @@ class GameLoop(
                                 dica = true
                                 iaJogando()
                                 luzP--
+                                val bd = BDTile(context)
+                                val base = bd.buscar()
+                                bd.atualizar(Base(fase, score.toLong(), luzP, base.ima, base.sufle))
                             } else {
                                 objX = credLuz
                                 creditoRecorsus = true
@@ -2252,6 +2284,9 @@ class GameLoop(
                                 botao2.isSelected = true
                                 limparSelecionados()
                                 imaP--
+                                val bd = BDTile(context)
+                                val base = bd.buscar()
+                                bd.atualizar(Base(fase, score.toLong(), base.luz, imaP, base.sufle))
                             } else if (selectedTiles.isNotEmpty()) {
                                 objX = credIma
                                 creditoRecorsus = true
@@ -2271,6 +2306,10 @@ class GameLoop(
                                 embaralhando = true
                                 embaralha()
                                 sufleP--
+
+                                val bd = BDTile(context)
+                                val base = bd.buscar()
+                                bd.atualizar(Base(fase, score.toLong(), base.luz, base.ima, sufleP))
                             } else {
                                 objX = credSufle
                                 creditoRecorsus = true
@@ -2375,6 +2414,15 @@ class GameLoop(
 
                             lojaWAO.moedas=-2
                             lojaWAO.abrirLoja = true
+
+
+                        }else if (noADS.containsTouch(
+                                event.x,
+                                event.y
+                            ) && !semanuncio
+                        ) {
+
+                           gameView.comprar("remove_ads")
 
 
                         }

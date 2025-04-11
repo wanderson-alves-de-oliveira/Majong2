@@ -5,6 +5,7 @@ package com.wao.tile.ferramentas
 import android.content.Context
 
 import com.android.billingclient.api.*
+import com.wao.tile.db.BDTile
 
 class BillingManager(
     private val context: Context,
@@ -93,6 +94,11 @@ class BillingManager(
                 .build()
             billingClient.acknowledgePurchase(acknowledgeParams) { billingResult ->
                 if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
+
+                    val bd = BDTile(context)
+                    val base = bd.buscar()
+                    base.pontos += 2500
+                    bd.atualizar(base)
                     salvarCompra("remove_ads")
                     onRemoveAdsPurchased()
                 }

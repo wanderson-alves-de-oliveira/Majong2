@@ -21,7 +21,7 @@ class Venceu(
 
     var fase: Int = 0
     var pontos: Int = 0
-    private var valorminimo: Int = 500
+    private var valorminimo: Int = 300
     var semInternet = false
     var internetR = "Sem Internet"
     private val paint = Paint()
@@ -199,6 +199,8 @@ class Venceu(
         } else {
             if (pontos >= valorminimo) {
                 btm.h = (this.h * 0.08).toInt()
+                btm.x = (this.w * 0.55f)
+                btm.xFix = (this.w * 0.55f)
                 btmCoin.h = (this.h * 0.08).toInt()
                 btm.draw(canvas)
                 btmCoin.draw(canvas)

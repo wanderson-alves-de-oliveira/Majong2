@@ -37,7 +37,7 @@ class QuadradoAleatorio {
         val tamNovo = ((w * 0.9f) / 6.5f).toInt()
         val espaco = w * 0.03f
         val h = tamNovo+0
-        //val w = tamNovo+0
+        val w1 = tamNovo+0
 
         for (i in 0 until 6) {
             pY.add(tamNovo.toFloat() * (i + 3))
@@ -148,7 +148,7 @@ class QuadradoAleatorio {
                     context,
                     x,
                     y,
-                    w,
+                    w1,
                     h,
                     camadaP,
                     grau,

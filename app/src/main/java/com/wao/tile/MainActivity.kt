@@ -46,7 +46,6 @@ class MainActivity : Activity() {
         val billingManager = BillingManager(
             context = this,
             onCoinsPurchased = { qtd ->
-                Log.d("GameView", "MainActivity $qtd moedas")
 
                 gameView.adicionarMoedas(qtd)
             },
