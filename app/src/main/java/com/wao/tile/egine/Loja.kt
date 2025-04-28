@@ -24,7 +24,6 @@ class Loja(val context: Context, val gameView: GameView, val w: Int, val h: Int)
     val bd = BDTile(context)
     var base = BDTile(context).buscar()
 
-
     var abrirLoja = false
     var atualizar = false
 
@@ -92,19 +91,34 @@ class Loja(val context: Context, val gameView: GameView, val w: Int, val h: Int)
 
 
     private var semAds =
-        ItemLoja(this.context, noadsP, 0f, h * 0.05f, (w), (h), "No ADS", 1, 9.99f, 1)
+        ItemLoja(this.context, noadsP, 0f, h * 0.05f, (w), (h), "No ADS", 1, "", 1)
     private var coien1000 =
-        ItemLoja(this.context, coin, 0f, h * 0.15f, (w), (h), "Coins", 1000, 1.49f, 0)
+        ItemLoja(this.context, coin, 0f, h * 0.15f, (w), (h), "Coins", 1000,  "", 0)
     private var coien5000 =
-        ItemLoja(this.context, coin5P, 0f, h * 0.25f, (w), (h), "Coins", 5000, 5.49f, 0)
+        ItemLoja(this.context, coin5P, 0f, h * 0.25f, (w), (h), "Coins", 5000,  "", 0)
     private var coien10000 =
-        ItemLoja(this.context, coin10P, 0f, h * 0.35f, (w), (h), "Coins", 10000, 7.49f, 0)
+        ItemLoja(this.context, coin10P, 0f, h * 0.35f, (w), (h), "Coins", 10000,  "", 0)
+   var listaPreco : MutableList<String> = mutableListOf()
+    fun precos(){
+        semAds =
+            ItemLoja(this.context, noadsP, 0f, h * 0.05f, (w), (h), "No ADS", 1, this.listaPreco[3], 1)
+        coien1000 =
+            ItemLoja(this.context, coin, 0f, h * 0.15f, (w), (h), "Coins", 1000,  listaPreco[0], 0)
+        coien5000 =
+            ItemLoja(this.context, coin5P, 0f, h * 0.25f, (w), (h), "Coins", 5000,  listaPreco[2], 0)
 
-    private var luzP = ItemLoja(this.context, imgluzP, 0f, h * 0.45f, (w), (h), "Find", 1, 100f, 2)
+        coien10000 =
+            ItemLoja(this.context, coin10P, 0f, h * 0.35f, (w), (h), "Coins", 10000,  listaPreco[1], 0)
+    }
+
+
+
+
+    private var luzP = ItemLoja(this.context, imgluzP, 0f, h * 0.45f, (w), (h), "Find", 1, "100", 2)
     private var imaP =
-        ItemLoja(this.context, imgimaP, 0f, h * 0.55f, (w), (h), "Magnet", 1, 100f, 2)
+        ItemLoja(this.context, imgimaP, 0f, h * 0.55f, (w), (h), "Magnet", 1, "100", 2)
     private var sufleP =
-        ItemLoja(this.context, imgisufleP, 0f, h * 0.65f, (w), (h), "Shuffle", 1, 100f, 2)
+        ItemLoja(this.context, imgisufleP, 0f, h * 0.65f, (w), (h), "Shuffle", 1, "100", 2)
 
     var fecharLoja = BotaoM(
         this.context,
@@ -415,6 +429,11 @@ class Loja(val context: Context, val gameView: GameView, val w: Int, val h: Int)
 
         }
     }
+
+
+
+
+
 
     fun spToPx(sp: Float): Float {
         return TypedValue.applyDimension(

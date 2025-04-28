@@ -12,7 +12,7 @@ import androidx.compose.ui.graphics.toArgb
 class ItemLoja(
     var context: Context, var img: Bitmap, var x: Float, var y: Float,
     var w: Int,
-    var h: Int, var descri: String, var qtd: Int, var preco: Float, var tipo: Int
+    var h: Int, var descri: String, var qtd: Int, var preco: String, var tipo: Int
 ) {
 
 
@@ -58,7 +58,7 @@ class ItemLoja(
 
 
             paint.color = Color(0xFF673AB7).toArgb()
-            btm.stt = "R$ $preco"
+            btm.stt = preco
 
 
         } else {
@@ -67,13 +67,13 @@ class ItemLoja(
 
 
                     paint.color = Color(0xFFE91E63).toArgb()
-                    btm.stt = "R$ $preco"
+                    btm.stt = preco
                 }
                 2 -> {
 
 
                     paint.color = Color(0xFFFFFFFF).toArgb()
-                    btm.stt = "R$ $preco"
+                    btm.stt = preco
                 }
             }
         }

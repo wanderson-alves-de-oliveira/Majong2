@@ -32,7 +32,10 @@ import kotlinx.coroutines.Dispatchers
 
 @SuppressLint("ViewConstructor")
 @Suppress("DEPRECATION")
-class GameView(context: Context, private val billingManager: BillingManager) : SurfaceView(context),
+class GameView(
+    context: Context,
+    private val billingManager: BillingManager
+) : SurfaceView(context),
     SurfaceHolder.Callback {
     var gameLoop: GameLoop
     private var tiles = mutableListOf<MahjongTile>()
