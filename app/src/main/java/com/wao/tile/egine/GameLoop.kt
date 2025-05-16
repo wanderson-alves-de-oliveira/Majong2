@@ -219,12 +219,9 @@ class GameLoop(
 
     override fun run() {
 
-        while (running) {
-            val now = System.nanoTime()
-            (now - lastTime) / 1_000_000_000.0
+      //  while (running) {
 
-            // Convertendo para segundos
-            lastTime = now
+
             try {
                 update()
 
@@ -238,11 +235,9 @@ class GameLoop(
             render()
             handleInput()
 
-            val sleepTime = optimalTime - (System.nanoTime() - now)
-            if (sleepTime > 0) {
-                sleep(sleepTime / 1_000_000)
-            }
-        }
+
+
+       // }
     }
 
     private var canvas: Canvas? = null
@@ -250,7 +245,9 @@ class GameLoop(
 
 
         while (running) {
-
+            val frameTime = 1000 / 60 // 60 FPS
+            val startTime = System.currentTimeMillis()
+            lastTime = startTime
             //  this.canvas = null
             if (!cLocked) {
                 canvas = this.surfaceHolder.lockCanvas()
@@ -340,7 +337,7 @@ class GameLoop(
                                         paint
                                     )
 
-                                    sleep(250)
+                                  //  sleep(250)
                                     preload += 20
                                 }
 
@@ -627,10 +624,10 @@ class GameLoop(
 
 //////////////////////////////////////////////
 
-                                    runBlocking {
-
-
-                                        launch(Dispatchers.Default) {
+//                                    runBlocking {
+//
+//
+//                                        launch(Dispatchers.Default) {
 
 
                                             if (isTouched || ajustarY || embaralhando || limpando) {
@@ -643,6 +640,8 @@ class GameLoop(
 
                                                 var countEmbaralhar = 0
                                                 //  tiles.forEach {
+
+
                                                 for (itty in 0 until tiles.size) {
 
                                                     val it = tiles[itty]
@@ -671,15 +670,15 @@ class GameLoop(
                                                 }
 
                                                 isTouched = false
-                                                launch(Dispatchers.Default) {
+                                              //  launch(Dispatchers.Default) {
                                                     canvas!!.drawBitmap(b, 0f, 0f, paint)
                                                     //      canvas.drawBitmap(b2, 0f, 0f, paint)
-                                                }
+                                              //  }
 
                                             } else {
                                                 canvas!!.drawBitmap(b, 0f, 0f, paint)
                                                 //  canvas.drawBitmap(b2, 0f, 0f, paint)
-                                                launch(Dispatchers.Default) {
+                                              //  launch(Dispatchers.Default) {
 
                                                     try {
                                                         carregarCamadas()
@@ -689,14 +688,14 @@ class GameLoop(
                                                         //  b2 = bk
                                                     }
 
-                                                }
+                                              //  }
                                             }
 
 
-                                        }
-
-
-                                    }
+//                                        }
+//
+//
+//                                    }
 
 
 //
@@ -1200,6 +1199,11 @@ class GameLoop(
                 toque--
             }
 
+
+            val sleepTime = frameTime - (System.currentTimeMillis() - startTime)
+            if (sleepTime > 0) {
+                Thread.sleep(sleepTime)
+            }
         }
 
     }
@@ -1209,14 +1213,19 @@ class GameLoop(
     private fun adsr() {
         gameView.showRewardedAd(
             onReward = {
-                premiar = true
+             //   premiar = true
+
+             //   if (premiar) {
+                    receberPremio()
+               // }
+
+
             },
             onAdClosed = {
-                if (premiar) {
-                    receberPremio()
-                }
+
                 gameView.recarregarRewardedAd()
             }
+
         )
     }
 
