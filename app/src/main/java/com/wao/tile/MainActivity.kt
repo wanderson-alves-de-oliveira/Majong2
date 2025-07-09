@@ -25,7 +25,7 @@ class MainActivity : Activity() {
     private lateinit var gameView: GameView
     private lateinit var adView: AdView
     private lateinit var billingClient: BillingClient
-    private val productIds = listOf("coins_1000", "coins_5000", "coins_10000",  "remove_ads")
+    private val productIds = listOf("coins_1000", "coins_5000", "coins_10000", "remove_ads")
     var listaPreco = mutableListOf<String>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,7 +41,6 @@ class MainActivity : Activity() {
         NotificationScheduler.scheduleNotification(this)
 
         MobileAds.initialize(this@MainActivity) {}
-       // listaPreco = mutableListOf<String>()
         setupBillingClient()
 
         val layout = FrameLayout(this)
@@ -143,19 +142,20 @@ class MainActivity : Activity() {
 
                     for (product in productDetailsList) {
 
-                        val price = product.oneTimePurchaseOfferDetails?.formattedPrice ?: "Preço não disponível"
+                        val price = product.oneTimePurchaseOfferDetails?.formattedPrice
+                            ?: "Preço não disponível"
 
 
                         listaPreco.add(price)
 
 
                     }
-        if(!listaPreco.isEmpty()){
-            gameView.gameLoop.lojaWAO.listaPreco = listaPreco
-            gameView.gameLoop.lojaWAO.precos()
-        }
+                    if (!listaPreco.isEmpty()) {
+                        gameView.gameLoop.lojaWAO.listaPreco = listaPreco
+                        gameView.gameLoop.lojaWAO.precos()
+                    }
                 }
-            }else{
+            } else {
 
                 for (i in 0 until 4) {
 

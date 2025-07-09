@@ -131,17 +131,8 @@ class MahjongTile(
         val matrix = ColorMatrix()
 
             when (camada) {
-                0 -> {
-                    matrix.set(
-                        floatArrayOf(
-                            0.6f, 0f, 0f, 0f, 0f, // Red
-                            0f, 0.6f, 0f, 0f, 0f, // Green
-                            0f, 0f, 0.6f, 0f, 0f, // Blue
-                            0f, 0f, 0f, 1f, 0f  // Alpha
-                        )
-                    )
-                }
-                1 -> {
+
+                1,0 -> {
                     matrix.set(
                         floatArrayOf(
                             0.8f, 0f, 0f, 0f, 0f, // Red

@@ -12,8 +12,8 @@ android {
         applicationId = "com.wao.majong"
         minSdk = 24
         targetSdk = 35
-        versionCode = 20
-        versionName = "1.20"
+        versionCode = 22
+        versionName = "1.22"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
